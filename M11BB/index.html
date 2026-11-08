@@ -520,12 +520,12 @@ button.wkc:hover{border-color:var(--ink)}
     [2885, "2026-11-01", "3:30 PM", "Aréna Howie-Morenz", "ATT", "TOR", 3, 5],
     [2886, "2026-11-01", "6:30 PM", "Aréna Ahuntsic", "HUR", "BRA", 5, 2],
     [2887, "2026-11-01", "5:00 PM", "Aréna Clément-Jetté", "BUL", "OIL", 2, 4],
-    [2888, "2026-11-07", "11:15 AM", "Centre Étienne-Desmarteau", "BRA", "CHE"],
-    [2889, "2026-11-07", "12:00 PM", "Aréna Chaumont", "PHX", "ETO"],
-    [2890, "2026-11-07", "2:00 PM", "Aréna Marcelin-Wilson", "OIL", "ROC"],
-    [2891, "2026-11-07", "2:00 PM", "Centre Sportif Saint-Charles", "BAR", "HUR"],
-    [2892, "2026-11-07", "3:00 PM", "Aréna Martin-Brodeur", "PIO", "BUL"],
-    [2893, "2026-11-07", "3:00 PM", "Centre Sportif Saint-Charles", "TOR", "ATT"],
+    [2888, "2026-11-07", "11:15 AM", "Centre Étienne-Desmarteau", "BRA", "CHE", 3, 4],
+    [2889, "2026-11-07", "12:00 PM", "Aréna Chaumont", "PHX", "ETO", 0, 6],
+    [2890, "2026-11-07", "2:00 PM", "Aréna Marcelin-Wilson", "OIL", "ROC", 2, 2],
+    [2891, "2026-11-07", "2:00 PM", "Centre Sportif Saint-Charles", "BAR", "HUR", 1, 4],
+    [2892, "2026-11-07", "3:00 PM", "Aréna Martin-Brodeur", "PIO", "BUL", 1, 0],
+    [2893, "2026-11-07", "3:00 PM", "Centre Sportif Saint-Charles", "TOR", "ATT", 2, 3],
     [2894, "2026-11-08", "11:15 AM", "Centre Étienne-Desmarteau", "OIL", "CHE"],
     [2895, "2026-11-08", "12:15 PM", "Centre Étienne-Desmarteau", "ATT", "PIO"],
     [2896, "2026-11-08", "3:30 PM", "Aréna Mont-Royal", "BUL", "PHX"],
@@ -632,7 +632,7 @@ button.wkc:hover{border-color:var(--ink)}
     ROC: "Rocket du Nord", PHX: "Phénix de JSH", BUL: "Bulldogs St-Léonard", BAR: "Barons Élites de l'Est", TOR: "Tornade Villeray", ATT: "Attack H.S.O." };
   var R = {
     OIL: { Carzoli: "Alessio Carzoli", Trevisonno: "Antonio Trevisonno", Orobello: "Anthony Orobello", Sciangula: "Luca Sciangula", Dattoli: "Francesco Dattoli", Desnoyers: "Jacob Desnoyers", Bonaventura: "James Bonaventura", WyldeCruz: "William Wylde Cruz", Leo: "Milan Leo", Mucciarone: "Cristiano Mucciarone", Audet: "Xavier Audet", Gauthier: "Tristan Gauthier" },
-    ETO: { Charest: "Éliott Charest", Sylvain: "Kaelan Sylvain", Guay: "Gabriel Guay", Chouinard: "Zachary Chouinard Labrie", Vallee: "Charles Vallée", LDupuis: "Loralie Dupuis", ZDupuis: "Zachary Dupuis", Fernandez: "Matheo Fernandez", Nolet: "Emile Nolet Gauthier", Cimon: "Zack Cimon", Cabana: "Louis Cabana Lavoie" },
+    ETO: { Charest: "Éliott Charest", Sylvain: "Kaelan Sylvain", Guay: "Gabriel Guay", Chouinard: "Zachary Chouinard Labrie", Vallee: "Charles Vallée", LDupuis: "Loralie Dupuis", ZDupuis: "Zachary Dupuis", Fernandez: "Matheo Fernandez", Nolet: "Emile Nolet Gauthier", Cimon: "Zack Cimon", Metivier: "Jayden Métivier †", Cabana: "Louis Cabana Lavoie" },
     HUR: { Nelson: "Jack Nelson", Garston: "Lukas Garston", Fleiszer: "Solomon Fleiszer", Glen: "Samuel Glen", Chan: "Elliott Chan", Qisiiq: "Markusi Qisiiq", JecA: "Feliks Aleksander Jecz", Wellington: "William Wellington", Duncan: "Rylan Duncan", JecF: "Filip Marcel Jecz", Frechette: "Léo Fréchette", Sauvageau: "Louis Sauvageau", Gagnon: "Theodore Gagnon" },
     CHE: { Bibeau: "Victor Bibeau", TonThat: "Lani Ton-That", Lague: "Arnaud Lague", David: "Julien David", Esquerre: "Novak Esquerré", Lapointe: "Léon Lapointe", Kurilko: "David Kurilko", Aubertin: "Godefroy Aubertin", Dintzner: "Paul Dintzner", Payette: "Adrien Payette", Merette: "Alexis Mérette", Escano: "Liam Escano Vides" },
     PIO: { Legatos: "Memphis Legatos-Lebel", Martel: "Henri Martel", Kearney: "Tom Kearney", Bourque: "Gabriel Bourque", Ducharme: "Louis Ducharme", Grondin: "Markus Grondin", Carette: "Laurent Carette", Lavoie: "Miika Lavoie", Haney: "Elliott Haney", Douville: "Elliott Douville", Brisebois: "Lambert Brisebois †", Lebrun: "Théodore Lebrun", Hijji: "Adam Hijji" },
@@ -776,15 +776,42 @@ button.wkc:hover{border-color:var(--ink)}
     { id: 2900, a: "PIO", h: "HUR", s: [0, 0], d: { PIO: "Legatos Martel Kearney Bourque Ducharme Grondin Lavoie Haney Douville", HUR: HURD },
       g: [],
       p: [["PIO", "Ducharme"], ["PIO", "Haney"], ["HUR", "Frechette"], ["HUR", "Garston"], ["HUR", "Garston"]], k: [["PIO", "Lebrun", 31.4, 0], ["HUR", "Gagnon", 31.4, 0]] }
+    ,
+    { id: 2888, a: "BRA", h: "CHE", s: [3, 4], d: { BRA: BRAD, CHE: CHED },
+      g: [["CHE", "Lapointe", "Lague"], ["CHE", "Lapointe", "TonThat"], ["BRA", "Legare"], ["CHE", "Payette", "David"], ["BRA", "Delisle", "Legare"], ["BRA", "Delisle"], ["CHE", "Payette", "Bibeau"]],
+      p: [["BRA", "Bomhower"], ["BRA", "Moussaoui"], ["CHE", "David"], ["CHE", "Bibeau"]], k: [["BRA", "Pathmasiri", 25.2, 4], ["CHE", "Merette", 26.2, 3]] },
+    { id: 2889, a: "PHX", h: "ETO", s: [0, 6], d: { PHX: PHXD, ETO: "Charest Sylvain Guay Chouinard Vallee LDupuis Fernandez Nolet Cimon Metivier" },
+      g: [["ETO", "LDupuis"], ["ETO", "Fernandez"], ["ETO", "LDupuis", "Charest"], ["ETO", "Guay", "Cimon"], ["ETO", "Fernandez", "LDupuis"], ["ETO", "Sylvain", "Cimon"]],
+      p: [["PHX", "Dallaire"], ["PHX", "Boivin"]], k: [["PHX", "Lessard", 32.0, 6], ["ETO", "Cabana", 32.0, 0]] },
+    { id: 2890, a: "OIL", h: "ROC", s: [2, 2], d: { OIL: OILD, ROC: ROCD },
+      g: [["OIL", "Dattoli", "Leo", "WyldeCruz"], ["OIL", "Desnoyers", "Bonaventura", "Sciangula"], ["ROC", "Greffard", "Cusson"], ["ROC", "Henry", "Caspar"]],
+      p: [["ROC", "Greffard"], ["OIL", ""]], k: [["OIL", "Gauthier", 35.0, 2], ["ROC", "Cannistraro", 35.0, 2]] },
+    { id: 2891, a: "BAR", h: "HUR", s: [1, 4], d: { BAR: BARD, HUR: HURD },
+      g: [["HUR", "Qisiiq", "Garston"], ["HUR", "Garston", "Chan"], ["HUR", "Qisiiq"], ["BAR", "Enea", "Piccirilli", "Gouin"], ["HUR", "Qisiiq"]],
+      p: [["HUR", "Frechette"], ["BAR", "Testa"], ["BAR", "DiFulvio"], ["HUR", "Chan"], ["HUR", "Sauvageau"], ["HUR", "JecF"], ["BAR", "Piccirilli"], ["BAR", "Piccirilli"], ["BAR", "Piccirilli"]], k: [["BAR", "Madi", 27.1, 4], ["HUR", "Gagnon", 27.1, 1]] },
+    { id: 2892, a: "PIO", h: "BUL", s: [1, 0], d: { PIO: "Legatos Martel Kearney Bourque Ducharme Grondin Lavoie Haney Douville", BUL: BULD2 },
+      g: [["PIO", "Ducharme", "Grondin"]],
+      p: [["PIO", "Douville"], ["BUL", "Tosi"], ["BUL", "Sousa"], ["BUL", "Iskizzi"], ["BUL", "Lacroix"]], k: [["PIO", "Hijji", 26.4, 0], ["BUL", "Liu", 26.4, 1]] },
+    { id: 2893, a: "TOR", h: "ATT", s: [2, 3], d: { TOR: "Cote Champalbert NguyenMunoz McNicoll OPoulin Dupras Rahman Wheaton Laroche Luna", ATT: "Zulfugarov Tanguay Maislin Konar Wong Hebert Lauzon Alshalalfah Neron Nantel" },
+      g: [["TOR", "Rahman", "OPoulin", "Wheaton"], ["ATT", "Nantel", "Hebert"], ["ATT", "Zulfugarov"], ["TOR", "McNicoll", "Luna"], ["ATT", "Lauzon", "Maislin", "Konar"]],
+      p: [["TOR", "Cote"], ["TOR", "Cote"], ["ATT", "Tanguay"], ["ATT", "Wong"]], k: [["TOR", "Blais", 29.0, 3], ["ATT", "Requeima", 29.0, 2]] }
   ];
 
   var ORDER = ["CHE", "OIL", "PIO", "BAR", "BRA", "ROC", "HUR", "PHX", "BUL", "TOR", "ATT", "ETO"];
   // official standings, as of the league PDF: GP W T L PTS PTS% GF GA DIFF PIM
   var OFF = {
-    CHE: [8, 6, 1, 1, 21, ".875", 19, 7, 12, 16], OIL: [6, 6, 0, 0, 18, "1.000", 28, 8, 20, 26], BAR: [6, 4, 0, 2, 14, ".778", 19, 6, 13, 24],
-    PIO: [8, 3, 1, 4, 15, ".625", 13, 18, -5, 28], BRA: [7, 3, 0, 4, 13, ".619", 14, 23, -9, 16], ROC: [6, 2, 2, 2, 12, ".667", 13, 9, 4, 12],
-    PHX: [6, 2, 1, 3, 11, ".611", 10, 15, -5, 16], BUL: [7, 2, 0, 5, 11, ".524", 20, 20, 0, 28], TOR: [6, 2, 0, 4, 10, ".556", 12, 30, -18, 16],
-    HUR: [6, 2, 1, 3, 11, ".611", 10, 11, -1, 28], ATT: [6, 1, 0, 5, 8, ".444", 10, 27, -17, 20], ETO: [4, 2, 0, 2, 7, ".583", 15, 9, 6, 42]
+    CHE: [9, 7, 1, 1, 24, ".889", 23, 10, 13, 20],
+    OIL: [7, 6, 1, 0, 20, ".952", 30, 10, 20, 28],
+    BAR: [7, 4, 0, 3, 15, ".714", 20, 10, 10, 34],
+    PIO: [9, 4, 1, 4, 18, ".667", 14, 18, -4, 30],
+    BRA: [8, 3, 0, 5, 14, ".583", 17, 27, -10, 20],
+    ROC: [7, 2, 3, 2, 14, ".667", 15, 11, 4, 14],
+    PHX: [7, 2, 1, 4, 12, ".571", 10, 21, -11, 20],
+    BUL: [8, 2, 0, 6, 12, ".500", 20, 21, -1, 36],
+    TOR: [7, 2, 0, 5, 11, ".524", 14, 33, -19, 20],
+    HUR: [7, 3, 1, 3, 14, ".667", 14, 12, 2, 36],
+    ATT: [7, 2, 0, 5, 11, ".524", 13, 29, -16, 28],
+    ETO: [5, 3, 0, 2, 10, ".667", 21, 9, 12, 42]
   };
   var SHORT = { OIL: "Oilers", ETO: "Étoiles", HUR: "Hurricanes", CHE: "Chevaliers", PIO: "Pionniers", BRA: "Braves", ROC: "Rocket", PHX: "Phénix", BUL: "Bulldogs", BAR: "Barons", TOR: "Tornade", ATT: "Attack" };
   var BADGE = { OIL: "#E2631A", ETO: "#2563A8", HUR: "#B83240", CHE: "#6B4FA3", PIO: "#2F7D5B", BRA: "#1F7F8E", ROC: "#A8730B", PHX: "#B5427A", BUL: "#5C7F1F", BAR: "#3A4FA3", TOR: "#8A4FB0", ATT: "#3F7A7A" };
@@ -840,7 +867,7 @@ button.wkc:hover{border-color:var(--ink)}
     });
   }
   function formChips(t, n) {
-    var rs = results(t).slice(-n);
+    var rs = results(t).slice(-n).reverse();
     return '<span class="form" aria-label="Recent results">' + rs.map(function (x) {
       return '<span class="chip ' + x.r + '" title="' + x.r + " " + x.us + "–" + x.them + (x.home ? " vs " : " at ") + SHORT[x.opp] + '">' + x.r + "</span>";
     }).join("") + "</span>";
@@ -864,7 +891,7 @@ button.wkc:hover{border-color:var(--ink)}
       if (x[1]) skater(x[0], x[1]).g++;
       for (var i = 2; i < x.length; i++) skater(x[0], x[i]).a++;
     });
-    gm.p.forEach(function (x) { if (x[1]) skater(x[0], x[1]).pen++; });
+    gm.p.forEach(function (x) { if (x[1]) skater(x[0], x[1]).pen += 2; });
     [[gm.a, gm.s[0], gm.s[1]], [gm.h, gm.s[1], gm.s[0]]].forEach(function (tt) {
       var played = gm.k.filter(function (x) { return x[0] === tt[0] && x[2] > 0; });
       played.forEach(function (x) {
@@ -904,7 +931,7 @@ button.wkc:hover{border-color:var(--ink)}
       var day = DOW[pd(g.date).getDay()] + " · " + g.time;
       var wp = g.played ? null : winProb(g.a, g.h);
       var line = function (t, sc, win) { var pc = wp ? (t === g.a ? wp.a : wp.h) : 0, fav = wp && pc === Math.max(wp.a, wp.h) && wp.a !== wp.h; return '<span class="wkl' + (mine(t) ? " mine" : "") + (g.played && !win ? " lose" : "") + '">' + badge(t).replace(/alt="[^"]*"/, 'alt=""') + "<b>" + esc(SHORT[t]) + "</b>" + (g.played ? "<i>" + sc + "</i>" : '<em class="wpc' + (fav ? " fav" : "") + '" title="Win probability">' + pc + "%</em>") + "</span>"; };
-      var inner = '<span class="wkd">' + day + "</span>" + (g.played ? "" : '<span class="wph">Win prediction</span>') + line(g.a, g.sa, g.sa >= g.sh) + line(g.h, g.sh, g.sh >= g.sa);
+      var inner = '<span class="wkd">' + day + "</span>" + (g.played ? "" : '<span class="wph">Win probability</span>') + line(g.a, g.sa, g.sa >= g.sh) + line(g.h, g.sh, g.sh >= g.sa);
       return g.played ? '<div class="wkc done">' + inner + '<span class="wkf">Final</span></div>' : '<button class="wkc" data-open="' + g.id + '" aria-label="' + esc(SHORT[g.a]) + ' at ' + esc(SHORT[g.h]) + ', win probability ' + wp.a + ' to ' + wp.h + ' percent, tie ' + wp.t + ' percent">' + inner + '<span class="wkf">Tie ' + wp.t + '% · Preview →</span></button>';
     }).join("");
     return '<div class="wk"><div class="wkh"><h3>This weekend</h3><span>' + dlong(w[0]) + " – " + dlong(w[1]) + " · " + list.length + " game" + (list.length === 1 ? "" : "s") + (state.team === "ALL" ? "" : " for " + esc(SHORT[state.team])) + '</span></div><div class="wkrow">' + cards + "</div></div>";
@@ -916,7 +943,7 @@ button.wkc:hover{border-color:var(--ink)}
     return '<span class="wkl' + (g.played && !win ? " lose" : "") + '">' + badge(t) + '<b data-tp="' + t + '">' + esc(SHORT[t]) + "</b>" + pc + "</span>";
   }
   function homeGame(g) {
-    var inner = '<span class="hd">' + (g.played ? dshort(g.date) : dshort(g.date)) + "<small>" + (g.played ? "Final" : g.time) + '</small></span><span class="hls">' + (g.played ? "" : '<span class="wph">Win prediction</span>') + hLine(g, g.a, g.sa >= g.sh) + hLine(g, g.h, g.sh >= g.sa) + "</span>";
+    var inner = '<span class="hd">' + (g.played ? dshort(g.date) : dshort(g.date)) + "<small>" + (g.played ? "Final" : g.time) + '</small></span><span class="hls">' + (g.played ? "" : '<span class="wph">Win probability</span>') + hLine(g, g.a, g.sa >= g.sh) + hLine(g, g.h, g.sh >= g.sa) + "</span>";
     return g.played ? '<div class="hg">' + inner + "</div>" : '<button class="hg" data-open="' + g.id + '">' + inner + "</button>";
   }
   function renderHome() {
@@ -967,7 +994,7 @@ button.wkc:hover{border-color:var(--ink)}
       var s = ST[t];
       return '<tr class="' + (mine(t) ? "me" : "") + '"><td class="rk num">' + s.rank + '</td><td class="l stick"><button class="teamlink" data-team="' + t + '">' + tname(t) + "</button></td>" +
         "<td>" + s.gp + "</td><td>" + s.w + "</td><td>" + s.tie + "</td><td>" + s.l + '</td><td class="strong">' + s.pts + "</td><td>" + s.pct + '<span class="pctbar"><i style="width:' + Math.round(parseFloat(s.pct) * 100) + '%"></i></span></td>' +
-        "<td>" + s.gf + "</td><td>" + s.ga + "</td><td>" + (s.diff > 0 ? "+" : "") + s.diff + "</td><td>" + s.pim + "</td><td>" + remaining(t) + '</td><td class="l">' + formChips(t, 5) + "</td></tr>";
+        "<td>" + s.gf + "</td><td>" + s.ga + "</td><td>" + (s.diff > 0 ? "+" : "") + s.diff + "</td><td>" + s.pim + "</td><td class=\"l\">" + formChips(t, 5) + "</td></tr>";
     }).join("");
     $("p-standings").innerHTML =
       '<div class="sec-head"><div><h2>Standings</h2><p class="lede">League table through ' + dlong(LAST) + ". Tap a team to open its profile.</p></div></div>" +
@@ -977,8 +1004,8 @@ button.wkc:hover{border-color:var(--ink)}
       tile("Top of the table", esc(SHORT[lead.t]), lead.pts + " PTS in " + lead.gp + " games") +
       tile("Best offence", esc(SHORT[bestBy("gfg", true)]), f2(ST[bestBy("gfg", true)].gfg) + " goals per game") + "</div>" +
       '<div class="mob">' + mobS + condensed + '<p class="mfoot">PTS% is points percentage, the fairer comparison when teams have played different numbers of games. Tap a team to open its profile.</p></div>' +
-      '<div class="card desk"><div class="wrap"><table><thead><tr><th class="rk">#</th><th class="l stick">Team</th><th title="Games played">GP</th><th title="Wins">W</th><th title="Ties">T</th><th title="Losses">L</th><th title="Points">PTS</th><th title="Points percentage">PTS%</th><th title="Goals for">GF</th><th title="Goals against">GA</th><th title="Goal difference">DIFF</th><th title="Penalty minutes">PIM</th><th title="Games remaining">GR</th><th class="l">Last 5</th></tr></thead><tbody>' + body + "</tbody></table></div>" +
-      '<p class="note">GR is games remaining on the schedule. Teams have played different numbers of games, so PTS% is the fairer comparison.</p></div></div>';
+      '<div class="card desk"><div class="wrap"><table><thead><tr><th class="rk">#</th><th class="l stick">Team</th><th title="Games played">GP</th><th title="Wins">W</th><th title="Ties">T</th><th title="Losses">L</th><th title="Points">PTS</th><th title="Points percentage">PTS%</th><th title="Goals for">GF</th><th title="Goals against">GA</th><th title="Goal difference">DIFF</th><th title="Penalty minutes">PIM</th><th class="l">Last 5</th></tr></thead><tbody>' + body + "</tbody></table></div>" +
+      '</div></div>';
     $("p-standings").insertAdjacentHTML("beforeend", recapsHTML());
   }
   /* ---------- game recaps (generated from the game sheets) ---------- */
@@ -1043,7 +1070,7 @@ button.wkc:hover{border-color:var(--ink)}
     return '<div class="' + cls + '">' + tname(t) + (g.played ? '<span class="sc">' + sc + "</span>" : pc) + "</div>";
   }
   function gameInner(g, sheet) {
-    return '<div class="gtime"><b>' + g.time + "</b><span>#" + g.id + '</span></div><div class="gteams">' + (g.played ? "" : '<div class="wph">Win prediction</div>') + teamLine(g, "a") + teamLine(g, "h") + '</div><div class="gmeta"><span>' + esc(g.venue) + "</span>" +
+    return '<div class="gtime"><b>' + g.time + "</b><span>#" + g.id + '</span></div><div class="gteams">' + (g.played ? "" : '<div class="wph">Win probability</div>') + teamLine(g, "a") + teamLine(g, "h") + '</div><div class="gmeta"><span>' + esc(g.venue) + "</span>" +
       (g.played ? '<span><span class="final">Final</span>' + (sheet ? ' · <span class="more">Scoring summary</span>' : "") + "</span>" : '<span><span class="more">Matchup preview</span></span>') + "</div>";
   }
   function goalList(sh, t) {
@@ -1057,7 +1084,7 @@ button.wkc:hover{border-color:var(--ink)}
     var gl = sh.k.filter(function (x) { return x[2] > 0; }).map(function (x) { return esc(nm(x[0], x[1])) + " (" + SHORT[x[0]] + ", " + f1(x[2]) + " min, " + x[3] + " GA)"; }).join(" · ");
     var pa = sh.p.filter(function (x) { return x[0] === g.a; }).length, ph = sh.p.filter(function (x) { return x[0] === g.h; }).length;
     return '<div class="gdetail">' + recapBlock(g) + '<div><h4>' + esc(TEAMS[g.a]) + " goals</h4><ul>" + goalList(sh, g.a) + "</ul></div><div><h4>" + esc(TEAMS[g.h]) + " goals</h4><ul>" + goalList(sh, g.h) + "</ul></div>" +
-      '<div class="gfoot"><span>Goalies: ' + gl + "</span><span>Penalties: " + SHORT[g.a] + " " + pa + ", " + SHORT[g.h] + " " + ph + "</span></div></div>";
+      '<div class="gfoot"><span>Goalies: ' + gl + "</span><span>PIM: " + SHORT[g.a] + " " + pa * 2 + ", " + SHORT[g.h] + " " + ph * 2 + "</span></div></div>";
   }
   function isoOf(d) { return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
   function mlabel(k) { return k === TBD_DATE.slice(0, 7) ? "TBD" : MONTH[+k.slice(5) - 1] + (k.slice(0, 4) === "2027" ? " 2027" : ""); }
@@ -1117,7 +1144,7 @@ button.wkc:hover{border-color:var(--ink)}
     var names = who.slice(0, 3).map(function (r) { return esc(r.name) + (all ? " (" + r.team + ")" : ""); }).join(", ") + (who.length > 3 ? " +" + (who.length - 3) : "");
     return tile(label, m, names);
   }
-  var MSORT = { skaters: [["pts", "Points", -1], ["g", "Goals", -1], ["a", "Assists", -1], ["ppg", "Points per game", -1], ["pen", "Penalties", -1]], goalies: [["gaa", "Best GAA", 1], ["w", "Wins", -1], ["so", "Shutouts", -1], ["gp", "Games played", -1]] };
+  var MSORT = { skaters: [["pts", "Points", -1], ["g", "Goals", -1], ["a", "Assists", -1], ["ppg", "Points per game", -1], ["pen", "PIM", -1]], goalies: [["gaa", "Best GAA", 1], ["w", "Wins", -1], ["so", "Shutouts", -1], ["gp", "Games played", -1]] };
   function msortCtl(cfg) {
     var opts = MSORT[state.ptab], cur = opts.some(function (o) { return o[0] === cfg.key; }) ? cfg.key : opts[0][0];
     return '<div class="mtools"><select id="msort" aria-label="Sort by">' + opts.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === cur ? " selected" : "") + ">Sort: " + o[1] + "</option>"; }).join("") + "</select></div>";
@@ -1130,7 +1157,7 @@ button.wkc:hover{border-color:var(--ink)}
       ["Points", sks, "pts", function (a, b) { return b.g - a.g; }, ""],
       ["Goals", sks, "g", function (a, b) { return b.pts - a.pts; }, ""],
       ["Assists", sks, "a", function (a, b) { return b.pts - a.pts; }, ""],
-      ["Penalties", sks, "pen", function (a, b) { return a.name.localeCompare(b.name); }, " pen"],
+      ["PIM", sks, "pen", function (a, b) { return a.name.localeCompare(b.name); }, " min"],
       ["Goalie wins", gks, "w", function (a, b) { return b.gp - a.gp; }, " pen"]
     ];
     var cards = defs.map(function (d, di) {
@@ -1140,7 +1167,7 @@ button.wkc:hover{border-color:var(--ink)}
         return '<li><span class="lrk">' + (i + 1) + '</span><span class="ln">' + esc(r.name) + (all ? " " + badgeC(r.team) : "") + (di === 0 ? ' <small class="lsub">' + r.g + "G " + r.a + "A</small>" : "") + '</span><b class="lv">' + r[d[2]] + '</b>' + (di === 0 ? '<span class="lbar" aria-hidden="true"><i class="sg" style="width:' + (r.g / mx * 100).toFixed(1) + '%"></i><i class="sa" style="width:' + (r.a / mx * 100).toFixed(1) + '%"></i></span></li>' : '<span class="lbar" aria-hidden="true"><i class="' + (di === 3 ? "h" : "") + '" style="width:' + Math.max(4, Math.round(r[d[2]] / mx * 100)) + '%"></i></span></li>');
       }).join("") || '<li class="lnone">No data yet</li>') + "</ol></div>";
     }).join("");
-    return '<div><h3 style="margin:8px 0 12px">Top 8 leaders · ' + (all ? "All 12 teams" : esc(TEAMS[state.team])) + '</h3><div class="lgrid">' + cards + '</div><p class="mfoot" style="margin-top:10px">Penalties counts calls, not minutes. Goalie wins are credited when one goalie played the whole game.</p></div>';
+    return '<div><h3 style="margin:8px 0 12px">Top 8 leaders · ' + (all ? "All 12 teams" : esc(TEAMS[state.team])) + '</h3><div class="lgrid">' + cards + '</div><p class="mfoot" style="margin-top:10px">PIM assumes 2 minutes per penalty. Goalie wins are credited when one goalie played the whole game.</p></div>';
   }
   function renderPlayers() {
     var all = state.team === "ALL", out = "";
@@ -1149,7 +1176,7 @@ button.wkc:hover{border-color:var(--ink)}
     var scope = all ? "All 12 teams" : esc(TEAMS[state.team]);
     if (state.ptab === "skaters") {
       var rows = filt(SK), cfg = state.sk;
-      var cols = [["rank", "#", "rk"], ["name", "Player", "l stick"]].concat(all ? [["team", "Team", "l"]] : []).concat([["gp", "GP"], ["g", "G"], ["a", "A"], ["pts", "PTS"], ["ppg", "P/GP"], ["pen", "PEN"]]);
+      var cols = [["rank", "#", "rk"], ["name", "Player", "l stick"]].concat(all ? [["team", "Team", "l"]] : []).concat([["gp", "GP"], ["g", "G"], ["a", "A"], ["pts", "PTS"], ["ppg", "P/GP"], ["pen", "PIM"]]);
       var sorted = sortRows(rows, cfg.key === "rank" ? { key: "pts", dir: -1 } : cfg, function (x, y) { return y.pts - x.pts || y.g - x.g || x.name.localeCompare(y.name); });
       var body = sorted.slice(0, state.pm).map(function (r, i) {
         return '<tr class="' + (mine(r.team) && all ? "me" : "") + '"><td class="rk num">' + (i + 1) + '</td><td class="l strong stick">' + esc(r.name) + "</td>" + (all ? '<td class="l">' + tname(r.team) + "</td>" : "") +
@@ -1162,7 +1189,7 @@ button.wkc:hover{border-color:var(--ink)}
       }).join("") + (sorted.length ? "" : '<p class="empty">No players match.</p>') + moreBtn(sorted.length);
       out = '<div class="tiles">' + leaderTile(rows, "pts", "Points leader", all) + leaderTile(rows, "g", "Goals leader", all) + leaderTile(rows, "a", "Assists leader", all) + leaderTile(GK.filter(function (r) { return state.team === "ALL" || r.team === state.team; }), "w", "Goalie wins", all) + "</div>" +
         '<div class="mob">' + mobSk + '</div><div class="card desk"><div class="wrap"><table>' + head(cols, cfg.key === "rank" ? { key: "pts", dir: -1 } : cfg) + "<tbody>" + (body || '<tr><td class="empty" colspan="10">No players match.</td></tr>') + "</tbody></table></div>" +
-        '<div class="morerow">' + moreBtn(sorted.length) + '</div><p class="note">Tap a column to sort. PEN counts penalties, not minutes. GP counts games a player appears on the sheet.</p></div>';
+        '<div class="morerow">' + moreBtn(sorted.length) + '</div><p class="note">Tap a column to sort. PIM assumes 2 minutes per penalty. GP counts games a player appears on the sheet.</p></div>';
     } else {
       var grows = filt(GK), gc = state.gk;
       var gcols = [["rank", "#", "rk"], ["name", "Goalie", "l stick"]].concat(all ? [["team", "Team", "l"]] : []).concat([["gp", "GP"], ["w", "W"], ["l", "L"], ["t", "T"], ["min", "MIN"], ["ga", "GA"], ["gaa", "GAA"], ["so", "SO"]]);
@@ -1184,7 +1211,7 @@ button.wkc:hover{border-color:var(--ink)}
         '<div class="morerow">' + moreBtn(gs.length) + '</div><p class="note">GAA is goals against per 60 minutes in net. W, L and T are credited when one goalie played the whole game. Sheets do not record shots, so there is no save percentage.</p></div>';
     }
     var focusQ = document.activeElement && document.activeElement.id === "q";
-    $("p-players").innerHTML = '<div class="sec-head"><div><h2>Players</h2><p class="lede">' + scope + ". Counted from " + G.length + " of the " + PLAYED.length + " games played" + (G.length < PLAYED.length ? "." : ", every game so far.") + "</p></div></div>" +
+    $("p-players").innerHTML = '<div class="sec-head"><div><h2>Players</h2></div></div>' +
       '<div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">' + tools + out + leadersHTML() + "</div>";
     if (focusQ) { var el = $("q"); el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
   }
@@ -1211,10 +1238,10 @@ button.wkc:hover{border-color:var(--ink)}
       '<div class="thr">' + (ng ? '<span class="sub">Next game</span><b>' + when(ng) + "</b><span>" + (ng.h === t ? "vs " + esc(TEAMS[ng.a]) : "at " + esc(TEAMS[ng.h])) + '</span><button class="btn pri" data-open="' + ng.id + '">Matchup preview</button>' : "") +
       '<button class="btn" data-allteams="1">All teams</button></div></div>';
     var tiles = '<div class="tiles">' + tile("Points %", s.pct, ord(RK.pctn[t]) + " in the conference") + tile("Goals for / GP", f2(s.gfg), ord(RK.gfg[t]) + " · " + s.gf + " total") + tile("Goals against / GP", f2(s.gag), ord(RK.gag[t]) + " fewest · " + s.ga + " total") +
-      tile("Home record", hr, "W-T-L") + tile("Away record", ar, "W-T-L") + tile("Penalties / GP", f1(s.pimg), ord(RK.pimg[t]) + " fewest · " + s.pim + " min") + "</div>";
+      tile("Home record", hr, "W-T-L") + tile("Away record", ar, "W-T-L") + tile("PIM / GP", f1(s.pimg), ord(RK.pimg[t]) + " fewest · " + s.pim + " min") + "</div>";
     var sks = SK.filter(function (r) { return r.team === t; }).sort(function (a, b) { return b.pts - a.pts || b.g - a.g || a.name.localeCompare(b.name); });
     var gks = GK.filter(function (r) { return r.team === t; }).sort(function (a, b) { return b.min - a.min; });
-    var skT = '<div class="card"><div class="wrap"><table class="rt"><thead><tr><th class="l stick">Skater</th><th>GP</th><th>G</th><th>A</th><th>PTS</th><th>P/GP</th><th>PEN</th></tr></thead><tbody>' + sks.map(function (r) {
+    var skT = '<div class="card"><div class="wrap"><table class="rt"><thead><tr><th class="l stick">Skater</th><th>GP</th><th>G</th><th>A</th><th>PTS</th><th>P/GP</th><th>PIM</th></tr></thead><tbody>' + sks.map(function (r) {
       return '<tr><td class="l strong stick">' + esc(r.name) + "</td><td>" + r.gp + "</td><td>" + r.g + "</td><td>" + r.a + '</td><td class="strong">' + r.pts + "</td><td>" + f2(r.ppg) + "</td><td>" + r.pen + "</td></tr>";
     }).join("") + "</tbody></table></div></div>";
     var gkT = '<div class="card"><div class="wrap"><table class="rt"><thead><tr><th class="l stick">Goalie</th><th>GP</th><th>W-L-T</th><th>MIN</th><th>GA</th><th>GAA</th><th>SO</th></tr></thead><tbody>' + gks.map(function (r) {
@@ -1228,7 +1255,7 @@ button.wkc:hover{border-color:var(--ink)}
       return '<div class="trow up"><span class="tdt">' + dshort(g.date) + (g.time === "TBD" ? "" : "<small>" + g.time + "</small>") + '</span><span class="to">' + (home ? "vs " : "at ") + tname(opp) + "<small>" + esc(g.venue) + '</small></span><button class="btn" data-open="' + g.id + '">Preview</button></div>';
     }).join("") || '<p class="empty">No games left on the schedule.</p>';
     el.innerHTML = head + '<div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">' + tiles +
-      '<div class="tgrid"><div class="tcol"><h3>Skaters</h3>' + skT + "<h3>Goalies</h3>" + gkT + '<p class="mfoot">Counted from game sheets. PEN counts penalties, not minutes.</p></div>' +
+      '<div class="tgrid"><div class="tcol"><h3>Skaters</h3>' + skT + "<h3>Goalies</h3>" + gkT + '<p class="mfoot">Counted from game sheets. PIM assumes 2 minutes per penalty.</p></div>' +
       '<div class="tcol"><h3>Results</h3><div class="card tlist">' + resL + "</div><h3>Upcoming</h3><div class=\"card tlist\">" + upL + "</div></div></div></div>";
   }
 
