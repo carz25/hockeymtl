@@ -26,7 +26,7 @@
   document.body.classList.add(OFFICIAL ? "st-off" : "st-sheet");
   if (MULTI) document.body.classList.add("multi");
   document.body.insertAdjacentHTML("afterbegin",
-    '\n<div class="hdr">\n<header class="top">\n  <div class="in brand">' + (L.logo || "") + "<h1>" + L.title + " <span>" + L.subtitle + "</span></h1>" +
+    '\n<div class="hdr">\n<header class="top">\n  <div class="in brand">' + (L.logo ? '<a class="home" href="' + (L.homeUrl || "https://hockeymtl.ca/") + '" aria-label="Hockey MTL home" title="Hockey MTL home">' + L.logo + "</a>" : "") + "<h1>" + L.title + " <span>" + L.subtitle + "</span></h1>" +
     (MULTI ? '<select id="divsel" class="divsel" aria-label="Filter by division"></select>' : "") + "</div>\n</header>\n" +
     '<nav class="nav" aria-label="Sections">\n  <div class="in">\n    <div class="tabs">\n' +
     '      <a href="#home" data-tab="home">Home</a>\n      <a href="#standings" data-tab="standings">Standings</a>\n      <a href="#players" data-tab="players">Players</a>\n' +
