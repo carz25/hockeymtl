@@ -3,6 +3,7 @@
 :root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
 /* Layout: dark scoreboard header + sticky tab bar, light data panels below. Rows read like a rink-side scoreboard: two team lines per game, tabular numerals. */
 :root{
+  --tab-on:#7DD3FC; /* selected tab and the bar under the tabs */
   --bg:#EDF1F5; --card:#FFFFFF; --soft:#F4F7FA; --ink:#0F1B2A; --mute:#425267; --rule:#D5DEE8;
   --head:#0C1A2C; --head-ink:#F2F6FA; --head-mute:#AABCD0; --head-rule:#1E3250;
   --accent:#C8202F; --accent-soft:#FBE7E9; --follow:#FFF2E6; --follow-bar:#F26A1B;
@@ -40,12 +41,12 @@ a{color:inherit}
 .m .brand{gap:10px}
 h1{font-family:var(--display);font-weight:800;font-size:clamp(26px,4.4vw,44px);line-height:1;letter-spacing:.02em;text-transform:uppercase;margin:0;white-space:nowrap}
 h1 span{color:var(--head-mute);font-size:calc(1em - 20pt)}
-.nav{background:var(--head);border-bottom:3px solid var(--accent)}
+.nav{background:var(--head);border-bottom:3px solid var(--tab-on)}
 .nav .in{display:flex;gap:16px;align-items:center}
 .tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;min-width:0}
 .nav a{font-family:var(--display);font-weight:600;font-size:18px;letter-spacing:.07em;text-transform:uppercase;text-decoration:none;color:var(--head-ink);font-weight:800;padding:8px 16px 6px;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-3px;border-radius:4px 4px 0 0}
 .nav a:hover{background:rgba(255,255,255,.08)}
-.nav a[aria-current="page"]{color:#fff;background:var(--accent);border-bottom-color:var(--accent)}
+.nav a[aria-current="page"]{color:var(--tab-on);border-bottom-color:var(--tab-on)}
 
 main{padding-block:24px 8px;display:flex;flex-direction:column;gap:20px}
 h2{font-family:var(--display);font-weight:800;font-size:30px;letter-spacing:.02em;text-transform:uppercase;line-height:1;margin:0}
@@ -257,7 +258,7 @@ footer p{margin:0;max-width:90ch}
 .m .mc>summary{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
 .m .mmid{grid-column:1/-1;grid-row:1;flex-direction:row;gap:10px;justify-content:center}
 .m .mteam.h{align-items:flex-start;text-align:left}
-.m .nav a{flex:1 1 auto;text-align:center;font-size:17px;letter-spacing:0;padding:9px 2px 7px}
+.m .nav a{flex:1 1 auto;text-align:center;font-size:15px;letter-spacing:0;padding:9px 2px 7px}
 .m .hg{grid-template-columns:78px minmax(0,1fr);gap:10px;padding:10px}
 .m .pfgrid{grid-template-columns:minmax(0,1fr)}
 .sc{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:2px 12px;align-items:center}
