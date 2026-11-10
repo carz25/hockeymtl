@@ -43,9 +43,9 @@ h1 span{color:var(--head-mute);font-size:calc(1em - 20pt)}
 .nav{background:var(--head);border-bottom:3px solid var(--accent)}
 .nav .in{display:flex;gap:16px;align-items:center}
 .tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;min-width:0}
-.nav a{font-family:var(--display);font-weight:600;font-size:18px;letter-spacing:.07em;text-transform:uppercase;text-decoration:none;color:var(--head-mute);padding:8px 16px 6px;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-3px}
-.nav a:hover{color:var(--head-ink)}
-.nav a[aria-current="page"]{color:var(--head-ink);border-bottom-color:var(--head-ink)}
+.nav a{font-family:var(--display);font-weight:600;font-size:18px;letter-spacing:.07em;text-transform:uppercase;text-decoration:none;color:var(--head-ink);font-weight:800;padding:8px 16px 6px;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-3px;border-radius:4px 4px 0 0}
+.nav a:hover{background:rgba(255,255,255,.08)}
+.nav a[aria-current="page"]{color:#fff;background:var(--accent);border-bottom-color:var(--accent)}
 
 main{padding-block:24px 8px;display:flex;flex-direction:column;gap:20px}
 h2{font-family:var(--display);font-weight:800;font-size:30px;letter-spacing:.02em;text-transform:uppercase;line-height:1;margin:0}
@@ -243,7 +243,7 @@ footer p{margin:0;max-width:90ch}
 .m h1{font-size:24px;line-height:1}
 .m h1 span{display:inline;font-size:12px;letter-spacing:.05em;margin-left:4px}
 .m .nav .in{padding-left:0;padding-right:0;max-width:none;flex-wrap:wrap;gap:0}
-.m .tabs{width:100%;overflow:visible;gap:0}
+.m .tabs{width:100%;overflow-x:auto;gap:0}
 .m main{gap:16px}
 .m h2{font-size:28px}
 .m .tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
@@ -257,7 +257,7 @@ footer p{margin:0;max-width:90ch}
 .m .mc>summary{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
 .m .mmid{grid-column:1/-1;grid-row:1;flex-direction:row;gap:10px;justify-content:center}
 .m .mteam.h{align-items:flex-start;text-align:left}
-.m .nav a{flex:1 1 auto;text-align:center;font-size:12px;letter-spacing:0;padding:9px 2px 7px}
+.m .nav a{flex:1 1 auto;text-align:center;font-size:17px;letter-spacing:0;padding:9px 2px 7px}
 .m .hg{grid-template-columns:78px minmax(0,1fr);gap:10px;padding:10px}
 .m .pfgrid{grid-template-columns:minmax(0,1fr)}
 .sc{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:2px 12px;align-items:center}
@@ -449,10 +449,11 @@ td.pts{font-size:17px}
 .pc .pst .sm{font-size:12px;align-self:center}
 .pc .pst b{color:var(--ink);font-weight:600}
 .m .tools{flex-wrap:wrap}.m .tools .search{flex:1 1 0;min-width:0;max-width:none}.m .tools .advbtn{flex:none;width:auto;font-size:12px;padding:6px 10px;min-height:38px}
-@media (prefers-reduced-motion:no-preference){.nav a{transition:color .15s}}
+@media (prefers-reduced-motion:no-preference){.nav a{transition:color .15s,background-color .15s}}
 
 /* ---- leagues whose player stats are counted from game sheets (LEAGUE.stats = "sheets") ---- */
 .st-sheet table.pt col.nu{width:58px}
 .st-sheet .card .wrap:has(table.pt){overflow-x:hidden}
 @media (max-width:1000px){.st-sheet table.pt col.nu{width:50px}}
 th.adv,td.adv{background:color-mix(in srgb,var(--rule) 18%,transparent)}
+.brand .home{display:flex;flex:none;border-radius:50%}
