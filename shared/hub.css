@@ -203,7 +203,6 @@ th.grp,td.grp{border-left:1px solid var(--rule)}
 .multi .brand{flex-wrap:wrap}
 .divsel{margin-left:auto;font:inherit;font-size:13px;color:#fff;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:7px 10px;min-width:0;max-width:100%;cursor:pointer}
 .divsel option{color:#111;background:#fff}
-.m.multi .brand h1 span{display:none}
 .m .divsel{max-width:52%}
 .multi .brand .puck{width:56px;height:56px;flex:none}
 .m.multi .brand .puck{width:48px;height:48px}
