@@ -539,7 +539,7 @@ td.pts{font-size:17px}
     SDN: [14, 5, 7, 2, 31, ".554", 50, 64, -14, 88, 5, 0, 14, false],
     SMI: [12, 6, 5, 1, 28, ".583", 42, 42, 0, 127, 5, 1, 10, false],
     CBL: [11, 4, 6, 1, 19, ".432", 30, 42, -12, 118, 3, 1, 7, false],
-    PLA: [13, 1, 10, 2, 0, "–", 21, 58, -37, 18, 0, 1, 0, true]
+    PLA: [13, 1, 10, 2, 15, ".288", 21, 58, -37, 152, 0, 1, 11, false]
   };
   var SCHED = [
     [1322, "2026-09-12", "11:30 AM", "Aréna Municipal (Glace 1) - Boisbriand, QC", "SEN", "SMI", 4, 2],
@@ -1106,7 +1106,7 @@ td.pts{font-size:17px}
       var body = d.teams.map(function (t) {
         var s = ST[t];
         return '<tr class="' + (mine(t) ? "me" : "") + '"><td class="rk num">' + s.rank + '</td><td class="l stick"><button class="teamlink" data-team="' + t + '">' + tname(t) + "</button></td>" +
-          "<td>" + s.gp + "</td><td>" + s.w + "</td><td>" + s.l + "</td><td>" + s.otl + '</td><td class="strong">' + dash(s, s.pts) + "</td><td>" + s.pct + (s.pend ? "" : '<span class="pctbar"><i style="width:' + Math.round(s.pctn * 100) + '%"></i></span>') + "</td>" +
+          "<td>" + s.gp + "</td><td>" + s.w + "</td><td>" + s.l + "</td><td>" + s.otl + '</td><td class="strong">' + dash(s, s.pts) + "</td><td>" + s.pct + "</td>" +
           "<td>" + s.gf + "</td><td>" + s.ga + "</td><td>" + sgn(s) + "</td><td>" + dash(s, s.pim) + "</td><td>" + s.rw + "</td><td>" + dash(s, s.sp) + '</td><td class="l">' + formChips(t, 5) + "</td></tr>";
       }).join("");
       return '<h3 class="divh">' + esc(d.name) + '</h3><div class="card"><div class="wrap"><table><thead><tr><th class="rk">#</th><th class="l stick">Team</th><th title="Games played">GP</th><th title="Wins, all kinds">W</th><th title="Regulation losses">L</th><th title="Overtime and shootout losses">OTL</th><th title="Points">PTS</th><th title="Points percentage, PTS out of 4 per game">PTS%</th><th title="Goals for">GF</th><th title="Goals against">GA</th><th title="Goal difference">DIFF</th><th title="Penalty minutes">PIM</th><th title="Regulation wins">RW</th><th title="Sportsmanship points, included in PTS">SP</th><th class="l">Last 5</th></tr></thead><tbody>' + body + "</tbody></table></div></div>";
@@ -1119,7 +1119,7 @@ td.pts{font-size:17px}
       tile("Best points %", esc(SHORT[bp.t]), bp.pct + " · " + esc(divOf(bp.t).name)) +
       tile("Best defence", esc(SHORT[bd]), f2(ST[bd].gag) + " allowed per game · best offence " + esc(SHORT[bo]) + " " + f2(ST[bo].gfg)) + "</div>" +
       '<div class="mob">' + mob + "</div><div class=\"desk\">" + desk + "</div>" +
-      '<p class="mfoot">PTS: 3 for a regulation win, 2 for an overtime or shootout win, 1 for an overtime or shootout loss, plus SP (sportsmanship points, up to 1 per game). PTS% is PTS out of 4 per game played. L counts regulation losses only. Ranks and comparisons are within each division.</p></div>';
+      '</div>';
     $("p-standings").insertAdjacentHTML("beforeend", recapsHTML());
   }
   /* ---------- game recaps (generated from the game sheets) ---------- */
