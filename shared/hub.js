@@ -556,7 +556,7 @@
       }).join("") + (sorted.length ? "" : '<p class="empty">No players match.</p>') + moreBtn(sorted.length);
       out = '<div class="tiles">' + leaderTile(rows, "pts", "Points leader", all) + leaderTile(rows, "g", "Goals leader", all) + leaderTile(rows, "a", "Assists leader", all) + leaderTile(GK.filter(function (r) { return state.team === "ALL" || r.team === state.team; }), "w", "Goalie wins", all) + "</div>" +
         '<div class="mob">' + mobSk + '</div><div class="card desk"><div class="wrap">' + ptStartC(cols, cfg.key === "rank" ? { key: "pts", dir: -1 } : cfg) + "<tbody>" + (body || '<tr><td class="empty" colspan="22">No players match.</td></tr>') + "</tbody></table></div>" +
-        '<div class="morerow">' + moreBtn(sorted.length) + '</div><p class="note">Tap a column to sort. PIM assumes 2 minutes per penalty. GP counts games a player appears on the sheet.' + " MP is games with 2 or more points. PPG, PPA, SHG and SHA are worked out from goal and penalty times and are counted for " + TIMED.length + " of " + G.length + " games read so far (a minor is 2:00 and ends when the other team scores). Shots on goal are not recorded on the sheets." + '</p></div>';
+        '<div class="morerow">' + moreBtn(sorted.length) + '</div></div>';
     } else {
       var grows = filt(GK), gc = state.gk;
       var gcols = [["rank", "#", "rk"], ["name", "Goalie", "l stick"]].concat(all ? [["team", "Team", "l"]] : []).concat([["gp", "GP"], ["w", "W"], ["l", "L"], ["t", "T"], ["min", "MIN"], ["ga", "GA"], ["gaa", "GAA"], ["so", "SO"]]);
@@ -603,7 +603,7 @@
       }).join("") + (sorted.length ? "" : '<p class="empty">No players match.</p>') + moreBtn(sorted.length);
       out = '<div class="tiles">' + leaderTile(rows, "pts", "Points leader", all) + leaderTile(rows, "g", "Goals leader", all) + leaderTile(rows, "a", "Assists leader", all) + leaderTile(rows, "ppg", "Power-play goals", all) + "</div>" +
         '<div class="mob">' + mobSk + '</div><div class="card desk"><div class="wrap">' + ptStart(cols, cfg.key === "rank" ? { key: "pts", dir: -1 } : cfg) + "<tbody>" + (body || '<tr><td class="empty" colspan="18">No players match.</td></tr>') + "</tbody></table></div>" +
-        '<div class="morerow">' + moreBtn(sorted.length) + '</div><p class="note">Tap a column to sort; hover a heading for its meaning. PP is power play, SH is short-handed, GWG is game-winning goals, GTG is game-tying goals, PIM is penalty minutes. Official player stats through ' + dlong(AS_OF) + ", plus game sheets through " + dlong(DATA_THROUGH) + ".</p></div>";
+        '<div class="morerow">' + moreBtn(sorted.length) + '</div></div>';
     } else {
       var grows = filt(GK), gc = state.gk;
       var gcols = [["rank", "#", "rk"], ["name", "Goalie", "l stick"]].concat(all ? [["team", "Team", "l"]] : []).concat([["gp", "GP", "", "Games played"], ["gs", "GS", "", "Games started"], ["w", "W", "", "Wins"], ["l", "L", "", "Losses"], ["t", "OTL", "", "Overtime and shootout losses"], ["wpct", "W%", "", "Win percentage"], ["min", "MIN", "", "Minutes played"], ["ga", "GA", "", "Goals against"], ["gaa", "GAA", "", "Goals against per 45-minute game"], ["so", "SO", "", "Shutouts"]]);
