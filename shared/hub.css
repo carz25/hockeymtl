@@ -492,3 +492,12 @@ th.adv,td.adv{background:color-mix(in srgb,var(--rule) 18%,transparent)}
 .svseg{align-self:flex-start}
 .svseg button{padding:6px 16px;min-height:34px;font-size:13px}
 .scg{display:flex;flex-direction:column;gap:8px}
+/* footer bar shared by every page (built by shared/logo.js) */
+.sitebar{background:#080C12;color:rgba(255,255,255,.7);border-top:1px solid rgba(255,255,255,.08);font-size:12px}
+.sitebar-in{max-width:1080px;margin:0 auto;padding:12px max(16px,env(safe-area-inset-left,0px)) calc(12px + env(safe-area-inset-bottom,0px));display:flex;flex-wrap:wrap;align-items:center;gap:6px 20px}
+.sitebar a{color:#fff;text-decoration:none}
+.sitebar a:hover{color:#7DD3FC}
+.sitebar-home{font-family:var(--display);font-weight:800;font-size:15px;letter-spacing:.06em;text-transform:uppercase}
+.sitebar-nav{display:flex;gap:16px;font-weight:600}
+.sitebar-note{margin-left:auto}
+@media (max-width:720px){.sitebar-in{gap:4px 16px}.sitebar-note{margin-left:0;width:100%;font-size:11px}}

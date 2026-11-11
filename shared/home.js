@@ -7,6 +7,8 @@
 
   function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;"); }
   var LOGO = window.HMTL_LOGO || "";
+  var BASE = window.HMTL_BASE || "";                      // "/" on the not-found page
+  var HEADING = window.HMTL_HEADING || "Choose a division";
 
   // a few skate scratches per panel, fixed so they look the same on every visit
   function scratches(seed) {
@@ -27,17 +29,20 @@
 
   var panels = LEAGUES.map(function (l, i) {
     var num = (String(l.label).match(/\d+/) || [""])[0];
-    return '<a class="hp-p" href="' + l.folder + '/" style="--c:' + l.color + ";--i:" + i + '">' +
+    return '<a class="hp-p" href="' + BASE + l.folder + '/" style="--c:' + l.color + ";--i:" + i + '">' +
       '<span class="hp-in">' + scratches(11 + i * 97) +
       '<span class="hp-num" aria-hidden="true">' + esc(num) + "</span>" +
-      '<span class="hp-name"><span class="hp-bar" aria-hidden="true"></span>' + esc(l.label) + "</span></span></a>";
+      '<span class="hp-name">' + esc(l.label) + '<span class="hp-go">Open</span></span></span></a>';
   }).join("");
 
+  // thin strip along the top in the division colours
+  var step = 100 / LEAGUES.length, strip = LEAGUES.map(function (l, i) { return l.color + " " + (i * step) + "% " + ((i + 1) * step) + "%"; }).join(",");
   document.body.insertAdjacentHTML("afterbegin",
     '<div class="lp">' +
-    '<header class="lp-top"><a class="lp-brand" href="./" aria-label="Hockey MTL home">' + LOGO + (window.HMTL_WORDMARK || "Hockey MTL") + "</a><h1>Choose a division</h1></header>" +
+    '<div class="lp-strip" aria-hidden="true" style="background:linear-gradient(90deg,' + strip + ')"></div>' +
+    '<header class="lp-top"><a class="lp-brand" href="' + (BASE || "./") + '" aria-label="Hockey MTL home">' + LOGO + (window.HMTL_WORDMARK || "Hockey MTL") + "</a><h1>" + esc(HEADING) + "</h1></header>" +
     ad("728x90", "lp-ad-top") +
     '<nav class="hp" aria-label="Divisions" style="--n:' + LEAGUES.length + '">' + panels + "</nav>" +
-    '<footer class="lp-foot">Unofficial fan site, not affiliated with any league or club. &copy; 2026 Hockey MTL</footer>' +
+    (window.HMTL_SITEBAR ? window.HMTL_SITEBAR(BASE) : "") +
     "</div>");
 })();

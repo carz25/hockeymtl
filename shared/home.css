@@ -1,12 +1,12 @@
 /* hockeymtl.ca landing page: full-height division panels cut on a slant. One screen, no scrolling.
    Fonts come from hub.css (Big Shoulders Display, IBM Plex Sans). */
-:root{--seam:#E9F1F7;--slant:-11deg}
+:root{--seam:#080C12;--slant:-11deg}
 html,body{height:100%}
 body{margin:0;background:var(--seam);color:#fff;font-family:var(--body);overflow:hidden}
 .lp{position:relative;height:100vh;height:100dvh;overflow:hidden;overflow:clip}
 
 /* header floats over the panels */
-.lp-top{position:absolute;z-index:5;left:0;right:0;top:0;display:flex;align-items:center;justify-content:space-between;gap:16px;
+.lp-top{position:absolute;z-index:5;left:0;right:0;top:4px;display:flex;align-items:center;justify-content:space-between;gap:16px;
   padding:16px max(28px,4vw);pointer-events:none}
 .lp-top>*{pointer-events:auto}
 .lp-brand{display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none}
@@ -20,10 +20,10 @@ body{margin:0;background:var(--seam);color:#fff;font-family:var(--body);overflow
 /* the panels: skewed boxes with the content skewed back upright */
 .hp{position:absolute;inset:0;display:flex;gap:10px;margin:0 -9vw}
 .hp-p{position:relative;flex:1 1 0;min-width:0;transform:skewX(var(--slant));overflow:hidden;color:#fff;text-decoration:none;outline:none;
-  background:color-mix(in srgb,var(--c) 72%,#040A16);transition:flex-grow .55s cubic-bezier(.2,.8,.2,1)}
+  background:color-mix(in srgb,var(--c) 60%,#070B11);transition:flex-grow .55s cubic-bezier(.2,.8,.2,1)}
 .hp-in{position:absolute;inset:0 -30%;transform:skewX(calc(var(--slant) * -1));display:block;
   background:
-    radial-gradient(ellipse 50% 42% at 50% -6%, rgba(220,236,255,.30), transparent 72%),
+    radial-gradient(ellipse 50% 42% at 50% -6%, rgba(220,236,255,.2), transparent 72%),
     radial-gradient(ellipse 80% 60% at 50% 115%, rgba(6,14,28,.75), transparent 70%)}
 /* ice grain */
 .hp-in::before{content:"";position:absolute;inset:0;opacity:.22;mix-blend-mode:overlay;
@@ -33,24 +33,28 @@ body{margin:0;background:var(--seam);color:#fff;font-family:var(--body);overflow
 .hp-scr{position:absolute;inset:0;width:100%;height:100%;z-index:1}
 .hp-scr path{fill:none;stroke:rgba(255,255,255,.16);stroke-width:1.2;stroke-linecap:round}
 
-.hp-num{position:absolute;z-index:2;left:50%;top:50%;transform:translate(-50%,-52%);
+.hp-num{position:absolute;z-index:2;left:50%;top:50%;transform:translate(-50%,-52%);padding:0 .18em;
   font-family:var(--display);font-weight:800;font-style:italic;line-height:.8;letter-spacing:-.03em;
-  font-size:min(58vh,34vw);color:transparent;-webkit-text-stroke:2px rgba(255,255,255,.5);
+  font-size:min(58vh,34vw);color:transparent;-webkit-text-stroke:2px rgba(255,255,255,.3);
   transition:color .45s,-webkit-text-stroke-color .45s}
-.hp-name{position:absolute;z-index:3;left:calc(30% + 4vw + 9vw * var(--first,0));bottom:9vh;display:flex;flex-direction:column;gap:22px;
+.hp-name{position:absolute;z-index:3;left:calc(30% + 4vw + 9vw * var(--first,0));bottom:12vh;display:flex;flex-direction:column;align-items:flex-start;gap:22px;
   font-family:var(--display);font-weight:800;font-size:clamp(48px,6.4vw,96px);line-height:.85;letter-spacing:.01em;white-space:nowrap;text-shadow:0 4px 24px rgba(0,0,0,.35)}
 .hp-p:first-child .hp-name{--first:1}
-.hp-bar{display:block;width:56px;height:6px;background:#fff;transition:width .45s cubic-bezier(.2,.8,.2,1)}
+/* clipped-corner "Open" plate */
+.hp-go{font-family:var(--display);font-weight:800;font-size:17px;letter-spacing:.12em;text-transform:uppercase;line-height:1;text-shadow:none;
+  background:#fff;color:#0B1220;padding:12px 30px 11px 18px;clip-path:polygon(0 0,100% 0,100% 62%,calc(100% - 12px) 100%,0 100%);transition:background .3s,color .3s,padding .3s}
 
 /* hover or keyboard focus: the panel takes more room and its number fills in */
 .hp:hover .hp-p,.hp:focus-within .hp-p{flex-grow:.85}
 .hp .hp-p:hover,.hp .hp-p:focus-visible{flex-grow:1.5}
 .hp-p:hover .hp-num,.hp-p:focus-visible .hp-num{color:rgba(255,255,255,.14);-webkit-text-stroke-color:rgba(255,255,255,.9)}
-.hp-p:hover .hp-bar,.hp-p:focus-visible .hp-bar{width:140px}
-.hp-p:focus-visible .hp-name{text-decoration:underline;text-decoration-thickness:4px;text-underline-offset:10px}
+.hp-p:hover .hp-go,.hp-p:focus-visible .hp-go{background:color-mix(in srgb,var(--c) 70%,#fff);color:#fff;padding-right:44px}
+.hp-p:focus-visible .hp-go{outline:3px solid #7DD3FC;outline-offset:3px}
 
 /* footer bar */
-.lp-foot{margin:0;border:0;border-top:1px solid rgba(255,255,255,.1);background:#040A16;position:absolute;z-index:5;left:0;right:0;bottom:0;padding:9px 20px;font-size:12px;text-align:center;color:rgba(255,255,255,.72)}
+/* colour strip on top, footer bar at the bottom */
+.lp-strip{position:absolute;z-index:6;left:0;right:0;top:0;height:4px}
+.lp .sitebar{position:absolute;z-index:5;left:0;right:0;bottom:0}
 
 /* opening: the panels slam in from opposite sides, then light glints across the numbers once */
 @media (prefers-reduced-motion:no-preference){
@@ -75,6 +79,7 @@ body{margin:0;background:var(--seam);color:#fff;font-family:var(--body);overflow
   .hp-in{inset:-30% 0;transform:skewY(calc(var(--slant) * -1))}
   .hp-num{font-size:min(34vh,62vw)}
   .hp-name{left:28px;bottom:calc(30% + 5vh);font-size:clamp(44px,13vw,72px);gap:14px}
+  .hp-go{font-size:14px;padding:10px 24px 9px 14px}
   .hp-p:last-child .hp-name{bottom:calc(30% + 15vh)}
   .hp-p:first-child .hp-num{top:58%}
   .hp-p:first-child .hp-name{--first:0}
@@ -83,7 +88,6 @@ body{margin:0;background:var(--seam);color:#fff;font-family:var(--body);overflow
   .lp-brand .wm-h{font-size:10px}
   .lp-brand .wm-m{font-size:28px}
   .lp-top h1{font-size:15px;letter-spacing:.05em}
-  .lp-foot{font-size:10.5px;padding-bottom:calc(8px + env(safe-area-inset-bottom,0px))}
 }
 @media (prefers-reduced-motion:no-preference) and (max-width:767px), (prefers-reduced-motion:no-preference) and (max-aspect-ratio:4/5){
   .hp-p{animation-name:slamL}

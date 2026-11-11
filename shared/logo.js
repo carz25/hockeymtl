@@ -11,3 +11,12 @@ window.HMTL_LOGO = '<svg class="puck" viewBox="0 0 140 140" role="img" aria-labe
     '<text x="72" y="114" text-anchor="middle" fill="#fff" stroke="#0B1A2E" stroke-width="5" paint-order="stroke" stroke-linejoin="round" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="800" font-size="44" transform="skewX(-10) translate(18 0)">MTL</text></svg>';
 /* "HOCKEY / MTL" wordmark that sits beside the shield, styled in hub.css (.wm). */
 window.HMTL_WORDMARK = '<span class="wm" aria-hidden="true"><span class="wm-h">Hockey</span><span class="wm-m">MTL</span></span>';
+/* Footer bar shared by every page: home, each division site and the not-found page.
+   base is the path back to the site root ("" on the home page, "../" in a division folder, "/" on the 404 page). */
+window.HMTL_SITEBAR = function (base) {
+  base = base || "";
+  var links = (window.LEAGUES || []).map(function (l) { return '<a href="' + base + l.folder + '/">' + l.label + "</a>"; }).join("");
+  return '<div class="sitebar"><div class="sitebar-in"><a class="sitebar-home" href="' + (base || "./") + '">Hockey MTL</a>' +
+    '<nav class="sitebar-nav" aria-label="All divisions">' + links + "</nav>" +
+    '<span class="sitebar-note">Unofficial fan site, not affiliated with any league or club. &copy; 2026 Hockey MTL</span></div></div>';
+};
