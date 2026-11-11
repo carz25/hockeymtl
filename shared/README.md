@@ -4,9 +4,14 @@ Every league site runs on the same design and code, which live in this folder.
 Change something here once and every league updates.
 
 ```
+index.html     hockeymtl.ca home page: one panel per division (built by shared/home.js)
 shared/
   hub.css      design for every league (colours, fonts, layout, mobile view)
   hub.js       code for every league (home, standings, players, schedule, teams, previews)
+  logo.js      Hockey MTL shield and wordmark, used on every page
+  leagues.js   divisions shown on the home page, with their panel colour
+  home.css     home page design
+  home.js      home page code (Google ad slots are switched off with SHOW_ADS)
 M11BB/  M13AAA/  (one folder per league)
   index.html   short page that loads the files below. Copy it for a new league.
   league.js    settings for this league (title, format). Rarely changes.
@@ -20,7 +25,8 @@ M11BB/  M13AAA/  (one folder per league)
 |---|---|
 | New game sheets, standings, schedule changes | that league's `data.js` only |
 | League name, format | that league's `league.js` |
-| Hockey MTL header logo (same on every league) | `shared/hub.js` (`LOGO`) |
+| Hockey MTL logo and wordmark (every page) | `shared/logo.js` |
+| Divisions on the home page, panel colours | `shared/leagues.js` |
 | Team logos | that league's `logos.css` |
 | Anything about how the site looks or works | `shared/hub.css` or `shared/hub.js` |
 
@@ -60,6 +66,7 @@ The data files hold the same variables as before the split, so the format hasn't
 1. Copy `M11BB/index.html` into the new folder and change the two names in it (`<title>` and `copyright`). Remove the `logos.css` line if there are no logos yet.
 2. Copy `M11BB/league.js` (if the league is like M11 BB) or `M13AAA/league.js` (if it's like M13 AAA) and change the settings.
 3. Create `data.js` from the league's schedule, standings and game sheets.
+4. Add one line for it to `shared/leagues.js` so it gets a panel on the home page.
 
 ## Notes
 

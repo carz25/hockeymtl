@@ -455,4 +455,10 @@ td.pts{font-size:17px}
 .st-sheet .card .wrap:has(table.pt){overflow-x:hidden}
 @media (max-width:1000px){.st-sheet table.pt col.nu{width:50px}}
 th.adv,td.adv{background:color-mix(in srgb,var(--rule) 18%,transparent)}
-.brand .home{display:flex;flex:none;border-radius:50%}
+.brand .home{display:flex;flex-direction:row;align-items:center;gap:10px;flex:none;color:#fff;text-decoration:none;padding-right:14px;margin-right:2px;border-right:1px solid rgba(255,255,255,.18)}
+/* Hockey MTL wordmark (shared by every page): small spaced HOCKEY over a big slanted MTL, like the shield */
+.wm{display:inline-flex;flex-direction:column;justify-content:center;line-height:1;font-family:var(--display);color:#fff}
+.wm-h{font-weight:700;font-size:11px;letter-spacing:.42em;text-transform:uppercase;color:#7DD3FC;margin:0 0 1px 1px}
+.wm-m{font-weight:800;font-style:italic;font-size:30px;letter-spacing:.03em;line-height:.9}
+.m .brand .home{padding-right:10px}
+.m .brand .wm{display:none}

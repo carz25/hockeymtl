@@ -1,266 +1,28 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>hockeymtl | League Hub</title>
-
-  <!-- Google Analytics / GTM Tag -->
-  <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-THDCDJCZ"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'GTM-THDCDJCZ');
-  </script>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Public+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg-main: #f8fafc;
-      --header-bg: #0f172a;
-      --card-bg: #ffffff;
-      --accent: #0284c7;
-      --accent-hover: #0369a1;
-      --text-main: #334155;
-      --text-dark: #0f172a;
-      --text-muted: #64748b;
-      --border: #e2e8f0;
-      --badge-bg: #e0f2fe;
-      --badge-text: #0369a1;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: 'Public Sans', system-ui, -apple-system, sans-serif;
-      background-color: var(--bg-main);
-      color: var(--text-main);
-      line-height: 1.5;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    header {
-      background-color: var(--header-bg);
-      color: #ffffff;
-      padding: 1.5rem 1.5rem;
-      border-bottom: 3px solid var(--accent);
-    }
-
-    .header-container {
-      max-width: 1000px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .brand-title {
-      font-family: 'Oswald', sans-serif;
-      font-size: 1.75rem;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      text-transform: lowercase;
-    }
-
-    .brand-title span {
-      font-size: 0.9rem;
-      color: #94a3b8;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .hub-badge {
-      background-color: var(--accent);
-      color: #ffffff;
-      font-family: 'Oswald', sans-serif;
-      font-size: 0.85rem;
-      font-weight: 700;
-      padding: 0.25rem 0.6rem;
-      border-radius: 4px;
-      letter-spacing: 0.5px;
-    }
-
-    main {
-      flex: 1;
-      max-width: 1000px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 3rem 1.5rem;
-    }
-
-    .hero-banner {
-      text-align: center;
-      margin-bottom: 3rem;
-    }
-
-    .hero-banner h2 {
-      font-family: 'Oswald', sans-serif;
-      font-size: 2.25rem;
-      color: var(--text-dark);
-      margin-bottom: 0.5rem;
-      text-transform: uppercase;
-    }
-
-    .hero-banner p {
-      color: var(--text-muted);
-      font-size: 1.05rem;
-    }
-
-    .portal-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .portal-card {
-      background-color: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 2rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
-      text-decoration: none;
-      color: inherit;
-    }
-
-    .portal-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      border-color: var(--accent);
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 1rem;
-    }
-
-    .division-tag {
-      font-family: 'Oswald', sans-serif;
-      font-size: 0.85rem;
-      font-weight: 700;
-      background-color: var(--badge-bg);
-      color: var(--badge-text);
-      padding: 0.2rem 0.5rem;
-      border-radius: 4px;
-      text-transform: uppercase;
-    }
-
-    .portal-card h3 {
-      font-family: 'Oswald', sans-serif;
-      font-size: 1.75rem;
-      color: var(--text-dark);
-      margin-bottom: 0.5rem;
-    }
-
-    .portal-card p {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .card-footer {
-      display: flex;
-      align-items: center;
-      font-weight: 700;
-      font-size: 0.95rem;
-      color: var(--accent);
-      gap: 0.5rem;
-    }
-
-    .portal-card:hover .card-footer {
-      color: var(--accent-hover);
-    }
-
-    .arrow-icon {
-      transition: transform 0.15s ease;
-    }
-
-    .portal-card:hover .arrow-icon {
-      transform: translateX(4px);
-    }
-
-    footer {
-      background-color: #ffffff;
-      border-top: 1px solid var(--border);
-      padding: 1.5rem;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      text-align: center;
-    }
-
-    .footer-container {
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hockey MTL | Choose a division</title>
+<meta name="description" content="Scores, standings and schedules for Montréal youth hockey divisions.">
+<meta name="copyright" content="Hockey MTL">
+<script async src="https://www.googletagmanager.com/gtm.js?id=GTM-THDCDJCZ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'GTM-THDCDJCZ');
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="shared/hub.css">
+<link rel="stylesheet" href="shared/home.css">
 </head>
 <body>
-
-  <header>
-    <div class="header-container">
-      <div class="brand-title">hockeymtl <span>Platform</span></div>
-      <div class="hub-badge">LEAGUE HUB</div>
-    </div>
-  </header>
-
-  <main>
-    <div class="hero-banner">
-      <h2>Select Division</h2>
-      <p>Access statistics, schedules, standings, and team information.</p>
-    </div>
-
-    <div class="portal-grid">
-      <a href="/M11BB/" class="portal-card">
-        <div>
-          <div class="card-header">
-            <span class="division-tag">L.H.G.M. MTL</span>
-          </div>
-          <h3>M11 BB</h3>
-          <p>Complete standings, schedules, team stats, and player metrics for the M11 BB division.</p>
-        </div>
-        <div class="card-footer">
-          Enter Division Portal <span class="arrow-icon">&rarr;</span>
-        </div>
-      </a>
-
-      <a href="/M13AAA/" class="portal-card">
-        <div>
-          <div class="card-header">
-            <span class="division-tag">L.E.H.Q. League</span>
-          </div>
-          <h3>M13 AAA</h3>
-          <p>Official coverage, schedule, and team standings for the LEHQ M13 AAA division.</p>
-        </div>
-        <div class="card-footer">
-          Enter Division Portal <span class="arrow-icon">&rarr;</span>
-        </div>
-      </a>
-    </div>
-  </main>
-
-  <footer>
-    <div class="footer-container">
-      <p>Unofficial fan-made platform by hockeymtl, not affiliated with the league or its clubs. All standings and schedules are based on official league sheets.</p>
-    </div>
-  </footer>
-
+<!-- Leagues on the rink: shared/leagues.js -->
+<script src="shared/logo.js"></script>
+<script src="shared/leagues.js"></script>
+<script src="shared/home.js"></script>
 </body>
 </html>
