@@ -23,22 +23,13 @@
   var PPX = window.PPX || [], TIMED = window.TIMED || [];
 
   /* Hockey MTL shield logo (same on every league site). Clicking it goes to the hockeymtl.ca home page. */
-  var LOGO = '<svg class="puck" viewBox="0 0 140 140" role="img" aria-label="Hockey MTL"><defs>' +
-    '<linearGradient id="hmtlShield" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2E6FE0"/><stop offset="1" stop-color="#0B2A66"/></linearGradient></defs>' +
-    '<g fill="#7DD3FC" stroke="#0B1A2E" stroke-width="2" stroke-linejoin="round">' +
-    '<path d="M24 46 L36 8 L44 11 L37 46 Z"/><path d="M33 22 Q46 30 56 46 L40 46 Z" fill="#5BB8EE"/>' +
-    '<rect x="50" y="26" width="10" height="22"/><rect x="61" y="14" width="11" height="34"/><rect x="73" y="22" width="9" height="26"/><rect x="83" y="8" width="8" height="40"/><path d="M87 8 V1"/><rect x="92" y="28" width="12" height="20"/><rect x="105" y="20" width="9" height="28"/></g>' +
-    '<path d="M18 44 H122 V80 C122 109 98 127 70 137 C42 127 18 109 18 80 Z" fill="#0B1A2E"/>' +
-    '<path d="M22 48 H118 V80 C118 106 96 122 70 132 C44 122 22 106 22 80 Z" fill="url(#hmtlShield)" stroke="#fff" stroke-width="3.5"/>' +
-    '<path d="M30 56 H110" stroke="#7DD3FC" stroke-width="2" opacity=".7"/>' +
-    '<text x="70" y="75" text-anchor="middle" fill="#fff" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="800" font-size="17" letter-spacing="4">HOCKEY</text>' +
-    '<text x="72" y="114" text-anchor="middle" fill="#fff" stroke="#0B1A2E" stroke-width="5" paint-order="stroke" stroke-linejoin="round" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="800" font-size="44" transform="skewX(-10) translate(18 0)">MTL</text></svg>';
+  var LOGO = window.HMTL_LOGO || "";
 
   /* page skeleton */
   document.body.classList.add(OFFICIAL ? "st-off" : "st-sheet");
   if (MULTI) document.body.classList.add("multi");
   document.body.insertAdjacentHTML("afterbegin",
-    '\n<div class="hdr">\n<header class="top">\n  <div class="in brand">' + ('<a class="home" href="' + (L.homeUrl || "https://hockeymtl.ca/") + '" aria-label="Hockey MTL home" title="Hockey MTL home">' + LOGO + "</a>") + "<h1>" + L.title + " <span>" + L.subtitle + "</span></h1>" +
+    '\n<div class="hdr">\n<header class="top">\n  <div class="in brand">' + ('<a class="home" href="' + (L.homeUrl || "https://hockeymtl.ca/") + '" aria-label="Hockey MTL home" title="Hockey MTL home">' + LOGO + (window.HMTL_WORDMARK || "") + "</a>") + "<h1>" + L.title + " <span>" + L.subtitle + "</span></h1>" +
     (MULTI ? '<select id="divsel" class="divsel" aria-label="Filter by division"></select>' : "") + "</div>\n</header>\n" +
     '<nav class="nav" aria-label="Sections">\n  <div class="in">\n    <div class="tabs">\n' +
     '      <a href="#home" data-tab="home">Home</a>\n      <a href="#standings" data-tab="standings">Standings</a>\n      <a href="#players" data-tab="players">Players</a>\n' +
