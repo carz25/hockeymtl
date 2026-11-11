@@ -36,8 +36,8 @@ a{color:inherit}
 .hdr{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--head);color:var(--head-ink)}
 .top .in{padding-block:10px 0}
 .brand{display:flex;align-items:center;gap:12px}
-.puck{height:46px;width:auto;flex:none;display:block}
-.m .puck{height:38px}
+.puck{width:56px;height:56px;flex:none;display:block;filter:drop-shadow(0 2px 5px rgba(0,0,0,.35))}
+.m .puck{width:48px;height:48px}
 .m .brand{gap:10px}
 h1{font-family:var(--display);font-weight:800;font-size:clamp(26px,4.4vw,44px);line-height:1;letter-spacing:.02em;text-transform:uppercase;margin:0;white-space:nowrap}
 h1 span{color:var(--head-mute);font-size:calc(1em - 20pt)}
@@ -205,8 +205,6 @@ th.grp,td.grp{border-left:1px solid var(--rule)}
 .divsel{margin-left:auto;font:inherit;font-size:13px;color:#fff;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:7px 10px;min-width:0;max-width:100%;cursor:pointer}
 .divsel option{color:#111;background:#fff}
 .m .divsel{max-width:52%}
-.multi .brand .puck{width:56px;height:56px;flex:none}
-.m.multi .brand .puck{width:48px;height:48px}
 .lcard h3 .lsub{font-weight:400;margin-left:6px}
 .st-off .ln>*{flex:none;white-space:nowrap;overflow-wrap:normal}
 .m.st-off .ln{flex-wrap:wrap;gap:2px 8px}
