@@ -501,8 +501,9 @@ th.adv,td.adv{background:color-mix(in srgb,var(--rule) 18%,transparent)}
 .sitebar-nav{display:flex;gap:16px;font-weight:600}
 .sitebar-note{margin-left:auto}
 @media (max-width:720px){.sitebar-in{gap:4px 16px}.sitebar-note{margin-left:0;width:100%;font-size:11px}}
-/* division sites: the footer bar stays fixed along the bottom of the screen */
-.st-off .sitebar,.st-sheet .sitebar{position:fixed;left:0;right:0;bottom:0;z-index:40}
-body.st-off,body.st-sheet{padding-bottom:calc(46px + env(safe-area-inset-bottom,0px))}
-/* on phones the fixed bar keeps to one row; the same note is in the page footer above it */
-.m.st-off .sitebar-note,.m.st-sheet .sitebar-note{display:none}
+/* division sites on desktop: the footer bar stays fixed along the bottom of the screen (phones: it scrolls with the page) */
+body.st-off:not(.m) .sitebar,body.st-sheet:not(.m) .sitebar{position:fixed;left:0;right:0;bottom:0;z-index:40}
+body.st-off:not(.m),body.st-sheet:not(.m){padding-bottom:46px}
+/* short pages (like Teams) still put the page footer, with the View options, at the bottom of the screen */
+body.st-off,body.st-sheet{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;box-sizing:border-box}
+body.st-off>main,body.st-sheet>main{flex:1 0 auto;width:100%}
