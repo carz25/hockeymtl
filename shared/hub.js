@@ -163,7 +163,7 @@
   /* ---------- state ---------- */
   var state = { div: "ALL", team: "ALL", sf: "upcoming", ptab: "skaters", q: "", open: 0, sk: { key: "pts", dir: -1 }, gk: { key: "gaa", dir: 1 }, pm: 10, adv: false, view: "auto", sv: "table" };
   try { var sd = localStorage.getItem(KEY + "-div"); if (DIVS.some(function (d) { return d.id === sd; })) state.div = sd; } catch (e) { }
-  try { var stv = localStorage.getItem(KEY + "-standings"); if (stv === "grid") state.sv = "grid"; } catch (e) { }
+  try { var stv = localStorage.getItem(KEY + "-standings"); if (stv === "grid" || stv === "special") state.sv = stv; } catch (e) { }
   try { var sv = localStorage.getItem(KEY + "-view"); if (sv === "mobile" || sv === "desktop") state.view = sv; } catch (e) { }
   var mq = window.matchMedia("(max-width:720px)");
   function applyView() {
@@ -241,6 +241,26 @@
       '<div class="hgrid"><div class="hcol"><div class="hh"><h3>Standings</h3><button class="hlink" data-go="standings">Full standings →</button></div>' + snap + "</div>" +
       '<div class="hcol"><div class="hh"><h3>Top performers</h3><button class="hlink" data-go="players">All players →</button></div><div class="pfgrid">' + perf + "</div></div></div></div>";
   }
+  /* Special teams per team. Sheet leagues: power-play and short-handed goals for and against, from the timed game sheets.
+     Official-stat leagues: power-play and short-handed goals for, summed from the league's player stats (no "against"). */
+  var SPT = (function () {
+    var out = {}, byId = {};
+    ORDER.forEach(function (t) { out[t] = { ppg: 0, shg: 0, ppga: 0, shga: 0 }; });
+    GAMES.forEach(function (g) { byId[g.id] = g; });
+    if (OFFICIAL) {
+      PSTATS.forEach(function (p) { if (out[p[0]]) { out[p[0]].ppg += p[6] || 0; out[p[0]].shg += p[8] || 0; } });
+    } else {
+      PPX.forEach(function (x) {
+        var g = byId[x[0]], t = x[1], opp = g ? (g.a === t ? g.h : g.a) : null;
+        if (!out[t]) return;
+        if (x[3] === "PP") { out[t].ppg++; if (out[opp]) out[opp].ppga++; }
+        if (x[3] === "SH") { out[t].shg++; if (out[opp]) out[opp].shga++; }
+      });
+    }
+    return out;
+  })();
+  var SPT_AGAINST = !OFFICIAL;   // goals-against columns only when every goal's situation is known
+
   function renderStandings() {
     // One layout for every league. Record columns follow the league format (W-L-OTL or W-T-L);
     // on phones a Table / Grid switch picks compact tables (default) or team cards.
@@ -278,16 +298,22 @@
           '<div class="bar" aria-hidden="true"><i style="width:' + Math.round(s.pctn * 100) + '%"></i></div><div class="row"><span>GF <b>' + s.gf + "</b></span><span>GA <b>" + s.ga + "</b></span><span>DIFF <b>" + sgn(s) + "</b></span>" + formChips(t, 5) + "</div></div>";
       }).join("") + "</div>";
     }).join("");
-    var svSeg = '<div class="seg svseg" role="group" aria-label="Standings view">' + [["table", "Table"], ["grid", "Grid"]].map(function (x) { return '<button data-sv="' + x[0] + '" aria-pressed="' + (state.sv === x[0]) + '">' + x[1] + "</button>"; }).join("") + "</div>";
+    var mobSpec = curDivs().map(function (d) {
+      return divHead(d) + '<div class="card"><div class="wrap"><table class="ctable spt"><thead><tr><th class="rk">#</th><th class="l stick">Team</th><th title="Goals for per game">GF/G</th><th title="Goals against per game">GA/G</th><th title="Power-play goals">PPG</th>' + (SPT_AGAINST ? '<th title="Power-play goals against">PPGA</th>' : "") + '<th title="Short-handed goals">SHG</th>' + (SPT_AGAINST ? '<th title="Short-handed goals against">SHGA</th>' : "") + '<th title="Penalty minutes per game">PIM/G</th></tr></thead><tbody>' + d.teams.map(function (t) {
+        var s = ST[t], x = SPT[t];
+        return '<tr class="' + (mine(t) ? "me" : "") + '"><td class="rk num">' + s.rank + "</td>" + teamCell(t) + "<td>" + f1(s.gfg) + "</td><td>" + f1(s.gag) + '</td><td class="strong">' + x.ppg + "</td>" + (SPT_AGAINST ? "<td>" + x.ppga + "</td>" : "") + '<td class="strong">' + x.shg + "</td>" + (SPT_AGAINST ? "<td>" + x.shga + "</td>" : "") + "<td>" + (s.pend ? "–" : f1(s.pimg)) + "</td></tr>";
+      }).join("") + "</tbody></table></div></div>";
+    }).join("") + (OFFICIAL && AS_OF ? '<p class="mfoot">PPG and SHG are official league totals through ' + dlong(AS_OF) + ".</p>" : "");
+    var svSeg = '<div class="seg svseg" role="group" aria-label="Standings view">' + [["table", "Table"], ["grid", "Grid"], ["special", "Special teams"]].map(function (x) { return '<button data-sv="' + x[0] + '" aria-pressed="' + (state.sv === x[0]) + '">' + x[1] + "</button>"; }).join("") + "</div>";
 
     var desk = curDivs().map(function (d) {
       var body = d.teams.map(function (t) {
         var s = ST[t];
         return '<tr class="' + (mine(t) ? "me" : "") + '"><td class="rk num">' + s.rank + "</td>" + teamCell(t) +
           "<td>" + s.gp + "</td>" + rtd(s) + '<td class="strong">' + dash(s, s.pts) + "</td><td>" + s.pct + pctBar(s) + "</td>" +
-          "<td>" + s.gf + "</td><td>" + s.ga + "</td><td>" + sgn(s) + "</td><td>" + dash(s, s.pim) + "</td>" + (OT ? "<td>" + s.rw + "</td><td>" + dash(s, s.sp) + "</td>" : "") + "<td>" + remaining(t) + '</td><td class="l">' + formChips(t, 5) + "</td></tr>";
+          "<td>" + s.gf + "</td><td>" + s.ga + "</td><td>" + sgn(s) + "</td><td>" + dash(s, s.pim) + "</td><td>" + SPT[t].ppg + "</td>" + (SPT_AGAINST ? "<td>" + SPT[t].ppga + "</td>" : "") + "<td>" + SPT[t].shg + "</td>" + (SPT_AGAINST ? "<td>" + SPT[t].shga + "</td>" : "") + (OT ? "<td>" + s.rw + "</td><td>" + dash(s, s.sp) + "</td>" : "") + "<td>" + remaining(t) + '</td><td class="l">' + formChips(t, 5) + "</td></tr>";
       }).join("");
-      return divHead(d) + '<div class="card"><div class="wrap"><table><thead><tr><th class="rk">#</th><th class="l stick">Team</th><th title="Games played">GP</th>' + rth(true) + '<th title="Points">PTS</th><th title="Points percentage">PTS%</th><th title="Goals for">GF</th><th title="Goals against">GA</th><th title="Goal difference">DIFF</th><th title="Penalty minutes">PIM</th>' +
+      return divHead(d) + '<div class="card"><div class="wrap"><table><thead><tr><th class="rk">#</th><th class="l stick">Team</th><th title="Games played">GP</th>' + rth(true) + '<th title="Points">PTS</th><th title="Points percentage">PTS%</th><th title="Goals for">GF</th><th title="Goals against">GA</th><th title="Goal difference">DIFF</th><th title="Penalty minutes">PIM</th><th title="Power-play goals">PPG</th>' + (SPT_AGAINST ? '<th title="Power-play goals against">PPGA</th>' : "") + '<th title="Short-handed goals">SHG</th>' + (SPT_AGAINST ? '<th title="Short-handed goals against">SHGA</th>' : "") +
         (OT ? '<th title="Regulation wins">RW</th><th title="Sportsmanship points, included in PTS">SP</th>' : "") + '<th title="Games remaining">GR</th><th class="l">Last 5</th></tr></thead><tbody>' + body + "</tbody></table></div></div>";
     }).join("");
     var lede = MULTI ? (state.div === "ALL" ? DIVS.length + " divisions of " + DIVS[0].teams.length : esc(curDivs()[0].name)) + ", as of " + dlong(LAST) : "League table through " + dlong(LAST);
@@ -298,7 +324,7 @@
       tile("Goals per game", f2(totGF / totGP), totGF + " goals in about " + totGP + " games") +
       tile("Best points %", esc(SHORT[bp.t]), bp.pct + (MULTI ? " · " + esc(divOf(bp.t).name) : "")) +
       tile("Best defence", esc(SHORT[bd]), f2(ST[bd].gag) + " allowed per game · best offence " + esc(SHORT[bo]) + " " + f2(ST[bo].gfg)) + "</div>" +
-      '<div class="mob">' + svSeg + (state.sv === "grid" ? mobGrid : mobTable) + '</div><div class="desk">' + desk + "</div>" +
+      '<div class="mob">' + svSeg + (state.sv === "grid" ? mobGrid : state.sv === "special" ? mobSpec : mobTable) + '</div><div class="desk">' + desk + "</div>" +
       "</div>";
     $("p-standings").insertAdjacentHTML("beforeend", recapsHTML());
   }

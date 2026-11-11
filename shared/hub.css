@@ -507,3 +507,8 @@ body.st-off:not(.m),body.st-sheet:not(.m){padding-bottom:46px}
 /* short pages (like Teams) still put the page footer, with the View options, at the bottom of the screen */
 body.st-off,body.st-sheet{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;box-sizing:border-box}
 body.st-off>main,body.st-sheet>main{flex:1 0 auto;width:100%}
+/* special-teams table on phones: tighter so all columns fit */
+.ctable.spt th,.ctable.spt td{padding:8px 2px}
+.ctable.spt th{font-size:10px}
+.ctable.spt td.strong{font-size:15px}
+.svseg button{padding:6px 12px}
