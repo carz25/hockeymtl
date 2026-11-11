@@ -8,7 +8,8 @@
   function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;"); }
   var LOGO = window.HMTL_LOGO || "";
   var BASE = window.HMTL_BASE || "";                      // "/" on the not-found page
-  var HEADING = window.HMTL_HEADING || "Choose a division";
+  // the home page heading is for screen readers only; the not-found page shows its own message
+  var HEADING = window.HMTL_HEADING || "Choose a division", SHOW_HEADING = !!window.HMTL_HEADING;
 
   // a few skate scratches per panel, fixed so they look the same on every visit
   function scratches(seed) {
@@ -32,7 +33,7 @@
     return '<a class="hp-p" href="' + BASE + l.folder + '/" style="--c:' + l.color + ";--i:" + i + '">' +
       '<span class="hp-in">' + scratches(11 + i * 97) +
       '<span class="hp-num" aria-hidden="true">' + esc(num) + "</span>" +
-      '<span class="hp-name">' + esc(l.label) + '<span class="hp-go">Open</span></span></span></a>';
+      '<span class="hp-name">' + esc(l.label) + "</span></span></a>";
   }).join("");
 
   // thin strip along the top in the division colours
@@ -40,7 +41,7 @@
   document.body.insertAdjacentHTML("afterbegin",
     '<div class="lp">' +
     '<div class="lp-strip" aria-hidden="true" style="background:linear-gradient(90deg,' + strip + ')"></div>' +
-    '<header class="lp-top"><a class="lp-brand" href="' + (BASE || "./") + '" aria-label="Hockey MTL home">' + LOGO + (window.HMTL_WORDMARK || "Hockey MTL") + "</a><h1>" + esc(HEADING) + "</h1></header>" +
+    '<header class="lp-top"><a class="lp-brand" href="' + (BASE || "./") + '" aria-label="Hockey MTL home">' + LOGO + (window.HMTL_WORDMARK || "Hockey MTL") + "</a><h1" + (SHOW_HEADING ? "" : ' class="sr"') + ">" + esc(HEADING) + "</h1></header>" +
     ad("728x90", "lp-ad-top") +
     '<nav class="hp" aria-label="Divisions" style="--n:' + LEAGUES.length + '">' + panels + "</nav>" +
     (window.HMTL_SITEBAR ? window.HMTL_SITEBAR(BASE) : "") +
