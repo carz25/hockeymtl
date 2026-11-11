@@ -1,1 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>M11 AAA - LHGM | Coming Soon</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Public+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #f8fafc;
+      --header-bg: #0f172a;
+      --card-bg: #ffffff;
+      --accent: #0284c7;
+      --text-main: #334155;
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --badge-bg: #e0f2fe;
+      --badge-text: #0369a1;
+    }
 
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Public Sans', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background-color: var(--header-bg);
+      color: #ffffff;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 3px solid var(--accent);
+    }
+
+    .header-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .league-badge {
+      background-color: var(--accent);
+      color: #ffffff;
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    h1 {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    h1 span {
+      font-size: 1rem;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    nav {
+      background-color: #ffffff;
+      border-bottom: 1px solid var(--border);
+      padding: 0 1.5rem;
+    }
+
+    .nav-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      gap: 1.5rem;
+      overflow-x: auto;
+    }
+
+    .nav-item {
+      padding: 0.85rem 0;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-decoration: none;
+      white-space: nowrap;
+      border-bottom: 2px solid transparent;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .nav-item.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .tag {
+      font-size: 0.65rem;
+      background-color: var(--badge-bg);
+      color: var(--badge-text);
+      padding: 0.15rem 0.4rem;
+      border-radius: 3px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    main {
+      flex: 1;
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 3rem 1.5rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .hero-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 3rem 2.5rem;
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background-color: #f0f9ff;
+      border: 1px solid #bae6fd;
+      color: #0369a1;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.35rem 0.85rem;
+      border-radius: 9999px;
+      margin-bottom: 1.5rem;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--accent);
+      border-radius: 50%;
+    }
+
+    .hero-card h2 {
+      font-family: 'Oswald', sans-serif;
+      font-size: 2.25rem;
+      color: var(--text-dark);
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+    }
+
+    .hero-card p {
+      color: var(--text-muted);
+      font-size: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .grid-preview {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      border-top: 1px solid var(--border);
+      padding-top: 1.75rem;
+    }
+
+    .preview-item {
+      text-align: center;
+    }
+
+    .preview-item .label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .preview-item .val {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.1rem;
+      color: var(--text-dark);
+      margin-top: 0.25rem;
+    }
+
+    footer {
+      background-color: #ffffff;
+      border-top: 1px solid var(--border);
+      padding: 1.5rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    .footer-container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-container">
+      <div class="league-badge">LEHQ</div>
+      <h1>M13 AAA <span>L.E.H.Q. League</span></h1>
+    </div>
+  </header>
+
+  <nav aria-label="Main Navigation">
+    <div class="nav-container">
+      <a href="#" class="nav-item active">Home</a>
+      <a href="#" class="nav-item">Standings <span class="tag">Soon</span></a>
+      <a href="#" class="nav-item">Schedule <span class="tag">Soon</span></a>
+      <a href="#" class="nav-item">Teams <span class="tag">Soon</span></a>
+      <a href="#" class="nav-item">Players <span class="tag">Soon</span></a>
+      <a href="#" class="nav-item">Matchups <span class="tag">Soon</span></a>
+    </div>
+  </nav>
+
+  <main>
+    <div class="hero-card">
+      <div class="status-pill">
+        <span class="status-dot"></span>
+        Under Construction
+      </div>
+      <h2>Site Coming Soon</h2>
+      <p>We are currently setting up the official statistics, standings, and schedule portal for the M13 AAA LEHQ division. Check back soon for full season coverage.</p>
+      
+      <div class="grid-preview">
+        <div class="preview-item">
+          <div class="label">Category</div>
+          <div class="val">M13 AAA</div>
+        </div>
+        <div class="preview-item">
+          <div class="label">League</div>
+          <div class="val">LEHQ</div>
+        </div>
+        <div class="preview-item">
+          <div class="label">Status</div>
+          <div class="val">Preparing</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-container">
+      <p>Unofficial fan-made page, not affiliated with the league or its clubs. Standings and schedules will be updated once official league data is published.</p>
+    </div>
+  </footer>
+
+</body>
+</html>
