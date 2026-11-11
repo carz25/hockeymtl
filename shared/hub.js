@@ -292,7 +292,7 @@
     }).join("");
     var lede = MULTI ? (state.div === "ALL" ? DIVS.length + " divisions of " + DIVS[0].teams.length : esc(curDivs()[0].name)) + ", as of " + dlong(LAST) : "League table through " + dlong(LAST);
     $("p-standings").innerHTML =
-      '<div class="sec-head"><div><h2>Standings</h2><p class="lede">' + lede + ". Tap a team to open its profile.</p></div></div>" +
+      '<div class="sec-head"><div><h2>Standings</h2><p class="lede">' + lede + ".</p></div></div>" +
       '<div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">' + focus +
       '<div class="tiles">' + tile("Teams", DT().length, MULTI ? (state.div === "ALL" ? DIVS.length + " divisions of " + DIVS[0].teams.length : esc(curDivs()[0].name)) : "in the " + GROUP) +
       tile("Goals per game", f2(totGF / totGP), totGF + " goals in about " + totGP + " games") +
