@@ -37,7 +37,8 @@
     '<main class="in">\n  <section id="p-home"></section>\n  <section id="p-standings" hidden></section>\n  <section id="p-schedule" hidden></section>\n  <section id="p-teams" hidden></section>\n  <section id="p-players" hidden></section>\n</main>\n\n' +
     '<footer>\n  <div class="in">\n    <p id="asof"></p>\n    <div class="viewsw"><span>View</span><div class="seg" role="group" aria-label="Page layout"><button data-view="auto">Auto</button><button data-view="mobile">Mobile</button><button data-view="desktop">Desktop</button></div></div>\n' +
     "    <p>" + L.footerNote + "</p>\n" +
-    '    <p class="copy">&copy; ' + (L.copyrightYear || 2026) + " " + L.name + ". The design, layout and code of this page may not be copied, reproduced or used to train AI models without written permission.</p>\n  </div>\n</footer>\n\n");
+    '    <p class="copy">The design, layout and code of this page may not be copied, reproduced or used to train AI models without written permission.</p>\n  </div>\n</footer>\n' +
+    (window.HMTL_SITEBAR ? window.HMTL_SITEBAR("../") : "") + "\n");
 
   var TABS = ["home", "standings", "players", "schedule", "teams"];
   var MONTH = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
