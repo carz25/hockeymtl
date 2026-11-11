@@ -501,3 +501,8 @@ th.adv,td.adv{background:color-mix(in srgb,var(--rule) 18%,transparent)}
 .sitebar-nav{display:flex;gap:16px;font-weight:600}
 .sitebar-note{margin-left:auto}
 @media (max-width:720px){.sitebar-in{gap:4px 16px}.sitebar-note{margin-left:0;width:100%;font-size:11px}}
+/* division sites: the footer bar stays fixed along the bottom of the screen */
+.st-off .sitebar,.st-sheet .sitebar{position:fixed;left:0;right:0;bottom:0;z-index:40}
+body.st-off,body.st-sheet{padding-bottom:calc(46px + env(safe-area-inset-bottom,0px))}
+/* on phones the fixed bar keeps to one row; the same note is in the page footer above it */
+.m.st-off .sitebar-note,.m.st-sheet .sitebar-note{display:none}
