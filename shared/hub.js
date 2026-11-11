@@ -442,7 +442,7 @@
   function head(cols, cfg) {
     return "<thead><tr>" + cols.map(function (c) {
       var on = cfg.key === c[0];
-      return '<th class="' + (c[2] || "") + (on ? " on" : "") + '" aria-sort="' + (on ? (cfg.dir < 0 ? "descending" : "ascending") : "none") + '"><button class="sort" data-key="' + c[0] + '"' + (c[3] ? ' title="' + c[3] + '"' : "") + '>' + c[1] + (on ? (cfg.dir < 0 ? " ▾" : " ▴") : "") + "</button></th>";
+      return '<th class="' + (c[2] || "") + (on ? " on" : "") + '" aria-sort="' + (on ? (cfg.dir < 0 ? "descending" : "ascending") : "none") + '"><button class="sort" data-key="' + c[0] + '"' + (c[3] ? ' title="' + c[3] + '"' : "") + '>' + c[1] + (on ? '<span class="arr">' + (cfg.dir < 0 ? "▾" : "▴") + "</span>" : "") + "</button></th>";
     }).join("") + "</tr></thead>";
   }
   function leaderTile(rows, key, label, all) {
@@ -497,7 +497,7 @@
     var cards = defs.map(function (d, di) {
       var top = d[1].filter(function (r) { return r[d[2]] > 0; }).sort(function (a, b) { return b[d[2]] - a[d[2]] || d[3](a, b) || a.name.localeCompare(b.name); }).slice(0, 8);
       var mx = top.length ? top[0][d[2]] : 1;
-      return '<div class="card lcard"><h3>' + d[0] + '</h3>' + (di === 0 ? '<div class="lkey"><span><i class="kg"></i>Goals</span><span><i class="ka"></i>Assists</span></div>' : "") + '<ol class="lbars">' + (top.map(function (r, i) {
+      return '<div class="card lcard" data-k="' + d[2] + '"><h3>' + d[0] + '</h3>' + (di === 0 ? '<div class="lkey"><span><i class="kg"></i>Goals</span><span><i class="ka"></i>Assists</span></div>' : "") + '<ol class="lbars">' + (top.map(function (r, i) {
         return '<li><span class="lrk">' + (i + 1) + '</span><span class="ln">' + esc(r.name) + (all ? " " + badgeC(r.team) : "") + (di === 0 ? ' <small class="lsub">' + r.g + "G " + r.a + "A</small>" : "") + '</span><b class="lv">' + r[d[2]] + '</b>' + (di === 0 ? '<span class="lbar" aria-hidden="true"><i class="sg" style="width:' + (r.g / mx * 100).toFixed(1) + '%"></i><i class="sa" style="width:' + (r.a / mx * 100).toFixed(1) + '%"></i></span></li>' : '<span class="lbar" aria-hidden="true"><i class="' + (di === 3 ? "h" : "") + '" style="width:' + Math.max(4, Math.round(r[d[2]] / mx * 100)) + '%"></i></span></li>');
       }).join("") || '<li class="lnone">No data yet</li>') + "</ol></div>";
     }).join("");
@@ -540,7 +540,7 @@
       var f = d.f || function (v) { return v; };
       var top = d.rows.filter(function (r) { return d.zero || r[d.k] > 0; }).sort(function (a, b) { return (d.asc ? a[d.k] - b[d.k] : b[d.k] - a[d.k]) || d.tie(a, b) || a.name.localeCompare(b.name); }).slice(0, 8);
       var mx = top.length ? top[0][d.k] : 1, mn = top.length ? top[0][d.k] : 0;
-      return '<div class="card lcard"><h3>' + d.t + (d.note ? ' <small class="lsub">' + d.note + "</small>" : "") + "</h3>" + (d.special ? '<div class="lkey"><span><i class="kg"></i>Goals</span><span><i class="ka"></i>Assists</span></div>' : "") + '<ol class="lbars">' + (top.map(function (r, i) {
+      return '<div class="card lcard" data-k="' + d.k + '"><h3>' + d.t + (d.note ? ' <small class="lsub">' + d.note + "</small>" : "") + "</h3>" + (d.special ? '<div class="lkey"><span><i class="kg"></i>Goals</span><span><i class="ka"></i>Assists</span></div>' : "") + '<ol class="lbars">' + (top.map(function (r, i) {
         var w = d.asc ? (r[d.k] ? mn / r[d.k] * 100 : 100) : r[d.k] / mx * 100;
         return '<li><span class="lrk">' + (i + 1) + '</span><span class="ln">' + esc(r.name) + (all ? " " + badgeC(r.team) : "") + (d.special ? ' <small class="lsub">' + r.g + "G " + r.a + "A</small>" : (d.sub ? ' <small class="lsub">' + d.sub(r) + "</small>" : "")) + '</span><b class="lv">' + f(r[d.k]) + (d.unit || "") + "</b>" +
           (d.special ? '<span class="lbar" aria-hidden="true"><i class="sg" style="width:' + (r.g / mx * 100).toFixed(1) + '%"></i><i class="sa" style="width:' + (r.a / mx * 100).toFixed(1) + '%"></i></span></li>' : '<span class="lbar" aria-hidden="true"><i class="' + (d.cls || "") + '" style="width:' + Math.max(4, Math.round(w)) + '%"></i></span></li>');

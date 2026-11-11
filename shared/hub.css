@@ -433,18 +433,20 @@ button.wkc:hover{border-color:var(--ink)}
 .viewsw{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 .viewsw .seg button{padding:5px 12px;min-height:32px;font-size:13px}
 .advbtn{display:none;background:var(--card);border:1px solid var(--rule);border-radius:4px;padding:8px 14px;min-height:38px;font-weight:500;cursor:pointer;color:var(--ink);white-space:nowrap}
-.advbtn[aria-pressed="true"]{border-color:var(--ink)}.m .advbtn{display:block}
+.advbtn[aria-pressed="true"]{border-color:var(--ink)}
 table.pt{table-layout:fixed}
 table.pt col.rk{width:40px}table.pt col.tm{width:150px}table.pt col.nu{width:52px}
 table.pt th,table.pt td{padding-left:6px;padding-right:6px;overflow:hidden;text-overflow:ellipsis}
 table.pt th:first-child,table.pt td:first-child{padding-left:10px}
-table.pt th .sort{max-width:100%;overflow:hidden;text-overflow:ellipsis}
+table.pt th .sort{max-width:100%;overflow:hidden;text-overflow:clip;white-space:nowrap}
+table.pt th,table.pt th .sort{text-overflow:clip}
+.sort .arr{margin-left:2px;font-size:.85em}
 td.pts{font-size:17px}
 @media (max-width:1000px){table.pt col.tm{width:56px}.pt td .tn b{display:none}}
 @media (max-width:800px){table.pt col.nu{width:44px}table.pt th{font-size:11px;letter-spacing:.04em}table.pt th,table.pt td{padding-left:4px;padding-right:4px}}
 .pc .pl{display:flex;align-items:center;gap:6px;min-width:0}.pc .pl .lgc{flex:none}
 .pc .nm{font-weight:600;font-size:15px;min-width:0;flex:0 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pc .pst{display:flex;flex-wrap:wrap;gap:2px 12px;font-size:15px;color:var(--mute);white-space:nowrap}
+.pc .pst{display:flex;flex-wrap:wrap;gap:2px 12px;font-size:12px;color:var(--mute);white-space:nowrap}
 .pc .pst .sm{font-size:12px;align-self:center}
 .pc .pst b{color:var(--ink);font-weight:600}
 .m .tools{flex-wrap:wrap}.m .tools .search{flex:1 1 0;min-width:0;max-width:none}.m .tools .advbtn{flex:none;width:auto;font-size:12px;padding:6px 10px;min-height:38px}
@@ -462,3 +464,23 @@ th.adv,td.adv{background:color-mix(in srgb,var(--rule) 18%,transparent)}
 .wm-m{font-weight:800;font-style:italic;font-size:30px;letter-spacing:.03em;line-height:.9}
 .m .brand .home{padding-right:10px}
 .m .brand .wm{display:none}
+
+/* ---- mobile fixes ---- */
+/* assists bars in the leader cards are yellow, like the assists part of the points bars */
+.lcard[data-k="a"] .lbar i,.lcard[data-k="pwa"] .lbar i,.lcard[data-k="ppa"] .lbar i,.lcard[data-k="sha"] .lbar i{background:var(--side-c)}
+/* player cards: points two sizes bigger than the GP/G/A numbers */
+.m .pc .pv{font-size:14px}
+.m .pc .pv small{font-size:9px;margin-top:1px}
+/* division picker: no arrow, smaller, and the league subtitle tucks under the title so it all fits on one row */
+.m .divsel{-webkit-appearance:none;appearance:none;max-width:none;flex:none;font-size:12px;padding:6px 10px;border-radius:6px}
+.m.multi .brand{flex-wrap:nowrap}
+.m.multi .brand h1{white-space:normal;min-width:0}
+.m.multi .brand h1 span{display:block;margin:3px 0 0}
+/* schedule cards: time and game number on one row, level with "Win probability" */
+.m .g,.m .grow>summary{position:relative;grid-template-columns:minmax(0,1fr)}
+.m .gtime{flex-direction:row;align-items:baseline;gap:10px}
+.m .gteams .wph{position:absolute;top:12px;right:16px}
+/* arena wraps on its own; "Matchup preview" stays on the same line */
+.m .gmeta{flex-wrap:nowrap;align-items:flex-end}
+.m .gmeta>span:first-child{flex:1 1 auto;min-width:0}
+.m .gmeta>span:last-child{flex:none;white-space:nowrap}
