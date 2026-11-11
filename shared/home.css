@@ -10,10 +10,11 @@ body{margin:0;background:var(--seam);color:#fff;font-family:var(--body);overflow
   padding:16px max(28px,4vw);pointer-events:none}
 .lp-top>*{pointer-events:auto}
 .lp-brand{display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none}
-.lp-brand .puck{width:52px;height:52px}
+.lp-brand{gap:20px}
+.lp-brand .puck{width:112px;height:112px}
 .lp-brand .wm{filter:drop-shadow(0 2px 8px rgba(0,0,0,.4))}
-.lp-brand .wm-h{font-size:13px}
-.lp-brand .wm-m{font-size:36px}
+.lp-brand .wm-h{font-size:22px;letter-spacing:.42em}
+.lp-brand .wm-m{font-size:76px}
 .lp-brand:focus-visible{outline:3px solid #7DD3FC;outline-offset:4px;border-radius:4px}
 .lp-top h1{margin:0;font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:.08em;text-transform:none;white-space:nowrap;color:rgba(255,255,255,.88);text-shadow:0 2px 10px rgba(0,0,0,.35)}
 
@@ -40,16 +41,12 @@ body{margin:0;background:var(--seam);color:#fff;font-family:var(--body);overflow
 .hp-name{position:absolute;z-index:3;left:calc(30% + 4vw + 9vw * var(--first,0));bottom:12vh;display:flex;flex-direction:column;align-items:flex-start;gap:22px;
   font-family:var(--display);font-weight:800;font-size:clamp(48px,6.4vw,96px);line-height:.85;letter-spacing:.01em;white-space:nowrap;text-shadow:0 4px 24px rgba(0,0,0,.35)}
 .hp-p:first-child .hp-name{--first:1}
-/* clipped-corner "Open" plate */
-.hp-go{font-family:var(--display);font-weight:800;font-size:17px;letter-spacing:.12em;text-transform:uppercase;line-height:1;text-shadow:none;
-  background:#fff;color:#0B1220;padding:12px 30px 11px 18px;clip-path:polygon(0 0,100% 0,100% 62%,calc(100% - 12px) 100%,0 100%);transition:background .3s,color .3s,padding .3s}
 
 /* hover or keyboard focus: the panel takes more room and its number fills in */
 .hp:hover .hp-p,.hp:focus-within .hp-p{flex-grow:.85}
 .hp .hp-p:hover,.hp .hp-p:focus-visible{flex-grow:1.5}
 .hp-p:hover .hp-num,.hp-p:focus-visible .hp-num{color:rgba(255,255,255,.14);-webkit-text-stroke-color:rgba(255,255,255,.9)}
-.hp-p:hover .hp-go,.hp-p:focus-visible .hp-go{background:color-mix(in srgb,var(--c) 70%,#fff);color:#fff;padding-right:44px}
-.hp-p:focus-visible .hp-go{outline:3px solid #7DD3FC;outline-offset:3px}
+.hp-p:focus-visible .hp-name{text-decoration:underline;text-decoration-thickness:5px;text-underline-offset:12px}
 
 /* footer bar */
 /* colour strip on top, footer bar at the bottom */
@@ -79,14 +76,14 @@ body{margin:0;background:var(--seam);color:#fff;font-family:var(--body);overflow
   .hp-in{inset:-30% 0;transform:skewY(calc(var(--slant) * -1))}
   .hp-num{font-size:min(34vh,62vw)}
   .hp-name{left:28px;bottom:calc(30% + 5vh);font-size:clamp(44px,13vw,72px);gap:14px}
-  .hp-go{font-size:14px;padding:10px 24px 9px 14px}
   .hp-p:last-child .hp-name{bottom:calc(30% + 15vh)}
   .hp-p:first-child .hp-num{top:58%}
   .hp-p:first-child .hp-name{--first:0}
   .lp-top{padding:12px 18px}
-  .lp-brand .puck{width:42px;height:42px}
-  .lp-brand .wm-h{font-size:10px}
-  .lp-brand .wm-m{font-size:28px}
+  .lp-brand{gap:12px}
+  .lp-brand .puck{width:58px;height:58px}
+  .lp-brand .wm-h{font-size:12px}
+  .lp-brand .wm-m{font-size:38px}
   .lp-top h1{font-size:15px;letter-spacing:.05em}
 }
 @media (prefers-reduced-motion:no-preference) and (max-width:767px), (prefers-reduced-motion:no-preference) and (max-aspect-ratio:4/5){
@@ -97,3 +94,8 @@ body{margin:0;background:var(--seam);color:#fff;font-family:var(--body);overflow
 @keyframes slamR{from{transform:skewY(var(--slant)) translateX(104%)}}
 /* very narrow phones: keep the heading for screen readers, hide it visually */
 @media (max-width:400px){.lp-top h1{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}}
+.sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+/* smaller laptops and tablets: a step down from the full desktop logo */
+@media (min-width:768px) and (max-width:1100px), (min-width:768px) and (max-height:700px){
+  .lp-brand .puck{width:84px;height:84px}.lp-brand .wm-h{font-size:17px}.lp-brand .wm-m{font-size:56px}
+}
