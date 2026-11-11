@@ -9,7 +9,7 @@ shared/
   hub.js       code for every league (home, standings, players, schedule, teams, previews)
 M11BB/  M13AAA/  (one folder per league)
   index.html   short page that loads the files below. Copy it for a new league.
-  league.js    settings for this league (title, format, logo). Rarely changes.
+  league.js    settings for this league (title, format). Rarely changes.
   logos.css    team logo images (optional)
   data.js      schedule, standings, rosters and game sheets. Updated every week.
 ```
@@ -19,7 +19,8 @@ M11BB/  M13AAA/  (one folder per league)
 | Change | File |
 |---|---|
 | New game sheets, standings, schedule changes | that league's `data.js` only |
-| League name, logo, format | that league's `league.js` |
+| League name, format | that league's `league.js` |
+| Hockey MTL header logo (same on every league) | `shared/hub.js` (`LOGO`) |
 | Team logos | that league's `logos.css` |
 | Anything about how the site looks or works | `shared/hub.css` or `shared/hub.js` |
 
@@ -39,7 +40,6 @@ Paste this into the instructions of each league's Claude chat or project:
 | `logos` | `true` when `logos.css` has team logos. `false` shows coloured badges with the team code. |
 | `group` | Word used in "1st in the ...": `"conference"` or `"division"`. |
 | `footerNote` | Footer text about where the numbers come from. |
-| `logo` | HTML for the header logo (image or SVG). |
 
 A league has divisions when its `data.js` defines `DIVS`. That adds the division picker and division sections. Without `DIVS`, the league is one table in the order of `ORDER`.
 
