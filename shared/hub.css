@@ -488,3 +488,7 @@ th.adv,td.adv{background:color-mix(in srgb,var(--rule) 18%,transparent)}
 /* standings tables on mobile: points 3 sizes smaller */
 .m .ctable td.strong{font-size:18px}
 @media (max-width:375px){.m .ctable td.strong{font-size:16px}}
+/* standings on phones: Table / Grid switch */
+.svseg{align-self:flex-start}
+.svseg button{padding:6px 16px;min-height:34px;font-size:13px}
+.scg{display:flex;flex-direction:column;gap:8px}

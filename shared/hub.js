@@ -160,8 +160,9 @@
   function topGoalie(t) { return GK.filter(function (r) { return r.team === t; }).sort(function (a, b) { return b.min - a.min; })[0]; }
 
   /* ---------- state ---------- */
-  var state = { div: "ALL", team: "ALL", sf: "upcoming", ptab: "skaters", q: "", open: 0, sk: { key: "pts", dir: -1 }, gk: { key: "gaa", dir: 1 }, pm: 10, adv: false, view: "auto" };
+  var state = { div: "ALL", team: "ALL", sf: "upcoming", ptab: "skaters", q: "", open: 0, sk: { key: "pts", dir: -1 }, gk: { key: "gaa", dir: 1 }, pm: 10, adv: false, view: "auto", sv: "table" };
   try { var sd = localStorage.getItem(KEY + "-div"); if (DIVS.some(function (d) { return d.id === sd; })) state.div = sd; } catch (e) { }
+  try { var stv = localStorage.getItem(KEY + "-standings"); if (stv === "grid") state.sv = "grid"; } catch (e) { }
   try { var sv = localStorage.getItem(KEY + "-view"); if (sv === "mobile" || sv === "desktop") state.view = sv; } catch (e) { }
   var mq = window.matchMedia("(max-width:720px)");
   function applyView() {
@@ -239,80 +240,65 @@
       '<div class="hgrid"><div class="hcol"><div class="hh"><h3>Standings</h3><button class="hlink" data-go="standings">Full standings →</button></div>' + snap + "</div>" +
       '<div class="hcol"><div class="hh"><h3>Top performers</h3><button class="hlink" data-go="players">All players →</button></div><div class="pfgrid">' + perf + "</div></div></div></div>";
   }
-  function renderStandingsC() {
-    var totGP = ORDER.reduce(function (s, t) { return s + ST[t].gp; }, 0) / 2;
-    var totGF = ORDER.reduce(function (s, t) { return s + ST[t].gf; }, 0);
-    var lead = ST[ORDER[0]];
-    var focus = "";
-    if (state.team !== "ALL") {
-      var s = ST[state.team], ng = nextGame(state.team);
-      focus = '<div class="focus"><div style="display:flex;gap:14px;align-items:center">' + badge(state.team, 1) + '<div><div class="big">' + esc(TEAMS[state.team]) + '</div><div class="sub">' + ord(s.rank) + " in the conference · " + s.w + "-" + s.l + "-" + s.tie + " · " + s.pts + " PTS · last 5 " + formChips(state.team, 5) + "</div></div></div>" +
-        (ng ? '<div class="nextg"><span class="sub">Next game</span><b>' + when(ng) + "</b><span>" + (ng.h === state.team ? "vs " + esc(TEAMS[ng.a]) : "at " + esc(TEAMS[ng.h])) + '</span><button class="btn pri" data-open="' + ng.id + '">Matchup preview</button> <button class="btn" data-go="teams">Team page</button></div>' : '<div class="nextg"><button class="btn" data-go="teams">Team page</button></div>') + "</div>";
-    }
-    var mobS = ORDER.map(function (t) {
-      var s = ST[t];
-      return '<div class="sc' + (mine(t) ? " me" : "") + '"><div class="r">' + s.rank + '</div><div><button class="teamlink" data-team="' + t + '">' + tname(t, "full") + '</button><div class="rec">' + s.w + "-" + s.tie + "-" + s.l + " · " + s.gp + " GP · " + remaining(t) + ' to play</div></div><div class="p">' + s.pts + "<small>PTS</small></div>" +
-        '<div class="bar" aria-hidden="true"><i style="width:' + Math.round(parseFloat(s.pct) * 100) + '%"></i></div><div class="row"><span>GF <b>' + s.gf + "</b></span><span>GA <b>" + s.ga + "</b></span><span>DIFF <b>" + (s.diff > 0 ? "+" : "") + s.diff + "</b></span>" + formChips(t, 5) + "</div></div>";
-    }).join("");
-    var condensed = '<h3 style="margin-top:12px">Standings table</h3><div class="card"><div class="wrap"><table class="ctable"><thead><tr><th class="rk">#</th><th class="l stick">Team</th><th>GP</th><th>W</th><th>T</th><th>L</th><th class="pts">PTS</th><th>GF</th><th>GA</th><th>DIFF</th><th>STRK</th></tr></thead><tbody>' + ORDER.map(function (t) {
-      var s = ST[t];
-      return '<tr class="' + (mine(t) ? "me" : "") + '"><td class="rk num">' + s.rank + '</td><td class="l stick"><button class="teamlink" data-team="' + t + '">' + tname(t) + "</button></td><td>" + s.gp + "</td><td>" + s.w + "</td><td>" + s.tie + "</td><td>" + s.l + '</td><td class="strong">' + s.pts + "</td><td>" + s.gf + "</td><td>" + s.ga + "</td><td>" + (s.diff > 0 ? "+" : "") + s.diff + "</td><td>" + streakOf(t) + "</td></tr>";
-    }).join("") + "</tbody></table></div></div>";
-    var body = ORDER.map(function (t) {
-      var s = ST[t];
-      return '<tr class="' + (mine(t) ? "me" : "") + '"><td class="rk num">' + s.rank + '</td><td class="l stick"><button class="teamlink" data-team="' + t + '">' + tname(t) + "</button></td>" +
-        "<td>" + s.gp + "</td><td>" + s.w + "</td><td>" + s.tie + "</td><td>" + s.l + '</td><td class="strong">' + s.pts + "</td><td>" + s.pct + '<span class="pctbar"><i style="width:' + Math.round(parseFloat(s.pct) * 100) + '%"></i></span></td>' +
-        "<td>" + s.gf + "</td><td>" + s.ga + "</td><td>" + (s.diff > 0 ? "+" : "") + s.diff + "</td><td>" + s.pim + "</td><td class=\"l\">" + formChips(t, 5) + "</td></tr>";
-    }).join("");
-    $("p-standings").innerHTML =
-      '<div class="sec-head"><div><h2>Standings</h2><p class="lede">League table through ' + dlong(LAST) + ". Tap a team to open its profile.</p></div></div>" +
-      '<div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">' + focus +
-      '<div class="tiles">' + tile("Games played", PLAYED.length + " of " + GAMES.length, UPCOMING.length + " still to play") +
-      tile("Goals per game", f2(totGF / totGP), totGF + " goals in " + totGP + " games") +
-      tile("Top of the table", esc(SHORT[lead.t]), lead.pts + " PTS in " + lead.gp + " games") +
-      tile("Best offence", esc(SHORT[bestBy("gfg", true)]), f2(ST[bestBy("gfg", true)].gfg) + " goals per game") + "</div>" +
-      '<div class="mob">' + mobS + condensed + '<p class="mfoot">PTS% is points percentage, the fairer comparison when teams have played different numbers of games. Tap a team to open its profile.</p></div>' +
-      '<div class="card desk"><div class="wrap"><table><thead><tr><th class="rk">#</th><th class="l stick">Team</th><th title="Games played">GP</th><th title="Wins">W</th><th title="Ties">T</th><th title="Losses">L</th><th title="Points">PTS</th><th title="Points percentage">PTS%</th><th title="Goals for">GF</th><th title="Goals against">GA</th><th title="Goal difference">DIFF</th><th title="Penalty minutes">PIM</th><th class="l">Last 5</th></tr></thead><tbody>' + body + "</tbody></table></div>" +
-      '</div></div>';
-    $("p-standings").insertAdjacentHTML("beforeend", recapsHTML());
-  }
   function renderStandings() {
-    if (!MULTI) return renderStandingsC();
+    // One layout for every league. Record columns follow the league format (W-L-OTL or W-T-L);
+    // on phones a Table / Grid switch picks compact tables (default) or team cards.
     var totGP = Math.round(DT().reduce(function (s, t) { return s + ST[t].gp; }, 0) / 2);
     var totGF = DT().reduce(function (s, t) { return s + ST[t].gf; }, 0);
     var bp = ST[bestBy("pctn", true)], bo = bestBy("gfg", true), bd = bestBy("gag", false);
+    var where = function (t) { return MULTI ? esc(divOf(t).name) : "the " + GROUP; };
     var focus = "";
     if (state.team !== "ALL") {
       var s = ST[state.team], ng = nextGame(state.team);
-      focus = '<div class="focus"><div style="display:flex;gap:14px;align-items:center">' + badge(state.team, 1) + '<div><div class="big">' + esc(TEAMS[state.team]) + '</div><div class="sub">' + ord(s.rank) + " in " + esc(divOf(state.team).name) + " · " + rec(s) + " · " + (s.pend ? "–" : s.pts) + " PTS · last 5 " + formChips(state.team, 5) + "</div></div></div>" +
+      focus = '<div class="focus"><div style="display:flex;gap:14px;align-items:center">' + badge(state.team, 1) + '<div><div class="big">' + esc(TEAMS[state.team]) + '</div><div class="sub">' + ord(s.rank) + " in " + where(state.team) + " · " + rec(s) + " · " + (s.pend ? "–" : s.pts) + " PTS · last 5 " + formChips(state.team, 5) + "</div></div></div>" +
         (ng ? '<div class="nextg"><span class="sub">Next game</span><b>' + when(ng) + "</b><span>" + (ng.h === state.team ? "vs " + esc(TEAMS[ng.a]) : "at " + esc(TEAMS[ng.h])) + '</span><button class="btn pri" data-open="' + ng.id + '">Matchup preview</button> <button class="btn" data-go="teams">Team page</button></div>' : '<div class="nextg"><button class="btn" data-go="teams">Team page</button></div>') + "</div>";
     }
     var dash = function (s, v) { return s.pend ? "–" : v; };
     var sgn = function (s) { return (s.diff > 0 ? "+" : "") + s.diff; };
-    var mob = curDivs().map(function (d) {
-      return '<h3 class="divh">' + esc(d.name) + '</h3><div class="card"><div class="wrap"><table class="ctable"><thead><tr><th class="rk">#</th><th class="l stick">Team</th><th>GP</th><th>W</th><th>L</th><th>OTL</th><th class="pts">PTS</th><th>DIFF</th><th>STRK</th></tr></thead><tbody>' + d.teams.map(function (t) {
+    // record columns in league order
+    var RC = OT ? [["W", "Wins, all kinds", "w"], ["L", "Regulation losses", "l"], ["OTL", "Overtime and shootout losses", "otl"]]
+                : [["W", "Wins", "w"], ["T", "Ties", "tie"], ["L", "Losses", "l"]];
+    var rth = function (full) { return RC.map(function (c) { return "<th" + (full ? ' title="' + c[1] + '"' : "") + ">" + c[0] + "</th>"; }).join(""); };
+    var rtd = function (s) { return RC.map(function (c) { return "<td>" + s[c[2]] + "</td>"; }).join(""); };
+    var divHead = function (d) { return MULTI ? '<h3 class="divh">' + esc(d.name) + "</h3>" : ""; };
+    var teamCell = function (t) { return '<td class="l stick"><button class="teamlink" data-team="' + t + '">' + tname(t) + "</button></td>"; };
+    var pctBar = function (s) { return '<span class="pctbar"><i style="width:' + Math.round(s.pctn * 100) + '%"></i></span>'; };
+
+    var mobTable = curDivs().map(function (d) {
+      return divHead(d) + '<div class="card"><div class="wrap"><table class="ctable"><thead><tr><th class="rk">#</th><th class="l stick">Team</th><th>GP</th>' + rth() + '<th class="pts">PTS</th><th>DIFF</th><th>STRK</th></tr></thead><tbody>' + d.teams.map(function (t) {
         var s = ST[t];
-        return '<tr class="' + (mine(t) ? "me" : "") + '"><td class="rk num">' + s.rank + '</td><td class="l stick"><button class="teamlink" data-team="' + t + '">' + tname(t) + "</button></td><td>" + s.gp + "</td><td>" + s.w + "</td><td>" + s.l + "</td><td>" + s.otl + '</td><td class="strong">' + dash(s, s.pts) + "</td><td>" + sgn(s) + "</td><td>" + streakOf(t) + "</td></tr>";
+        return '<tr class="' + (mine(t) ? "me" : "") + '"><td class="rk num">' + s.rank + "</td>" + teamCell(t) + "<td>" + s.gp + "</td>" + rtd(s) + '<td class="strong">' + dash(s, s.pts) + "</td><td>" + sgn(s) + "</td><td>" + streakOf(t) + "</td></tr>";
       }).join("") + "</tbody></table></div></div>";
     }).join("");
+    var mobGrid = curDivs().map(function (d) {
+      return divHead(d) + '<div class="scg">' + d.teams.map(function (t) {
+        var s = ST[t];
+        return '<div class="sc' + (mine(t) ? " me" : "") + '"><div class="r">' + s.rank + '</div><div><button class="teamlink" data-team="' + t + '">' + tname(t, "full") + '</button><div class="rec">' + rec(s) + " · " + s.gp + " GP · " + remaining(t) + ' to play</div></div><div class="p">' + dash(s, s.pts) + "<small>PTS</small></div>" +
+          '<div class="bar" aria-hidden="true"><i style="width:' + Math.round(s.pctn * 100) + '%"></i></div><div class="row"><span>GF <b>' + s.gf + "</b></span><span>GA <b>" + s.ga + "</b></span><span>DIFF <b>" + sgn(s) + "</b></span>" + formChips(t, 5) + "</div></div>";
+      }).join("") + "</div>";
+    }).join("");
+    var svSeg = '<div class="seg svseg" role="group" aria-label="Standings view">' + [["table", "Table"], ["grid", "Grid"]].map(function (x) { return '<button data-sv="' + x[0] + '" aria-pressed="' + (state.sv === x[0]) + '">' + x[1] + "</button>"; }).join("") + "</div>";
+
     var desk = curDivs().map(function (d) {
       var body = d.teams.map(function (t) {
         var s = ST[t];
-        return '<tr class="' + (mine(t) ? "me" : "") + '"><td class="rk num">' + s.rank + '</td><td class="l stick"><button class="teamlink" data-team="' + t + '">' + tname(t) + "</button></td>" +
-          "<td>" + s.gp + "</td><td>" + s.w + "</td><td>" + s.l + "</td><td>" + s.otl + '</td><td class="strong">' + dash(s, s.pts) + "</td><td>" + s.pct + "</td>" +
-          "<td>" + s.gf + "</td><td>" + s.ga + "</td><td>" + sgn(s) + "</td><td>" + dash(s, s.pim) + "</td><td>" + s.rw + "</td><td>" + dash(s, s.sp) + '</td><td class="l">' + formChips(t, 5) + "</td></tr>";
+        return '<tr class="' + (mine(t) ? "me" : "") + '"><td class="rk num">' + s.rank + "</td>" + teamCell(t) +
+          "<td>" + s.gp + "</td>" + rtd(s) + '<td class="strong">' + dash(s, s.pts) + "</td><td>" + s.pct + pctBar(s) + "</td>" +
+          "<td>" + s.gf + "</td><td>" + s.ga + "</td><td>" + sgn(s) + "</td><td>" + dash(s, s.pim) + "</td>" + (OT ? "<td>" + s.rw + "</td><td>" + dash(s, s.sp) + "</td>" : "") + "<td>" + remaining(t) + '</td><td class="l">' + formChips(t, 5) + "</td></tr>";
       }).join("");
-      return '<h3 class="divh">' + esc(d.name) + '</h3><div class="card"><div class="wrap"><table><thead><tr><th class="rk">#</th><th class="l stick">Team</th><th title="Games played">GP</th><th title="Wins, all kinds">W</th><th title="Regulation losses">L</th><th title="Overtime and shootout losses">OTL</th><th title="Points">PTS</th><th title="Points percentage, PTS out of 4 per game">PTS%</th><th title="Goals for">GF</th><th title="Goals against">GA</th><th title="Goal difference">DIFF</th><th title="Penalty minutes">PIM</th><th title="Regulation wins">RW</th><th title="Sportsmanship points, included in PTS">SP</th><th class="l">Last 5</th></tr></thead><tbody>' + body + "</tbody></table></div></div>";
+      return divHead(d) + '<div class="card"><div class="wrap"><table><thead><tr><th class="rk">#</th><th class="l stick">Team</th><th title="Games played">GP</th>' + rth(true) + '<th title="Points">PTS</th><th title="Points percentage">PTS%</th><th title="Goals for">GF</th><th title="Goals against">GA</th><th title="Goal difference">DIFF</th><th title="Penalty minutes">PIM</th>' +
+        (OT ? '<th title="Regulation wins">RW</th><th title="Sportsmanship points, included in PTS">SP</th>' : "") + '<th title="Games remaining">GR</th><th class="l">Last 5</th></tr></thead><tbody>' + body + "</tbody></table></div></div>";
     }).join("");
+    var lede = MULTI ? (state.div === "ALL" ? DIVS.length + " divisions of " + DIVS[0].teams.length : esc(curDivs()[0].name)) + ", as of " + dlong(LAST) : "League table through " + dlong(LAST);
     $("p-standings").innerHTML =
-      '<div class="sec-head"><div><h2>Standings</h2><p class="lede">' + (state.div === "ALL" ? "Three divisions of eight" : esc(curDivs()[0].name)) + ", as of " + dlong(LAST) + ". Tap a team to open its profile.</p></div></div>" +
+      '<div class="sec-head"><div><h2>Standings</h2><p class="lede">' + lede + ". Tap a team to open its profile.</p></div></div>" +
       '<div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">' + focus +
-      '<div class="tiles">' + tile("Teams", DT().length, state.div === "ALL" ? DIVS.length + " divisions of " + DIVS[0].teams.length : esc(curDivs()[0].name)) +
+      '<div class="tiles">' + tile("Teams", DT().length, MULTI ? (state.div === "ALL" ? DIVS.length + " divisions of " + DIVS[0].teams.length : esc(curDivs()[0].name)) : "in the " + GROUP) +
       tile("Goals per game", f2(totGF / totGP), totGF + " goals in about " + totGP + " games") +
-      tile("Best points %", esc(SHORT[bp.t]), bp.pct + " · " + esc(divOf(bp.t).name)) +
+      tile("Best points %", esc(SHORT[bp.t]), bp.pct + (MULTI ? " · " + esc(divOf(bp.t).name) : "")) +
       tile("Best defence", esc(SHORT[bd]), f2(ST[bd].gag) + " allowed per game · best offence " + esc(SHORT[bo]) + " " + f2(ST[bo].gfg)) + "</div>" +
-      '<div class="mob">' + mob + "</div><div class=\"desk\">" + desk + "</div>" +
-      '</div>';
+      '<div class="mob">' + svSeg + (state.sv === "grid" ? mobGrid : mobTable) + '</div><div class="desk">' + desk + "</div>" +
+      "</div>";
     $("p-standings").insertAdjacentHTML("beforeend", recapsHTML());
   }
   /* ---------- game recaps (generated from the game sheets) ---------- */
@@ -1034,6 +1020,7 @@ function makeModel(played, sheets, teams, opt) {
     if (b.dataset.all) { state.pm = 9999; renderPlayers(); return; }
     if (b.dataset.jump) { var jt = document.querySelector('#p-schedule [data-month="' + b.dataset.jump + '"]'); if (jt) jt.scrollIntoView({ block: "start", behavior: "smooth" }); return; }
     if (b.dataset.sf) { state.sf = b.dataset.sf; renderSchedule(); return; }
+    if (b.dataset.sv) { state.sv = b.dataset.sv; try { localStorage.setItem(KEY + "-standings", state.sv); } catch (x) { } renderStandings(); return; }
     if (b.hasAttribute("data-adv")) { state.adv = !state.adv; renderPlayers(); return; }
     if (b.dataset.pt) { state.ptab = b.dataset.pt; state.pm = 10; renderPlayers(); return; }
     if (b.dataset.key) {
