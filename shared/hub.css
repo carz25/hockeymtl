@@ -469,18 +469,22 @@ th.adv,td.adv{background:color-mix(in srgb,var(--rule) 18%,transparent)}
 /* assists bars in the leader cards are yellow, like the assists part of the points bars */
 .lcard[data-k="a"] .lbar i,.lcard[data-k="pwa"] .lbar i,.lcard[data-k="ppa"] .lbar i,.lcard[data-k="sha"] .lbar i{background:var(--side-c)}
 /* player cards: points two sizes bigger than the GP/G/A numbers */
-.m .pc .pv{font-size:14px}
-.m .pc .pv small{font-size:9px;margin-top:1px}
+.m .pc .pv{font-size:30px}
 /* division picker: no arrow, smaller, and the league subtitle tucks under the title so it all fits on one row */
 .m .divsel{-webkit-appearance:none;appearance:none;max-width:none;flex:none;font-size:12px;padding:6px 10px;border-radius:6px}
 .m.multi .brand{flex-wrap:nowrap}
 .m.multi .brand h1{white-space:normal;min-width:0}
 .m.multi .brand h1 span{display:block;margin:3px 0 0}
 /* schedule cards: time and game number on one row, level with "Win probability" */
-.m .g,.m .grow>summary{position:relative;grid-template-columns:minmax(0,1fr)}
+.m .g,.m .grow>summary{grid-template-columns:minmax(0,1fr) auto;align-items:center}
 .m .gtime{flex-direction:row;align-items:baseline;gap:10px}
-.m .gteams .wph{position:absolute;top:12px;right:16px}
+.m .gteams{display:contents}
+.m .gteams .wph{grid-column:2;grid-row:1;align-self:center}
+.m .gteams .gl,.m .gmeta{grid-column:1/-1}
 /* arena wraps on its own; "Matchup preview" stays on the same line */
 .m .gmeta{flex-wrap:nowrap;align-items:flex-end}
 .m .gmeta>span:first-child{flex:1 1 auto;min-width:0}
 .m .gmeta>span:last-child{flex:none;white-space:nowrap}
+/* standings tables on mobile: points 3 sizes smaller */
+.m .ctable td.strong{font-size:18px}
+@media (max-width:375px){.m .ctable td.strong{font-size:16px}}
