@@ -27,7 +27,7 @@
 
   var panels = LEAGUES.map(function (l, i) {
     var num = (String(l.label).match(/\d+/) || [""])[0];
-    return '<a class="hp-p" href="' + l.folder + '/index.html" style="--c:' + l.color + ";--i:" + i + '">' +
+    return '<a class="hp-p" href="' + l.folder + '/" style="--c:' + l.color + ";--i:" + i + '">' +
       '<span class="hp-in">' + scratches(11 + i * 97) +
       '<span class="hp-num" aria-hidden="true">' + esc(num) + "</span>" +
       '<span class="hp-name"><span class="hp-bar" aria-hidden="true"></span>' + esc(l.label) + "</span></span></a>";
@@ -35,7 +35,7 @@
 
   document.body.insertAdjacentHTML("afterbegin",
     '<div class="lp">' +
-    '<header class="lp-top"><a class="lp-brand" href="index.html" aria-label="Hockey MTL home">' + LOGO + (window.HMTL_WORDMARK || "Hockey MTL") + "</a><h1>Choose a division</h1></header>" +
+    '<header class="lp-top"><a class="lp-brand" href="./" aria-label="Hockey MTL home">' + LOGO + (window.HMTL_WORDMARK || "Hockey MTL") + "</a><h1>Choose a division</h1></header>" +
     ad("728x90", "lp-ad-top") +
     '<nav class="hp" aria-label="Divisions" style="--n:' + LEAGUES.length + '">' + panels + "</nav>" +
     '<footer class="lp-foot">Unofficial fan site, not affiliated with any league or club. &copy; 2026 Hockey MTL</footer>' +
