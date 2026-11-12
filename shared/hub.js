@@ -210,6 +210,62 @@
     var inner = '<span class="hd">' + (g.played ? dshort(g.date) : dshort(g.date)) + "<small>" + (g.played ? fin(g) : g.time) + '</small></span><span class="hls">' + (g.played ? "" : '<span class="wph">Win probability</span>') + hLine(g, g.a, g.sa >= g.sh) + hLine(g, g.h, g.sh >= g.sa) + "</span>";
     return g.played ? '<div class="hg">' + inner + "</div>" : '<button class="hg" data-open="' + g.id + '">' + inner + "</button>";
   }
+  /* ---------- desktop home pieces ---------- */
+  (window.LEAGUES || []).forEach(function (l) { if (l.label === LEAGUE.title) document.documentElement.style.setProperty("--lgc", l.color); });
+  var DAYL = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  function lastName(n) { var p = String(n).split(" "); return p.length > 1 ? p.slice(1).join(" ") : n; }
+  function scorers(g, t) {
+    var sh = SHEET[g.id]; if (!sh || !sh.g) return "";
+    var c = {}, order = [];
+    sh.g.forEach(function (x) { if (x[0] !== t || !x[1]) return; if (!c[x[1]]) { c[x[1]] = 0; order.push(x[1]); } c[x[1]]++; });
+    return order.map(function (k) { return esc(lastName(nm(t, k))) + (c[k] > 1 ? " " + c[k] : ""); }).join(", ");
+  }
+  function hotTeam() {
+    var best = null, bn = 0;
+    DT().forEach(function (t) { var rs = results(t), n = 0; for (var i = rs.length - 1; i >= 0 && rs[i].r === "W"; i--) n++; if (n > bn || (n === bn && best && ST[t].pts > ST[best].pts)) { bn = n; best = t; } });
+    return bn ? { t: best, n: bn } : null;
+  }
+  function pickFeature(list) {
+    var best = null, bs = 1e9;
+    list.forEach(function (g) {
+      var a = ST[g.a], h = ST[g.h]; if (!a || !h) return;
+      var sc = a.rank + h.rank + 2 * Math.abs(a.rank - h.rank) + (a.div === h.div ? 0 : 6);
+      if (sc < bs) { bs = sc; best = g; }
+    });
+    return best;
+  }
+  function featureHTML(g, label) {
+    if (!g) return "";
+    var wp = winProb(g.a, g.h), last = PLAYED.filter(function (x) { return (x.a === g.a && x.h === g.h) || (x.a === g.h && x.h === g.a); }).slice(-1)[0];
+    var side = function (t, pc, home) {
+      var s = ST[t];
+      return '<div class="gf-t' + (home ? " home" : "") + '">' + badge(t, 1) + '<div><div class="gf-n">' + esc(TEAMS[t]) + '</div><div class="gf-r">' + ord(s.rank) + (MULTI ? " in " + esc(divOf(t).name) : "") + " · " + rec(s) + " · " + (s.pend ? "–" : s.pts) + " PTS</div>" +
+        '<div class="gf-f">' + formChips(t, 5) + "</div></div><div class=\"gf-p\">" + pc + "<small>%</small></div></div>";
+    };
+    var lastTxt = last ? "Last meeting " + dshort(last.date) + ": " + esc(SHORT[last.a]) + " " + last.sa + "–" + last.sh + " " + esc(SHORT[last.h]) : "First meeting this season";
+    return '<section class="gf"><div class="gf-h"><span>' + label + "</span><span>" + esc(when(g)) + (g.venue ? " · " + esc(g.venue) : "") + "</span></div>" +
+      '<div class="gf-m">' + side(g.a, wp.a, 0) + '<div class="gf-vs">at</div>' + side(g.h, wp.h, 1) + "</div>" +
+      '<div class="gf-bar" role="img" aria-label="Win probability ' + esc(SHORT[g.a]) + " " + wp.a + "%, tie " + wp.t + "%, " + esc(SHORT[g.h]) + " " + wp.h + '%"><i style="flex:' + wp.a + '"></i><i class="t" style="flex:' + wp.t + '"></i><i class="h" style="flex:' + wp.h + '"></i></div>' +
+      '<div class="gf-foot"><span>' + esc(SHORT[g.a]) + " " + wp.a + "% · tie " + wp.t + "% · " + esc(SHORT[g.h]) + " " + wp.h + "%</span><span>" + lastTxt + '</span><button class="btn pri" data-open="' + g.id + '">Matchup preview</button></div></section>';
+  }
+  function dayCards(list) {
+    var days = [], by = {};
+    list.forEach(function (g) { if (!by[g.date]) { by[g.date] = []; days.push(g.date); } by[g.date].push(g); });
+    return '<div class="dcards">' + days.map(function (dt) {
+      var d = pd(dt);
+      return '<div class="card dc"><h4>' + DAYL[d.getDay()] + "<span>" + MONTH[d.getMonth()] + " " + d.getDate() + "</span></h4>" + by[dt].map(function (g) {
+        var wp = winProb(g.a, g.h), fa = wp.a > wp.h, fh = wp.h > wp.a;
+        var ln = function (t, pc, fav) { return '<span class="dl' + (mine(t) ? " mine" : "") + '">' + badge(t) + "<b>" + esc(SHORT[t]) + '</b><em class="' + (fav ? "fav" : "") + '">' + pc + "%</em></span>"; };
+        return '<button class="dg" data-open="' + g.id + '"><span class="dt">' + g.time + '</span><span class="dls">' + ln(g.a, wp.a, fa) + ln(g.h, wp.h, fh) + "</span></button>";
+      }).join("") + "</div>";
+    }).join("") + "</div>";
+  }
+  function resultTiles(list) {
+    return '<div class="rgrid">' + list.map(function (g) {
+      var ln = function (t, sc, win) { var who = scorers(g, t); return '<div class="rl' + (win ? " w" : "") + '">' + badge(t) + "<b>" + esc(SHORT[t]) + "</b><i>" + sc + "</i></div>" + (who ? '<div class="rs">' + who + "</div>" : ""); };
+      return '<div class="card rt2"><div class="rh"><span>' + dshort(g.date) + "</span><span>" + fin(g) + "</span></div>" + ln(g.a, g.sa, g.sa > g.sh) + ln(g.h, g.sh, g.sh > g.sa) + "</div>";
+    }).join("") + "</div>";
+  }
   function renderHome() {
     var totGF = DT().reduce(function (s, t) { return s + ST[t].gf; }, 0), totGP = DT().reduce(function (s, t) { return s + ST[t].gp; }, 0) / 2;
     var lead = MULTI ? ST[bestBy("pctn", true)] : ST[ORDER[0]], off = bestBy("gfg", true);
@@ -225,19 +281,28 @@
       var s = ST[t];
       return '<tr><td class="rk">' + s.rank + '</td><td class="l">' + tname(t) + "</td><td>" + s.gp + "</td><td>" + s.w + "-" + s.tie + "-" + s.l + '</td><td class="strong">' + s.pts + "</td><td>" + streakOf(t) + "</td></tr>";
     }).join("") + "</tbody></table></div>";
+    var wk = weekendDates(), wkList = UPCOMING.filter(function (g) { return g.date >= wk[0] && g.date <= wk[1] && gIn(g); });
+    var upList = wkList.length ? wkList : next, ft = pickFeature(upList), hot = hotTeam(), pl = PLAYED.filter(gIn).length, tg = GAMES.filter(gIn).length;
+    var band = '<div class="sband desk"><div class="sb"><span>Games played</span><b>' + pl + "<small> / " + tg + '</small></b><div class="hprog"><i style="width:' + (tg ? Math.round(pl / tg * 100) : 0) + '%"></i></div></div>' +
+      '<div class="sb"><span>Goals per game</span><b>' + f2(totGF / totGP) + "</b><em>" + totGF + " goals so far</em></div>" +
+      '<div class="sb"><span>' + (MULTI ? "Best record" : "Leader") + "</span><b>" + badge(lead.t) + esc(SHORT[lead.t]) + "</b><em>" + rec(lead) + " · " + lead.pts + " PTS</em></div>" +
+      '<div class="sb"><span>Hottest team</span>' + (hot ? "<b>" + badge(hot.t) + esc(SHORT[hot.t]) + "</b><em>" + hot.n + "-game win streak</em>" : "<b>–</b><em>No active win streak</em>") + "</div></div>";
+    var deskHome = '<div class="desk hdesk">' + band + featureHTML(ft, wkList.length ? "Game of the weekend" : "Game to watch") +
+      (upList.length ? '<div class="hcol"><div class="hh"><h3>' + (wkList.length ? "This weekend" : "Upcoming games") + '</h3><button class="hlink" data-sfgo="upcoming">Full schedule →</button></div>' + dayCards(upList) + "</div>" : "") +
+      (recent.length ? '<div class="hcol"><div class="hh"><h3>Recent results</h3><button class="hlink" data-sfgo="results">All results →</button></div>' + resultTiles(recent) + "</div>" : "") + "</div>";
     var defs = [["Points", SK, "pts"], ["Goals", SK, "g"], ["Assists", SK, "a"], ["Goalie wins", GK, "w"]];
     var perf = defs.map(function (d) {
       var top = d[1].filter(function (r) { return r[d[2]] > 0; }).sort(function (a, b) { return b[d[2]] - a[d[2]] || (b.pts || 0) - (a.pts || 0) || b.gp - a.gp || a.name.localeCompare(b.name); }).slice(0, 3);
       return '<div class="card pf"><h4>' + d[0] + "</h4><ol>" + (top.map(function (r, i) {
-        return '<li><span class="pr">' + (i + 1) + '</span><span class="pn">' + esc(r.name) + " " + badgeC(r.team) + '</span><span class="pv">' + r[d[2]] + "</span></li>";
+        return '<li><span class="pr">' + (i + 1) + "</span>" + badge(r.team) + '<span class="pn">' + esc(r.name) + "<small>" + esc(SHORT[r.team]) + '</small></span><span class="pv">' + r[d[2]] + "</span></li>";
       }).join("") || '<li><span></span><span class="pr">No data yet</span><span></span></li>') + "</ol></div>";
     }).join("");
     $("p-home").innerHTML = '<div class="home"><div class="hhero"><div class="sec-head"><div><h2>Current season</h2><p class="lede">' + (GAMES.length ? PLAYED.filter(gIn).length + " of " + GAMES.filter(gIn).length + " games played through " + dlong(LAST) + "." : "Standings as of " + dlong(LAST) + ". The schedule and game sheets will be added soon.") + '</p></div></div>' +
       '<div class="hprog" role="img" aria-label="' + PLAYED.length + " of " + GAMES.length + ' games played"><i style="width:' + (GAMES.length ? Math.round(PLAYED.filter(gIn).length / GAMES.filter(gIn).length * 100) : 0) + '%"></i></div>' +
-      '<div class="hstat"><span><b>' + f2(totGF / totGP) + "</b> goals per game</span><span>Leader <b>" + esc(SHORT[lead.t]) + "</b> · " + lead.pts + " PTS</span><span>Best offence <b>" + esc(SHORT[off]) + "</b> · " + f2(ST[off].gfg) + " per game</span></div></div>" +
-      weekendHTML() +
+      '<div class="hstat mob"><span><b>' + f2(totGF / totGP) + "</b> goals per game</span><span>Leader <b>" + esc(SHORT[lead.t]) + "</b> · " + lead.pts + " PTS</span><span>Best offence <b>" + esc(SHORT[off]) + "</b> · " + f2(ST[off].gfg) + " per game</span></div></div>" +
+      deskHome + '<div class="mob hmob">' + weekendHTML() +
       '<div class="hgrid"><div class="hcol"><div class="hh"><h3>Recent results</h3><button class="hlink" data-sfgo="results">All results →</button></div><div class="hlist">' + (recent.map(homeGame).join("") || '<p class="mfoot">Results appear here once the schedule is loaded.</p>') + "</div></div>" +
-      '<div class="hcol"><div class="hh"><h3>Upcoming games</h3><button class="hlink" data-sfgo="upcoming">Full schedule →</button></div><div class="hlist">' + (next.map(homeGame).join("") || '<p class="mfoot">Upcoming games appear here once the schedule is loaded.</p>') + "</div></div></div>" +
+      '<div class="hcol"><div class="hh"><h3>Upcoming games</h3><button class="hlink" data-sfgo="upcoming">Full schedule →</button></div><div class="hlist">' + (next.map(homeGame).join("") || '<p class="mfoot">Upcoming games appear here once the schedule is loaded.</p>') + "</div></div></div></div>" +
       '<div class="hgrid"><div class="hcol"><div class="hh"><h3>Standings</h3><button class="hlink" data-go="standings">Full standings →</button></div>' + snap + "</div>" +
       '<div class="hcol"><div class="hh"><h3>Top performers</h3><button class="hlink" data-go="players">All players →</button></div><div class="pfgrid">' + perf + "</div></div></div></div>";
   }
@@ -299,15 +364,28 @@
     }).join("");
     var svSeg = '<div class="svbar"><div class="seg svseg" role="group" aria-label="Standings view">' + [["table", "Table"], ["grid", "Grid"]].map(function (x) { return '<button data-sv="' + x[0] + '" aria-pressed="' + (state.sv === x[0]) + '">' + x[1] + "</button>"; }).join("") + '</div><button class="advtog" data-sadv="1" role="switch" aria-checked="' + state.sadv + '"><i aria-hidden="true"></i>Advanced stats</button></div>';
 
+    /* Desktop table: columns grouped Record | Scoring | Special teams | Form, ending with each team's next game. */
+    var nextCell = function (t) {
+      var g = nextGame(t); if (!g || g.date === TBD_DATE) return '<td class="l nxt">–</td>';
+      var home = g.h === t, opp = home ? g.a : g.h;
+      return '<td class="l nxt"><button class="nxtb" data-open="' + g.id + '" title="' + esc(when(g)) + '"><span>' + DOW[pd(g.date).getDay()] + " " + g.time + "</span>" + (home ? "vs" : "at") + " " + badge(opp) + "<b>" + esc(SHORT[opp]) + "</b></button></td>";
+    };
+    var nRec = 1 + RC.length + 2 + (OT ? 2 : 0), nSpt = 3 + (SPT_AGAINST ? 2 : 0);
     var deskFor = function (cls) { return curDivs().map(function (d) {
       var body = d.teams.map(function (t) {
         var s = ST[t];
         return '<tr class="' + (mine(t) ? "me" : "") + '"><td class="rk num">' + s.rank + "</td>" + teamCell(t) +
-          "<td>" + s.gp + "</td>" + rtd(s) + '<td class="strong">' + dash(s, s.pts) + "</td><td>" + s.pct + "</td>" +
-          "<td>" + s.gf + "</td><td>" + s.ga + "</td><td>" + sgn(s) + "</td><td>" + dash(s, s.pim) + "</td><td>" + SPT[t].ppg + "</td>" + (SPT_AGAINST ? "<td>" + SPT[t].ppga + "</td>" : "") + "<td>" + SPT[t].shg + "</td>" + (SPT_AGAINST ? "<td>" + SPT[t].shga + "</td>" : "") + (OT ? "<td>" + s.rw + "</td><td>" + dash(s, s.sp) + "</td>" : "") + "<td>" + remaining(t) + '</td><td class="l">' + formChips(t, 5) + "</td></tr>";
+          '<td class="g0">' + s.gp + "</td>" + rtd(s) + '<td class="strong ptsc">' + dash(s, s.pts) + "</td><td>" + s.pct + "</td>" + (OT ? "<td>" + s.rw + "</td><td>" + dash(s, s.sp) + "</td>" : "") +
+          '<td class="g0">' + s.gf + "</td><td>" + s.ga + "</td><td>" + sgn(s) + "</td>" +
+          '<td class="g0">' + dash(s, s.pim) + "</td><td>" + SPT[t].ppg + "</td>" + (SPT_AGAINST ? "<td>" + SPT[t].ppga + "</td>" : "") + "<td>" + SPT[t].shg + "</td>" + (SPT_AGAINST ? "<td>" + SPT[t].shga + "</td>" : "") +
+          '<td class="g0">' + remaining(t) + '</td><td class="l">' + formChips(t, 5) + "</td>" + nextCell(t) + "</tr>";
       }).join("");
-      return divHead(d) + '<div class="card"><div class="wrap"><table' + (cls ? ' class="' + cls + '"' : "") + '><thead><tr><th class="rk">#</th><th class="l stick">Team</th><th title="Games played">GP</th>' + rth(true) + '<th title="Points">PTS</th><th title="Points percentage">PTS%</th><th title="Goals for">GF</th><th title="Goals against">GA</th><th title="Goal difference">DIFF</th><th title="Penalty minutes">PIM</th><th title="Power-play goals">PPG</th>' + (SPT_AGAINST ? '<th title="Power-play goals against">PPGA</th>' : "") + '<th title="Short-handed goals">SHG</th>' + (SPT_AGAINST ? '<th title="Short-handed goals against">SHGA</th>' : "") +
-        (OT ? '<th title="Regulation wins">RW</th><th title="Sportsmanship points, included in PTS">SP</th>' : "") + '<th title="Games remaining">GR</th><th class="l">Last 5</th></tr></thead><tbody>' + body + "</tbody></table></div></div>";
+      return divHead(d) + '<div class="card"><div class="wrap"><table class="stt' + (cls ? " " + cls : "") + '"><thead>' +
+        '<tr class="grp"><th colspan="2"></th><th colspan="' + nRec + '" class="g0">Record</th><th colspan="3" class="g0">Scoring</th><th colspan="' + nSpt + '" class="g0">Special teams</th><th colspan="3" class="g0 l">Form</th></tr>' +
+        '<tr><th class="rk">#</th><th class="l stick">Team</th><th class="g0" title="Games played">GP</th>' + rth(true) + '<th class="ptsc" title="Points">PTS</th><th title="Points percentage">PTS%</th>' + (OT ? '<th title="Regulation wins">RW</th><th title="Sportsmanship points, included in PTS">SP</th>' : "") +
+        '<th class="g0" title="Goals for">GF</th><th title="Goals against">GA</th><th title="Goal difference">DIFF</th>' +
+        '<th class="g0" title="Penalty minutes">PIM</th><th title="Power-play goals">PPG</th>' + (SPT_AGAINST ? '<th title="Power-play goals against">PPGA</th>' : "") + '<th title="Short-handed goals">SHG</th>' + (SPT_AGAINST ? '<th title="Short-handed goals against">SHGA</th>' : "") +
+        '<th class="g0" title="Games remaining">GR</th><th class="l">Last 5</th><th class="l">Next game</th></tr></thead><tbody>' + body + "</tbody></table></div></div>";
     }).join(""); };
     var desk = deskFor("");
     var lede = MULTI ? (state.div === "ALL" ? DIVS.length + " divisions of " + DIVS[0].teams.length : esc(curDivs()[0].name)) + ", as of " + dlong(LAST) : "League table through " + dlong(LAST);
