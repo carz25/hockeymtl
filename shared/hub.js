@@ -161,9 +161,10 @@
   function topGoalie(t) { return GK.filter(function (r) { return r.team === t; }).sort(function (a, b) { return b.min - a.min; })[0]; }
 
   /* ---------- state ---------- */
-  var state = { div: "ALL", team: "ALL", sf: "upcoming", ptab: "skaters", q: "", open: 0, sk: { key: "pts", dir: -1 }, gk: { key: "gaa", dir: 1 }, pm: 10, adv: false, view: "auto", sv: "table", sadv: false };
+  var state = { div: "ALL", team: "ALL", sf: "upcoming", ptab: "skaters", q: "", open: 0, sk: { key: "pts", dir: -1 }, gk: { key: "gaa", dir: 1 }, pm: 10, adv: false, view: "auto", sv: "table", sadv: false, pv: "cards" };
   try { var sd = localStorage.getItem(KEY + "-div"); if (DIVS.some(function (d) { return d.id === sd; })) state.div = sd; } catch (e) { }
   try { var stv = localStorage.getItem(KEY + "-standings"); if (stv === "grid") state.sv = "grid"; if (stv === "special" || localStorage.getItem(KEY + "-standings-adv") === "1") { state.sadv = true; state.sv = "table"; } } catch (e) { }
+  try { if (localStorage.getItem(KEY + "-players-view") === "list") state.pv = "list"; } catch (e) { }
   try { var sv = localStorage.getItem(KEY + "-view"); if (sv === "mobile" || sv === "desktop") state.view = sv; } catch (e) { }
   var mq = window.matchMedia("(max-width:720px)");
   function applyView() {
@@ -555,6 +556,58 @@
     }).join("");
     return '<div><h3 style="margin:8px 0 12px">Top 8 leaders · ' + (all ? scopeLbl() : esc(TEAMS[state.team])) + '</h3><div class="lgrid">' + cards + '</div><p class="mfoot" style="margin-top:10px">PIM is penalty minutes. Rate leaders need ' + (state.ptab === "skaters" ? MINGP_SK + " games for skaters" : MINGP_GK + " games for goalies") + ".</p></div>";
   }
+  /* ---------- leader cards (Players, Cards view) ----------
+     One card per stat: the leader large with a silhouette in team colour, then the next four. */
+  function silhouette(t, gk) {
+    var c = BADGE[t] || "#2B6CB0";
+    return '<svg class="fsvg" viewBox="0 0 120 120" aria-hidden="true"><rect width="120" height="120" fill="' + c + '"/><rect width="120" height="120" fill="url(#fshade)"/>' +
+      '<path d="M18 120c0-26 17-41 42-41s42 15 42 41z" fill="#fff" fill-opacity=".9"/><path d="M48 80l12 15 12-15" fill="none" stroke="' + c + '" stroke-width="4" stroke-linejoin="round" opacity=".55"/>' +
+      '<circle cx="60" cy="50" r="19" fill="#fff" fill-opacity=".9"/>' +
+      (gk ? '<path d="M41 47a19 19 0 0 1 38 0v9a19 19 0 0 1-38 0z" fill="#fff"/><path d="M47 52h26M47 59h26M54 46v20M60 46v21M66 46v20" stroke="' + c + '" stroke-width="2" opacity=".6"/>'
+          : '<path d="M40 49a20 20 0 0 1 40 0v3H40z" fill="' + c + '" opacity=".75"/><path d="M38 52h44" stroke="#fff" stroke-width="2.5" stroke-opacity=".9"/>') + "</svg>";
+  }
+  function cardsHTML() {
+    var all = state.team === "ALL";
+    var inTeam = function (r) { return inDiv(r.team) && (all || r.team === state.team); };
+    var byPts = function (a, b) { return b.pts - a.pts || b.g - a.g; }, byGp = function (a, b) { return b.gp - a.gp; };
+    var defs;
+    if (state.ptab === "skaters") {
+      var sks = SK.filter(inTeam);
+      defs = [
+        { t: "Points", rows: sks, k: "pts", u: "PTS", tie: function (a, b) { return b.g - a.g; }, sub: function (r) { return r.g + " G · " + r.a + " A"; } },
+        { t: "Goals", rows: sks, k: "g", u: "G", tie: byPts },
+        { t: "Assists", rows: sks, k: "a", u: "A", tie: byPts },
+        { t: "Penalty minutes", rows: sks, k: "pen", u: "PIM", tie: byPts }
+      ];
+    } else {
+      var gks = GK.filter(inTeam), q = gks.filter(function (r) { return OFFICIAL ? r.gp >= MINGP_GK : r.min >= 60; });
+      defs = [
+        { t: "Wins", rows: gks, k: "w", u: "W", tie: byGp, gk: 1, sub: function (r) { return r.w + "-" + r.l + "-" + r.t + " · " + r.gp + " GP"; } },
+        { t: "Goals against average", rows: q, k: "gaa", u: "GAA", f: f2, asc: 1, zero: 1, tie: byGp, gk: 1, sub: function (r) { return r.gp + " GP"; }, note: OFFICIAL ? "Minimum " + MINGP_GK + " games" : "Minimum 60 minutes in net" },
+        { t: "Shutouts", rows: gks, k: "so", u: "SO", tie: byGp, gk: 1 }
+      ];
+    }
+    var html = defs.map(function (d) {
+      var f = d.f || function (v) { return v; };
+      var top = d.rows.filter(function (r) { return d.zero || r[d.k] > 0; }).sort(function (a, b) { return (d.asc ? a[d.k] - b[d.k] : b[d.k] - a[d.k]) || d.tie(a, b) || a.name.localeCompare(b.name); }).slice(0, 5);
+      if (!top.length) return '<div class="card fcard"><h3>' + d.t + '</h3><p class="fnone">No leader yet.</p></div>';
+      var L = top[0];
+      return '<div class="card fcard"><h3>' + d.t + "</h3>" +
+        '<div class="fhero' + (mine(L.team) ? " me" : "") + '"><div class="fsil">' + silhouette(L.team, d.gk) + badge(L.team) + '</div><div class="fwho"><div class="fname">' + esc(L.name) + '</div><div class="fteam">' + esc(TEAMS[L.team]) + "</div>" +
+        (d.sub ? '<div class="fsub">' + d.sub(L) + "</div>" : "") + '<div class="fval">' + f(L[d.k]) + "<small>" + d.u + "</small></div></div></div>" +
+        '<ol class="flist" start="2">' + top.slice(1).map(function (r, i) {
+          return '<li class="' + (mine(r.team) ? "me" : "") + '"><span class="frk">' + (i + 2) + "</span>" + badge(r.team) + '<span class="fn">' + esc(r.name) + "<small>" + esc(SHORT[r.team]) + '</small></span><b class="fv">' + f(r[d.k]) + "</b></li>";
+        }).join("") + "</ol>" + (d.note ? '<p class="fnote">' + d.note + "</p>" : "") + "</div>";
+    }).join("");
+    return '<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="fshade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".18"/><stop offset="1" stop-color="#000" stop-opacity=".28"/></linearGradient></defs></svg>' +
+      '<div class="fgrid' + (state.ptab === "goalies" ? " g3" : "") + '">' + html + "</div>" +
+      '<p class="mfoot">Top 5 in each category' + (all ? "" : " for " + esc(TEAMS[state.team])) + ". Switch to List for every player and more stats.</p>";
+  }
+  function pvTools(tools, seg) {
+    var pv = '<div class="seg pvseg" role="group" aria-label="Players view">' + [["cards", "Cards"], ["list", "List"]].map(function (x) { return '<button data-pv="' + x[0] + '" aria-pressed="' + (state.pv === x[0]) + '">' + x[1] + "</button>"; }).join("") + "</div>";
+    if (state.pv === "cards") return '<div class="tools"><div class="seg ptseg" role="group" aria-label="Player type">' + seg + "</div>" + pv + "</div>";
+    return tools.replace('<div class="seg" role="group" aria-label="Player type">' + seg + "</div>", '<div class="seg ptseg" role="group" aria-label="Player type">' + seg + "</div>" + pv + '<span class="tbrk"></span>');
+  }
   function renderPlayersC() {
     var all = state.team === "ALL", out = "";
     var seg = [["skaters", "Skaters"], ["goalies", "Goalies"]].map(function (x) { return '<button data-pt="' + x[0] + '" aria-pressed="' + (state.ptab === x[0]) + '">' + x[1] + "</button>"; }).join("");
@@ -599,7 +652,7 @@
     }
     var focusQ = document.activeElement && document.activeElement.id === "q";
     $("p-players").innerHTML = '<div class="sec-head"><div><h2>Players</h2></div></div>' +
-      '<div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">' + tools + out + leadersHTML() + "</div>";
+      '<div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">' + pvTools(tools, seg) + (state.pv === "cards" ? cardsHTML() : out + leadersHTML()) + "</div>";
     if (focusQ) { var el = $("q"); el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
   }
   function renderPlayers() {
@@ -650,7 +703,7 @@
     }
     var focusQ = document.activeElement && document.activeElement.id === "q";
     $("p-players").innerHTML = '<div class="sec-head"><div><h2>Players</h2></div></div>' +
-      '<div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">' + tools + out + leadersHTML() + "</div>";
+      '<div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">' + pvTools(tools, seg) + (state.pv === "cards" ? cardsHTML() : out + leadersHTML()) + "</div>";
     if (focusQ) { var el = $("q"); el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
   }
 
@@ -1044,6 +1097,7 @@ function makeModel(played, sheets, teams, opt) {
     if (b.dataset.sv) { state.sv = b.dataset.sv; state.sadv = false; try { localStorage.setItem(KEY + "-standings", state.sv); localStorage.setItem(KEY + "-standings-adv", "0"); } catch (x) { } renderStandings(); return; }
     if (b.dataset.sadv) { state.sadv = !state.sadv; if (state.sadv) state.sv = "table"; try { localStorage.setItem(KEY + "-standings", state.sv); localStorage.setItem(KEY + "-standings-adv", state.sadv ? "1" : "0"); } catch (x) { } renderStandings(); return; }
     if (b.hasAttribute("data-adv")) { state.adv = !state.adv; renderPlayers(); return; }
+    if (b.dataset.pv) { state.pv = b.dataset.pv; try { localStorage.setItem(KEY + "-players-view", state.pv); } catch (x) { } renderPlayers(); return; }
     if (b.dataset.pt) { state.ptab = b.dataset.pt; state.pm = 10; renderPlayers(); return; }
     if (b.dataset.key) {
       var cfg = state.ptab === "skaters" ? state.sk : state.gk, k = b.dataset.key;

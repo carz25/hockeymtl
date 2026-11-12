@@ -513,3 +513,39 @@ body.st-off>main,body.st-sheet>main{flex:1 0 auto;width:100%}
 .advtog:focus-visible{outline:2px solid var(--side-a);outline-offset:2px}
 /* advanced table on phones: the full desktop table, sliding sideways with the team column pinned */
 table.advt th,table.advt td{white-space:nowrap}
+/* Players: Cards view (leader cards). Leader large with a silhouette in team colour, next four listed below. */
+.pvseg{margin-left:auto}
+.tbrk{display:none}
+.fgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.fgrid.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:1100px){.fgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.fgrid.g3{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.fcard{padding:0;display:flex;flex-direction:column;min-width:0}
+.fcard h3{margin:0;padding:14px 16px 0;font-family:var(--display);font-weight:800;font-size:20px;letter-spacing:.02em;text-transform:uppercase}
+.fhero{display:grid;grid-template-columns:104px minmax(0,1fr);gap:14px;padding:12px 16px 16px;align-items:end}
+.fsil{position:relative;width:104px;height:104px}
+.fsvg{display:block;width:100%;height:100%;border-radius:6px}
+.fsil .lg{position:absolute;right:-8px;bottom:-8px;width:34px;height:34px;box-shadow:0 0 0 2px var(--card)}
+.fwho{min-width:0}
+.fname{font-weight:700;font-size:18px;line-height:1.2;overflow-wrap:anywhere}
+.fteam,.fsub{font-size:13px;color:var(--mute);line-height:1.35}
+.fval{font-family:var(--display);font-weight:800;font-size:54px;line-height:.95;margin-top:6px;font-variant-numeric:tabular-nums}
+.fval small{font-size:15px;font-weight:700;margin-left:6px;letter-spacing:.06em;color:var(--mute)}
+.flist{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
+.flist li{display:grid;grid-template-columns:18px 22px minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 16px;border-bottom:1px solid var(--rule)}
+.flist li:last-child{border-bottom:0}
+.flist .lg{width:22px;height:22px;border-radius:5px;padding:1px}
+.frk{color:var(--mute);font-variant-numeric:tabular-nums;font-size:13px}
+.fn{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fn small{font-weight:400;color:var(--mute);margin-left:6px;font-size:12px}
+.fv{font-variant-numeric:tabular-nums;font-size:15px}
+.fhero.me,.flist li.me{background:var(--follow)}
+.fnote,.fnone{margin:0;padding:8px 16px 12px;font-size:12px;color:var(--mute)}
+.fnone{padding:16px}
+/* phones: cards slide sideways one at a time */
+.m .fgrid,.m .fgrid.g3{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;margin:0 -16px;padding:0 16px 6px;scrollbar-width:none}
+.m .fgrid::-webkit-scrollbar{display:none}
+.m .fcard{flex:0 0 86%;scroll-snap-align:center}
+.m .tools .seg.ptseg{width:auto;flex:1}
+.m .tools .seg.pvseg{width:auto;flex:none;margin-left:0}
+.m .tools .pvseg button{flex:none;padding:8px 12px}
+.m .tbrk{display:block;flex-basis:100%;height:0}
