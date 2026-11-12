@@ -266,7 +266,7 @@
     // on phones a Table / Grid switch picks compact tables (default) or team cards.
     var totGP = Math.round(DT().reduce(function (s, t) { return s + ST[t].gp; }, 0) / 2);
     var totGF = DT().reduce(function (s, t) { return s + ST[t].gf; }, 0);
-    var bp = ST[bestBy("pctn", true)], bo = bestBy("gfg", true), bd = bestBy("gag", false);
+    var bp = ST[bestBy("pctn", true)], bo = bestBy("gfg", true), bd = bestBy("gag", false), bdf = bestBy("diff", true);
     var where = function (t) { return MULTI ? esc(divOf(t).name) : "the " + GROUP; };
     var focus = "";
     if (state.team !== "ALL") {
@@ -315,7 +315,7 @@
       '<div class="sec-head"><div><h2>Standings</h2><p class="lede">' + lede + ".</p></div></div>" +
       '<div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">' + focus +
       '<div class="tiles">' + tile("Best offence", esc(SHORT[bo]), f2(ST[bo].gfg) + " goals per game · " + ST[bo].gf + " total" + (MULTI ? " · " + esc(divOf(bo).name) : "")) +
-      tile("Goals per game", f2(totGF / totGP), totGF + " goals in about " + totGP + " games") +
+      tile("Highest diff", esc(SHORT[bdf]), (ST[bdf].diff > 0 ? "+" : "") + ST[bdf].diff + " goal difference · " + ST[bdf].gf + " for, " + ST[bdf].ga + " against" + (MULTI ? " · " + esc(divOf(bdf).name) : "")) +
       tile("Best points %", esc(SHORT[bp.t]), bp.pct + (MULTI ? " · " + esc(divOf(bp.t).name) : "")) +
       tile("Best defence", esc(SHORT[bd]), f2(ST[bd].gag) + " allowed per game" + (MULTI ? " · " + esc(divOf(bd).name) : "")) + "</div>" +
       '<div class="mob">' + svSeg + (state.sadv ? deskFor("advt") : state.sv === "grid" ? mobGrid : mobTable) + '</div><div class="desk">' + desk + "</div>" +
