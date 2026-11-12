@@ -557,13 +557,10 @@
   }
   /* ---------- leader cards (Players, Cards view) ----------
      One card per stat: the leader large with a silhouette in team colour, then the next four. */
-  function silhouette(t, gk) {
-    var c = BADGE[t] || "#2B6CB0", lg = LOGOS;
-    return (lg ? '<span class="fbg t-' + t + '" aria-hidden="true"></span>' : "") + '<svg class="fsvg" viewBox="0 0 120 120" aria-hidden="true">' + (lg ? "" : '<rect width="120" height="120" fill="' + c + '"/><rect width="120" height="120" fill="url(#fshade)"/>') +
-      '<path d="M18 120c0-26 17-41 42-41s42 15 42 41z" fill="' + (lg ? "#0F1B2A" : "#fff") + '" fill-opacity="' + (lg ? ".82" : ".9") + '"/><path d="M48 80l12 15 12-15" fill="none" stroke="' + (lg ? "#fff" : c) + '" stroke-width="4" stroke-linejoin="round" opacity=".55"/>' +
-      '<circle cx="60" cy="50" r="19" fill="' + (lg ? "#0F1B2A" : "#fff") + '" fill-opacity="' + (lg ? ".82" : ".9") + '"/>' +
-      (gk ? '<path d="M41 47a19 19 0 0 1 38 0v9a19 19 0 0 1-38 0z" fill="' + (lg ? "#0F1B2A" : "#fff") + '"/><path d="M47 52h26M47 59h26M54 46v20M60 46v21M66 46v20" stroke="' + (lg ? "#fff" : c) + '" stroke-width="2" opacity=".6"/>'
-          : '<path d="M40 49a20 20 0 0 1 40 0v3H40z" fill="' + (lg ? "#0F1B2A" : c) + '" opacity="' + (lg ? "1" : ".75") + '"/><path d="M38 52h44" stroke="#fff" stroke-width="2.5" stroke-opacity=".9"/>') + "</svg>";
+  /* picture beside the featured player: the team logo (or, for leagues without logos, the team colour and code) */
+  function silhouette(t) {
+    if (LOGOS) return '<span class="fbg t-' + t + '" aria-hidden="true"></span>';
+    return '<span class="fbg fcode" style="background:' + (BADGE[t] || "#2B6CB0") + '" aria-hidden="true">' + t + "</span>";
   }
   function cardsHTML() {
     var all = state.team === "ALL";
@@ -597,14 +594,13 @@
           return '<li><button class="frow' + (i === 0 ? " on" : "") + (mine(r.team) ? " me" : "") + '" data-fc="' + ci + '" data-fi="' + i + '"><span class="frk">' + (i + 1) + "</span>" + badge(r.team) + '<span class="fn">' + esc(r.name) + "<small>" + esc(SHORT[r.team]) + '</small></span><b class="fv">' + f(r[d.k]) + "</b></button></li>";
         }).join("") + "</ol></div>" + (d.note ? '<p class="fnote">' + d.note + "</p>" : "") + "</div>";
     }).join("");
-    return '<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="fshade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".18"/><stop offset="1" stop-color="#000" stop-opacity=".28"/></linearGradient></defs></svg>' +
-      '<div class="fgrid">' + html + "</div>" +
+    return '<div class="fgrid">' + html + "</div>" +
       '<p class="mfoot">Top 10 in each category' + (all ? "" : " for " + esc(TEAMS[state.team])) + ". Tap a name to feature that player. Switch to List for every player and more stats.</p>";
   }
   var FCARDS = [];
   function heroHTML(ci, i) {
     var c = FCARDS[ci], r = c.top[i], d = c.d;
-    return '<div class="fsil' + (LOGOS ? " haslg" : "") + '">' + silhouette(r.team, d.gk) + (LOGOS ? "" : badge(r.team)) + '</div><div class="fwho"><div class="frank">#' + (i + 1) + (i === 0 ? " · Leader" : "") + '</div><div class="fname">' + esc(r.name) + '</div><div class="fteam">' + esc(TEAMS[r.team]) + "</div>" +
+    return '<div class="fsil">' + silhouette(r.team) + '</div><div class="fwho"><div class="frank">#' + (i + 1) + (i === 0 ? " · Leader" : "") + '</div><div class="fname">' + esc(r.name) + '</div><div class="fteam">' + esc(TEAMS[r.team]) + "</div>" +
       (d.sub ? '<div class="fsub">' + d.sub(r) + "</div>" : "") + '<div class="fval">' + c.f(r[d.k]) + "<small>" + d.u + "</small></div></div>";
   }
   function featureRow(btn) {
