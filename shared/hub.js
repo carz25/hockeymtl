@@ -196,7 +196,7 @@
       var wp = g.played ? null : winProb(g.a, g.h);
       var line = function (t, sc, win) { var pc = wp ? (t === g.a ? wp.a : wp.h) : 0, fav = wp && pc === Math.max(wp.a, wp.h) && wp.a !== wp.h; return '<span class="wkl' + (mine(t) ? " mine" : "") + (g.played && !win ? " lose" : "") + '">' + badge(t).replace(/alt="[^"]*"/, 'alt=""') + "<b>" + esc(SHORT[t]) + "</b>" + (g.played ? "<i>" + sc + "</i>" : '<em class="wpc' + (fav ? " fav" : "") + '" title="Win probability">' + pc + "%</em>") + "</span>"; };
       var inner = '<span class="wkd">' + day + "</span>" + (g.played ? "" : '<span class="wph">Win probability</span>') + line(g.a, g.sa, g.sa >= g.sh) + line(g.h, g.sh, g.sh >= g.sa);
-      return g.played ? '<div class="wkc done">' + inner + '<span class="wkf">' + fin(g) + '</span></div>' : '<button class="wkc" data-open="' + g.id + '" aria-label="' + esc(SHORT[g.a]) + ' at ' + esc(SHORT[g.h]) + ', win probability ' + wp.a + ' to ' + wp.h + ' percent, tie ' + wp.t + ' percent">' + inner + '<span class="wkf">Tie ' + wp.t + '% · Preview →</span></button>';
+      return g.played ? '<div class="wkc done">' + inner + '<span class="wkf">' + fin(g) + '</span></div>' : '<button class="wkc" data-open="' + g.id + '" aria-label="' + esc(SHORT[g.a]) + ' at ' + esc(SHORT[g.h]) + ', win probability ' + wp.a + ' to ' + wp.h + ' percent' + (OT ? "" : ", tie " + wp.t + " percent") + '">' + inner + '<span class="wkf">' + (OT ? "" : "Tie " + wp.t + "% · ") + 'Preview →</span></button>';
     }).join("");
     return '<div class="wk"><div class="wkh"><h3>This weekend</h3><span>' + dlong(w[0]) + " – " + dlong(w[1]) + " · " + list.length + " game" + (list.length === 1 ? "" : "s") + (state.team === "ALL" ? "" : " for " + esc(SHORT[state.team])) + '</span></div><div class="wkrow">' + cards + "</div></div>";
   }
@@ -245,8 +245,8 @@
     var lastTxt = last ? "Last meeting " + dshort(last.date) + ": " + esc(SHORT[last.a]) + " " + last.sa + "–" + last.sh + " " + esc(SHORT[last.h]) : "First meeting this season";
     return '<section class="gf"><div class="gf-h"><span>' + label + "</span><span>" + esc(when(g)) + (g.venue ? " · " + esc(g.venue) : "") + "</span></div>" +
       '<div class="gf-m">' + side(g.a, wp.a, 0) + '<div class="gf-vs">at</div>' + side(g.h, wp.h, 1) + "</div>" +
-      '<div class="gf-bar" role="img" aria-label="Win probability ' + esc(SHORT[g.a]) + " " + wp.a + "%, tie " + wp.t + "%, " + esc(SHORT[g.h]) + " " + wp.h + '%"><i style="flex:' + wp.a + '"></i><i class="t" style="flex:' + wp.t + '"></i><i class="h" style="flex:' + wp.h + '"></i></div>' +
-      '<div class="gf-foot"><span>' + esc(SHORT[g.a]) + " " + wp.a + "% · tie " + wp.t + "% · " + esc(SHORT[g.h]) + " " + wp.h + "%</span><span>" + lastTxt + '</span><button class="btn pri" data-open="' + g.id + '">Matchup preview</button></div></section>';
+      '<div class="gf-bar" role="img" aria-label="Win probability ' + esc(SHORT[g.a]) + " " + wp.a + "%" + TIETXT(wp, ", ") + ", " + esc(SHORT[g.h]) + " " + wp.h + '%"><i style="flex:' + wp.a + '"></i>' + (OT ? "" : '<i class="t" style="flex:' + wp.t + '"></i>') + '<i class="h" style="flex:' + wp.h + '"></i></div>' +
+      '<div class="gf-foot"><span>' + esc(SHORT[g.a]) + " " + wp.a + "%" + TIETXT(wp, " · ") + " · " + esc(SHORT[g.h]) + " " + wp.h + "%</span><span>" + lastTxt + '</span><button class="btn pri" data-open="' + g.id + '">Matchup preview</button></div></section>';
   }
   function dayCards(list) {
     var days = [], by = {};
@@ -935,7 +935,7 @@ function makeModel(played, sheets, teams, opt) {
   var LG = sw ? sg / (2 * sw) : 4;
   var nt = 0;
   gs.forEach(function (g) { if (g.sa === g.sh) nt++; });
-  var TIE = (nt + o.tp * o.tprior) / (gs.length + o.tp);
+  var TIE = o.noTie ? 0 : (nt + o.tp * o.tprior) / (gs.length + o.tp);
   var att = {}, def = {};
   teams.forEach(function (t) { att[t] = 1; def[t] = 1; });
   for (var it = 0; it < 40; it++) {
@@ -1033,9 +1033,11 @@ function makeModel(played, sheets, teams, opt) {
   return { predict: predict, elo: elo, att: att, def: def, info: info, LG: LG, games: n };
 }
 
-  var MODEL = makeModel(PLAYED.map(function (g) { return { id: g.id, date: g.date, a: g.a, h: g.h, sa: g.sa, sh: g.sh }; }), G, ORDER);
+  // Leagues that play overtime have no ties, so the model gives a tie no chance there.
+  var MODEL = makeModel(PLAYED.map(function (g) { return { id: g.id, date: g.date, a: g.a, h: g.h, sa: g.sa, sh: g.sh }; }), G, ORDER, OT ? { noTie: 1 } : null);
   var ELORANK = ORDER.slice().sort(function (x, y) { return MODEL.elo[y] - MODEL.elo[x]; });
-  function winProb(a, h) { var p = MODEL.predict(a, h); return { a: p.a, h: p.h, t: p.t, la: p.la, lh: p.lh, full: p }; }
+  function winProb(a, h) { var p = MODEL.predict(a, h); if (OT) return { a: p.a, h: 100 - p.a, t: 0, la: p.la, lh: p.lh, full: p }; return { a: p.a, h: p.h, t: p.t, la: p.la, lh: p.lh, full: p }; }
+  var TIETXT = function (wp, sep) { return OT ? "" : sep + "tie " + wp.t + "%"; };
   function pctDiff(x) { var d = Math.round((x - 1) * 100); return (d > 0 ? "+" : "") + d + "%"; }
   function modelNotes(g, wp) {
     var p = wp.full, A = SHORT[g.a], H = SHORT[g.h], li = [], hid = [], gp = Math.min(ST[g.a].gp, ST[g.h].gp);
@@ -1138,8 +1140,8 @@ function makeModel(played, sheets, teams, opt) {
   }
   function matchBody(g) {
     var wp = winProb(g.a, g.h);
-    var wpBar = '<div class="wsum"><div class="wpbar" role="img" aria-label="Win probability: ' + SHORT[g.a] + " " + wp.a + " percent, tie " + wp.t + " percent, " + SHORT[g.h] + " " + wp.h + ' percent"><i class="wa" style="width:' + wp.a + '%"></i><i class="wt" style="width:' + wp.t + '%"></i><i class="wh" style="width:' + wp.h + '%"></i></div>' +
-      '<div class="wpl"><span><b>' + wp.a + "%</b>" + esc(SHORT[g.a]) + '</span><span class="mid">Win probability · Tie ' + wp.t + '%</span><span>' + esc(SHORT[g.h]) + ' <b style="margin:0 0 0 4px">' + wp.h + "%</b></span></div></div>";
+    var wpBar = '<div class="wsum"><div class="wpbar" role="img" aria-label="Win probability: ' + SHORT[g.a] + " " + wp.a + " percent" + (OT ? "" : ", tie " + wp.t + " percent") + ", " + SHORT[g.h] + " " + wp.h + ' percent"><i class="wa" style="width:' + wp.a + '%"></i>' + (OT ? "" : '<i class="wt" style="width:' + wp.t + '%"></i>') + '<i class="wh" style="width:' + wp.h + '%"></i></div>' +
+      '<div class="wpl"><span><b>' + wp.a + "%</b>" + esc(SHORT[g.a]) + '</span><span class="mid">Win probability' + (OT ? "" : " · Tie " + wp.t + "%") + '</span><span>' + esc(SHORT[g.h]) + ' <b style="margin:0 0 0 4px">' + wp.h + "%</b></span></div></div>";
     var A = ST[g.a], H = ST[g.h];
     var atk = function (x, y) { return "<p><b>" + esc(SHORT[x.t]) + " offence</b> scores " + f2(x.gfg) + " per game (" + ord(RK.gfg[x.t]) + " in the " + GROUP + "). <b>" + esc(SHORT[y.t]) + " defence</b> allows " + f2(y.gag) + " (" + ord(RK.gag[y.t]) + " fewest).</p>"; };
     var rows = cmpRow("Rank", -A.rank, -H.rank, ord(A.rank), ord(H.rank), "diff").replace(/<div class="track"[\s\S]*?<\/i><\/div>/, "") +
