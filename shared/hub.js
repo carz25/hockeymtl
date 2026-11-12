@@ -161,7 +161,7 @@
   function topGoalie(t) { return GK.filter(function (r) { return r.team === t; }).sort(function (a, b) { return b.min - a.min; })[0]; }
 
   /* ---------- state ---------- */
-  var state = { div: "ALL", team: "ALL", sf: "upcoming", ptab: "skaters", q: "", open: 0, sk: { key: "pts", dir: -1 }, gk: { key: "gaa", dir: 1 }, pm: 10, adv: false, view: "auto", sv: "table", sadv: false };
+  var state = { div: "ALL", team: "ALL", sf: "upcoming", ptab: "skaters", q: "", open: 0, sk: { key: "pts", dir: -1 }, gk: { key: "gaa", dir: 1 }, pm: 10, adv: false, view: "auto", sv: "table", sadv: false, pv: "cards" };
   try { var sd = localStorage.getItem(KEY + "-div"); if (DIVS.some(function (d) { return d.id === sd; })) state.div = sd; } catch (e) { }
   try { var stv = localStorage.getItem(KEY + "-standings"); if (stv === "grid") state.sv = "grid"; if (stv === "special" || localStorage.getItem(KEY + "-standings-adv") === "1") { state.sadv = true; state.sv = "table"; } } catch (e) { }
   try { var sv = localStorage.getItem(KEY + "-view"); if (sv === "mobile" || sv === "desktop") state.view = sv; } catch (e) { }
@@ -555,6 +555,66 @@
     }).join("");
     return '<div><h3 style="margin:8px 0 12px">Top 8 leaders · ' + (all ? scopeLbl() : esc(TEAMS[state.team])) + '</h3><div class="lgrid">' + cards + '</div><p class="mfoot" style="margin-top:10px">PIM is penalty minutes. Rate leaders need ' + (state.ptab === "skaters" ? MINGP_SK + " games for skaters" : MINGP_GK + " games for goalies") + ".</p></div>";
   }
+  /* ---------- leader cards (Players, Cards view) ----------
+     One card per stat: the leader large with a silhouette in team colour, then the next four. */
+  /* picture beside the featured player: the team logo (or, for leagues without logos, the team colour and code) */
+  function silhouette(t) {
+    if (LOGOS) return '<span class="fbg t-' + t + '" aria-hidden="true"></span>';
+    return '<span class="fbg fcode" style="background:' + (BADGE[t] || "#2B6CB0") + '" aria-hidden="true">' + t + "</span>";
+  }
+  function cardsHTML() {
+    var all = state.team === "ALL";
+    var inTeam = function (r) { return inDiv(r.team) && (all || r.team === state.team); };
+    var byPts = function (a, b) { return b.pts - a.pts || b.g - a.g; }, byGp = function (a, b) { return b.gp - a.gp; };
+    var defs;
+    if (state.ptab === "skaters") {
+      var sks = SK.filter(inTeam);
+      defs = [
+        { t: "Points", rows: sks, k: "pts", u: "PTS", tie: function (a, b) { return b.g - a.g; }, sub: function (r) { return "<b>" + r.g + " G · " + r.a + " A</b>"; } },
+        { t: "Goals", rows: sks, k: "g", u: "G", tie: byPts },
+        { t: "Assists", rows: sks, k: "a", u: "A", tie: byPts },
+        { t: "Penalty minutes", rows: sks, k: "pen", u: "PIM", tie: byPts }
+      ];
+    } else {
+      var gks = GK.filter(inTeam), q = gks.filter(function (r) { return OFFICIAL ? r.gp >= MINGP_GK : r.min >= 60; });
+      defs = [
+        { t: "Wins", rows: gks, k: "w", u: "W", tie: byGp, gk: 1, sub: function (r) { return r.w + "-" + r.l + "-" + r.t + " · " + r.gp + " GP"; } },
+        { t: "Goals against average", rows: q, k: "gaa", u: "GAA", f: f2, asc: 1, zero: 1, tie: byGp, gk: 1, sub: function (r) { return r.gp + " GP"; }, note: OFFICIAL ? "Minimum " + MINGP_GK + " games" : "Minimum 60 minutes in net" },
+        { t: "Shutouts", rows: gks, k: "so", u: "SO", tie: byGp, gk: 1 }
+      ];
+    }
+    FCARDS = [];
+    var html = defs.map(function (d, ci) {
+      var f = d.f || function (v) { return v; };
+      var top = d.rows.filter(function (r) { return d.zero || r[d.k] > 0; }).sort(function (a, b) { return (d.asc ? a[d.k] - b[d.k] : b[d.k] - a[d.k]) || d.tie(a, b) || a.name.localeCompare(b.name); }).slice(0, 10);
+      if (!top.length) return '<div class="card fcard"><h3>' + d.t + '</h3><p class="fnone">No leader yet.</p></div>';
+      FCARDS[ci] = { d: d, f: f, top: top };
+      return '<div class="card fcard"><h3>' + d.t + "</h3>" + '<div class="fbody"><div class="fhero" id="fh' + ci + '">' + heroHTML(ci, 0) + "</div>" +
+        '<ol class="flist">' + top.map(function (r, i) {
+          return '<li><button class="frow' + (i === 0 ? " on" : "") + (mine(r.team) ? " me" : "") + '" data-fc="' + ci + '" data-fi="' + i + '"><span class="frk">' + (i + 1) + "</span>" + badge(r.team) + '<span class="fn">' + esc(r.name) + "<small>" + esc(SHORT[r.team]) + '</small></span><b class="fv">' + f(r[d.k]) + "</b></button></li>";
+        }).join("") + "</ol></div>" + (d.note ? '<p class="fnote">' + d.note + "</p>" : "") + "</div>";
+    }).join("");
+    return '<div class="fgrid">' + html + "</div>" +
+      '<p class="mfoot">Top 10 in each category' + (all ? "" : " for " + esc(TEAMS[state.team])) + ". Tap a name to feature that player. Switch to List for every player and more stats.</p>";
+  }
+  var FCARDS = [];
+  function heroHTML(ci, i) {
+    var c = FCARDS[ci], r = c.top[i], d = c.d;
+    return '<div class="fsil">' + silhouette(r.team) + '</div><div class="fwho"><div class="frank">#' + (i + 1) + (i === 0 ? " · Leader" : "") + '</div><div class="fname">' + esc(r.name) + '</div><div class="fteam">' + esc(TEAMS[r.team]) + "</div>" +
+      (d.sub ? '<div class="fsub">' + d.sub(r) + "</div>" : "") + '<div class="fval">' + c.f(r[d.k]) + "<small>" + d.u + "</small></div></div>";
+  }
+  function featureRow(btn) {
+    var ci = +btn.dataset.fc, i = +btn.dataset.fi, h = $("fh" + ci);
+    if (!h || !FCARDS[ci] || btn.classList.contains("on")) return;
+    h.innerHTML = heroHTML(ci, i);
+    Array.prototype.forEach.call(btn.closest("ol").querySelectorAll(".frow"), function (x) { x.classList.toggle("on", x === btn); });
+  }
+  document.addEventListener("mouseover", function (e) { var b = e.target.closest && e.target.closest(".frow"); if (b && !document.body.classList.contains("m")) featureRow(b); });
+  function pvTools(tools, seg) {
+    var pv = '<div class="seg pvseg" role="group" aria-label="Players view">' + [["cards", "Cards"], ["list", "List"], ["table", "Table"]].map(function (x) { return '<button data-pv="' + x[0] + '"' + (x[0] === "table" ? ' class="mo"' : "") + ' aria-pressed="' + (state.pv === x[0] || (x[0] === "list" && state.pv === "table" && !document.body.classList.contains("m"))) + '">' + x[1] + "</button>"; }).join("") + "</div>";
+    if (state.pv === "cards") return '<div class="tools"><div class="seg ptseg" role="group" aria-label="Player type">' + seg + "</div>" + pv + "</div>";
+    return tools.replace('<div class="seg" role="group" aria-label="Player type">' + seg + "</div>", '<div class="seg ptseg" role="group" aria-label="Player type">' + seg + "</div>" + pv + '<span class="tbrk"></span>');
+  }
   function renderPlayersC() {
     var all = state.team === "ALL", out = "";
     var seg = [["skaters", "Skaters"], ["goalies", "Goalies"]].map(function (x) { return '<button data-pt="' + x[0] + '" aria-pressed="' + (state.ptab === x[0]) + '">' + x[1] + "</button>"; }).join("");
@@ -599,7 +659,7 @@
     }
     var focusQ = document.activeElement && document.activeElement.id === "q";
     $("p-players").innerHTML = '<div class="sec-head"><div><h2>Players</h2></div></div>' +
-      '<div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">' + tools + out + leadersHTML() + "</div>";
+      '<div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">' + pvTools(tools, seg) + (state.pv === "cards" ? cardsHTML() : '<div class="pout' + (state.pv === "table" ? " ptable" : "") + '">' + out + "</div>" + leadersHTML()) + "</div>";
     if (focusQ) { var el = $("q"); el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
   }
   function renderPlayers() {
@@ -650,7 +710,7 @@
     }
     var focusQ = document.activeElement && document.activeElement.id === "q";
     $("p-players").innerHTML = '<div class="sec-head"><div><h2>Players</h2></div></div>' +
-      '<div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">' + tools + out + leadersHTML() + "</div>";
+      '<div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">' + pvTools(tools, seg) + (state.pv === "cards" ? cardsHTML() : '<div class="pout' + (state.pv === "table" ? " ptable" : "") + '">' + out + "</div>" + leadersHTML()) + "</div>";
     if (focusQ) { var el = $("q"); el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
   }
 
@@ -1026,6 +1086,7 @@ function makeModel(played, sheets, teams, opt) {
 
   function openTeam(t) { if (!inDiv(t)) { state.div = "ALL"; syncDiv(); } state.team = t; state.open = 0; state.pm = 10; renderAll(); goto("teams"); }
   document.addEventListener("click", function (e) {
+    var frow = e.target.closest && e.target.closest(".frow"); if (frow) { featureRow(frow); return; }
     var tp = e.target.closest("[data-tp]");
     if (tp && !tp.closest(".wkc") && !tp.closest("#p-teams .tcard")) { e.preventDefault(); openTeam(tp.dataset.tp); return; }
     var tab = e.target.closest("a[data-tab]");
@@ -1044,6 +1105,7 @@ function makeModel(played, sheets, teams, opt) {
     if (b.dataset.sv) { state.sv = b.dataset.sv; state.sadv = false; try { localStorage.setItem(KEY + "-standings", state.sv); localStorage.setItem(KEY + "-standings-adv", "0"); } catch (x) { } renderStandings(); return; }
     if (b.dataset.sadv) { state.sadv = !state.sadv; if (state.sadv) state.sv = "table"; try { localStorage.setItem(KEY + "-standings", state.sv); localStorage.setItem(KEY + "-standings-adv", state.sadv ? "1" : "0"); } catch (x) { } renderStandings(); return; }
     if (b.hasAttribute("data-adv")) { state.adv = !state.adv; renderPlayers(); return; }
+    if (b.dataset.pv) { state.pv = b.dataset.pv; renderPlayers(); return; }
     if (b.dataset.pt) { state.ptab = b.dataset.pt; state.pm = 10; renderPlayers(); return; }
     if (b.dataset.key) {
       var cfg = state.ptab === "skaters" ? state.sk : state.gk, k = b.dataset.key;

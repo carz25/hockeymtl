@@ -513,3 +513,67 @@ body.st-off>main,body.st-sheet>main{flex:1 0 auto;width:100%}
 .advtog:focus-visible{outline:2px solid var(--side-a);outline-offset:2px}
 /* advanced table on phones: the full desktop table, sliding sideways with the team column pinned */
 table.advt th,table.advt td{white-space:nowrap}
+/* Players: Cards view (leader cards, after nhl.com/stats). Featured player on the left, top 10 on the right; hover or tap a name to feature it. */
+.pvseg{margin-left:auto}
+.tbrk{display:none}
+.fgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:1000px){.fgrid{grid-template-columns:minmax(0,1fr)}}
+.fcard{padding:0;display:flex;flex-direction:column;min-width:0}
+.fcard h3{margin:0;padding:14px 18px 12px;font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:.02em;text-transform:uppercase;border-bottom:1px solid var(--rule)}
+.fbody{display:grid;grid-template-columns:minmax(0,44%) minmax(0,1fr);flex:1}
+.fhero{padding:18px;border-right:1px solid var(--rule);display:flex;flex-direction:column;gap:14px}
+.fsil{position:relative;width:100%;max-width:200px;aspect-ratio:1}
+.fsvg{display:block;width:100%;height:100%;border-radius:6px}
+.fsil .lg{position:absolute;right:-10px;bottom:-10px;width:44px;height:44px;border-radius:8px;box-shadow:0 0 0 3px var(--card)}
+.fwho{min-width:0}
+.frank{font-size:12px;font-weight:700;color:var(--mute);font-variant-numeric:tabular-nums}
+.fname{font-weight:700;font-size:20px;line-height:1.2;overflow-wrap:anywhere}
+.fteam,.fsub{font-size:13px;color:var(--mute);line-height:1.35}
+.fval{font-family:var(--display);font-weight:800;font-size:60px;line-height:.95;margin-top:8px;font-variant-numeric:tabular-nums}
+.fval small{font-size:15px;font-weight:700;margin-left:6px;letter-spacing:.06em;color:var(--mute)}
+.flist{list-style:none;margin:0;padding:6px 0}
+.frow{display:grid;grid-template-columns:20px 22px minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;padding:7px 18px;background:none;border:0;text-align:left;cursor:pointer;color:var(--ink);font:inherit;border-left:3px solid transparent}
+.frow:hover{background:var(--soft)}
+.frow.me{background:var(--follow)}
+.frow.on{border-left-color:var(--ink);background:var(--soft)}
+.frow:focus-visible{outline:2px solid var(--side-a);outline-offset:-2px}
+.flist .lg{width:22px;height:22px;border-radius:5px;padding:1px}
+.frk{color:var(--mute);font-variant-numeric:tabular-nums;font-size:13px}
+.fn{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fn small{font-weight:400;color:var(--mute);margin-left:6px;font-size:12px}
+.fv{font-variant-numeric:tabular-nums;font-size:15px}
+.frow.on .fn,.frow.on .fv{font-weight:800}
+.fnote,.fnone{margin:0;padding:8px 18px 12px;font-size:12px;color:var(--mute);border-top:1px solid var(--rule)}
+.fnone{padding:16px;border:0}
+/* phones: featured player on top (silhouette beside the name), top 10 below; categories slide sideways */
+.m .fgrid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;margin:0 -16px;padding:0 16px 6px;scrollbar-width:none}
+.m .fgrid::-webkit-scrollbar{display:none}
+.m .fcard{flex:0 0 88%;scroll-snap-align:center}
+.m .fbody{grid-template-columns:minmax(0,1fr)}
+.m .fhero{flex-direction:row;align-items:flex-end;border-right:0;border-bottom:1px solid var(--rule);padding:16px}
+.m .fsil{width:110px;flex:none}
+.m .fsil .lg{width:34px;height:34px;right:-8px;bottom:-8px}
+.m .fval{font-size:50px}
+.m .frow{padding:7px 16px}
+.m .tools .seg.ptseg{width:auto;flex:1}
+.m .tools .seg.pvseg{width:auto;flex:none;margin-left:0}
+.m .tools .pvseg button{flex:none;padding:8px 12px}
+.m .tbrk{display:block;flex-basis:100%;height:0}
+/* leader cards: the team logo fills the picture */
+.fsil{border-radius:6px;overflow:hidden;background:#fff;border:1px solid var(--rule)}
+.fbg{position:absolute;inset:8%;background-repeat:no-repeat;background-position:center;background-size:contain}
+.fcode{inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--display);font-weight:800;font-size:40px}
+.fsub b{color:var(--ink);font-weight:700}
+/* phones: the List view drops the four leader boxes (the Cards view covers them) */
+.m #p-players .tiles{display:none}
+/* Players: Table view on phones shows the desktop table, sliding sideways with the player column pinned. The Table button is phone-only (List is already the table on desktop). */
+.pout{display:flex;flex-direction:column;gap:16px}
+.pvseg button.mo{display:none}
+.m .pvseg button.mo{display:inline-block}
+.m .ptable .mob{display:none}
+.m .ptable .desk{display:block}
+.m .ptable .desk table th,.m .ptable .desk table td{white-space:nowrap}
+.m .ptable .desk table{table-layout:auto;width:max-content;min-width:100%}
+.m .ptable .desk col{width:auto !important}
+.m .ptable .desk .stick{min-width:130px;max-width:150px;white-space:normal;box-shadow:1px 0 0 var(--rule)}
+.m .ptable .desk th,.m .ptable .desk td{padding-left:8px;padding-right:8px}
