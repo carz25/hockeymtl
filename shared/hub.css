@@ -683,3 +683,44 @@ table.stt tr.me .ptsc{background:transparent}
 @media (max-width:1100px){.sband{grid-template-columns:repeat(2,minmax(0,1fr))}.rgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.gf-m{grid-template-columns:minmax(0,1fr)}.gf-vs{display:none}}
 body:not(.m) .hhero .hprog,body:not(.m) .hstat{display:none}
 .m .hstat.mob{flex-direction:row;gap:6px 28px}
+/* ---------- desktop polish (Nov 12) ---------- */
+/* standings: bigger, bold, centred headings; division names bold */
+body:not(.m) table.stt{font-size:16px}
+body:not(.m) table.stt th{text-align:center;font-weight:700;font-size:13px;color:var(--ink)}
+body:not(.m) table.stt tr.grp th{text-align:center;font-weight:800;font-size:12px;color:var(--ink);padding-left:0}
+body:not(.m) table.stt td{text-align:center}
+body:not(.m) table.stt td.l{text-align:left}
+body:not(.m) table.stt td.strong{font-size:18px}
+body:not(.m) table.stt .tn b{font-size:16px}
+body:not(.m) #p-standings .divh{font-size:15px;font-weight:800;color:var(--ink)}
+/* players list: narrower name column, stats spread out, grouped and centred headings, PTS band */
+body:not(.m) table.pt col.nm{width:210px}
+body:not(.m) table.pt col.nu,body:not(.m) .st-sheet table.pt col.nu{width:auto}
+body:not(.m) table.pt col.tm{width:160px}
+body:not(.m) table.pt th{text-align:center;font-weight:700;color:var(--ink)}
+body:not(.m) table.pt th .sort{justify-content:center;width:100%;font-weight:700}
+body:not(.m) table.pt td{text-align:center;padding-top:7px;padding-bottom:7px}
+body:not(.m) table.pt td.l,body:not(.m) table.pt th.l{text-align:left}
+body:not(.m) table.pt th.l .sort{justify-content:flex-start}
+table.pt tr.grp th{background:var(--soft);font-size:12px;font-weight:800;letter-spacing:.08em;color:var(--ink);text-align:center;padding-top:8px;padding-bottom:0;border-bottom:0}
+table.pt tr.grp th.g0{border-left:1px solid var(--rule)}
+.m table.pt tr.grp{display:none}
+body:not(.m) table.pt td.pts,body:not(.m) table.pt th.pts{background:var(--soft)}
+/* players: search sits left of Cards / List on desktop */
+body:not(.m) #p-players .tools .search{order:2;margin-left:auto}
+body:not(.m) #p-players .tools .pvseg{order:3;margin-left:auto}
+body:not(.m) #p-players .tools:has(.search) .pvseg{margin-left:0}
+body:not(.m) #p-players .tools .advbtn{order:4}
+/* schedule: two games across per day; an opened matchup takes the full width */
+body:not(.m) .dgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-items:start}
+body:not(.m) .dgrid>.grow[open]{grid-column:1/-1}
+.m .dgrid{display:flex;flex-direction:column;gap:8px}
+body:not(.m) .dgrid .g,body:not(.m) .dgrid .grow>summary{grid-template-columns:76px minmax(0,1fr) minmax(0,190px)}
+.gbar{display:flex;gap:2px;height:5px;border-radius:3px;overflow:hidden;margin-top:3px}
+.gbar i{background:var(--side-a)}.gbar i.t{background:var(--rule)}.gbar i.h{background:var(--side-h)}
+.m .gbar{display:none}
+/* players table on desktop: text 1px larger */
+body:not(.m) table.pt{font-size:16px}
+body:not(.m) table.pt thead tr:not(.grp) th{font-size:13px}
+body:not(.m) table.pt td.pts{font-size:19px}
+body:not(.m) table.pt .tn b{font-size:16px}
