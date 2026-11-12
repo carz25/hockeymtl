@@ -586,14 +586,15 @@ table.advt th,table.advt td{white-space:nowrap}
 .m #p-players .search{display:none}
 .m h2{font-size:25px}
 /* phone List rows: logo beside the name, team and stats underneath, no bar */
-.pc.pc2{grid-template-columns:20px 30px minmax(0,1fr) auto;gap:0 10px;padding:7px 12px}
+.pc.pc2{grid-template-columns:20px minmax(0,1fr) auto;gap:0 10px;padding:8px 12px}
 .pc.pc2 .r{font-size:18px}
-.pc.pc2>.lg{width:30px;height:30px;border-radius:6px;padding:1px}
-.pc.pc2 .pn{gap:1px}
-.pc.pc2 .pst{gap:0 5px;font-size:12.5px}
+.pc.pc2 .pl{gap:8px}
+.pc.pc2 .pl .lg{width:26px;height:26px;border-radius:5px;padding:1px}
+.pc.pc2 .pn{gap:2px}
+.pc.pc2 .pst{flex-wrap:nowrap;gap:0 5px;font-size:12.5px;min-width:0}
 .pc.pc2 .pst span{white-space:nowrap}
+.pc.pc2 .pst .ptm{color:var(--mute);min-width:0;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto}
 .pc.pc2 .dt{font-style:normal;color:var(--mute)}
-.pc.pc2 .ptm{color:var(--mute)}
 .m .pc.pc2 .pv{font-size:28px}
 /* phone Table view: # and Player stay put while the stats slide; narrower, names cut with an ellipsis */
 .m .ptable .desk th.rk,.m .ptable .desk td.rk{position:sticky;left:0;z-index:2;background:var(--card);width:26px;min-width:26px;max-width:26px;padding-left:4px;padding-right:2px;text-align:center}

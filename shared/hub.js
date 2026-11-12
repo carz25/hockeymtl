@@ -471,7 +471,7 @@
   function msortCtlC(cfg) {
     var opts = MSORT_C[state.ptab].concat(state.adv && state.ptab === "skaters" ? ADV_C : []), cur = opts.some(function (o) { return o[0] === cfg.key; }) ? cfg.key : opts[0][0];
     var lbl = opts.filter(function (o) { return o[0] === cur; })[0][1];
-    return '<div class="mtools"><label class="pick"><span>Sort: ' + esc(lbl) + '</span><select id="msort" aria-label="Sort by">' + opts.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === cur ? " selected" : "") + ">" + o[1] + "</option>"; }).join("") + "</select></label>" + teamPick() + "</div>";
+    return '<div class="mtools"><label class="pick"><span>' + esc(lbl) + '</span><select id="msort" aria-label="Sort by">' + opts.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === cur ? " selected" : "") + ">" + o[1] + "</option>"; }).join("") + "</select></label>" + teamPick() + "</div>";
   }
   function teamPick() {
     if (state.team !== "ALL") return "";
@@ -479,12 +479,19 @@
     return '<label class="pick"><span>' + esc(cur) + '</span><select id="mteam" aria-label="Team">' + [["ALL", "All teams"]].concat(DT().map(function (t) { return [t, SHORT[t]]; })).map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === state.pteam ? " selected" : "") + ">" + esc(o[1]) + "</option>"; }).join("") + "</select></label>";
   }
   /* one player row in the phone List view: logo, name, team and stats underneath, big value on the right */
-  function pcard(r, i, gk) {
+  function pcard(r, i, gk, v) {
     var dot = '<i class="dt">·</i>';
     var line = gk ? "<span><b>" + r.w + "-" + r.l + "-" + r.t + "</b> " + (OT ? "W-L-OTL" : "W-L-T") + "</span>" + dot + "<span><b>" + r.so + "</b> SO</span>" + dot + "<span><b>" + r.ga + "</b> GA</span>"
       : "<span><b>" + r.g + "</b> Goals</span>" + dot + "<span><b>" + r.a + "</b> Assists</span>" + dot + "<span><b>" + r.pts + "</b> Points</span>";
-    return '<div class="pc pc2' + (mine(r.team) ? " me" : "") + '"><div class="r">' + (i + 1) + "</div>" + badge(r.team) + '<div class="pn"><b class="nm">' + esc(r.name) + '</b><div class="pst"><span class="ptm">' + esc(SHORT[r.team]) + "</span></div>" + '<div class="pst">' + line + "</div></div>" +
-      '<div class="pv">' + (gk ? f2(r.gaa) + "<small>GAA</small>" : r.pts + "<small>PTS</small>") + "</div></div>";
+    var x = r[v.k], val = typeof x !== "number" ? "–" : v.k === "wpct" ? f3(x) : v.k === "min" ? f1(x) : x % 1 ? f2(x) : x;
+    return '<div class="pc pc2' + (mine(r.team) ? " me" : "") + '"><div class="r">' + (i + 1) + '</div><div class="pn"><div class="pl">' + badge(r.team) + '<b class="nm">' + esc(r.name) + '</b></div><div class="pst"><span class="ptm">' + esc(SHORT[r.team]) + "</span>" + dot + line + "</div></div>" +
+      '<div class="pv">' + val + "<small>" + v.l + "</small></div></div>";
+  }
+  /* which stat the big number on the right shows: the one the list is sorted by */
+  function pval(cols, cfg, def) {
+    var k = cfg.key === "rank" || cfg.key === "name" || cfg.key === "team" ? def : cfg.key;
+    var c = cols.filter(function (c) { return c[0] === k; })[0];
+    return { k: k, l: c ? c[1].replace(/[▾▴]/g, "") : k.toUpperCase() };
   }
   var MINGP_SK = 5, MINGP_GK = 3;
   function ptStart(cols, cfg) {
@@ -500,7 +507,7 @@
   function msortCtl(cfg) {
     var opts = MSORT[state.ptab], cur = opts.some(function (o) { return o[0] === cfg.key; }) ? cfg.key : opts[0][0];
     var lbl = opts.filter(function (o) { return o[0] === cur; })[0][1];
-    return '<div class="mtools"><label class="pick"><span>Sort: ' + esc(lbl) + '</span><select id="msort" aria-label="Sort by">' + opts.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === cur ? " selected" : "") + ">" + o[1] + "</option>"; }).join("") + "</select></label>" + teamPick() + "</div>";
+    return '<div class="mtools"><label class="pick"><span>' + esc(lbl) + '</span><select id="msort" aria-label="Sort by">' + opts.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === cur ? " selected" : "") + ">" + o[1] + "</option>"; }).join("") + "</select></label>" + teamPick() + "</div>";
   }
   function moreBtn(n) { return n > state.pm ? '<button class="btn" data-more="1">Show 10 more</button> <button class="btn" data-all="1">Show all ' + n + "</button>" : ""; }
   function f3(x) { return x.toFixed(3).replace(/^0/, ""); }
@@ -646,7 +653,8 @@
       }).join("");
       var mxp = Math.max.apply(null, sorted.map(function (r) { return r.pts; }).concat([1]));
       mrow = msortCtlC(cfg);
-      var mobSk = sorted.slice(0, state.pm).map(function (r, i) { return pcard(r, i, 0); }).join("") + (sorted.length ? "" : '<p class="empty">No players match.</p>') + moreBtn(sorted.length);
+      var pv = pval(cols, cfg, "pts");
+      var mobSk = sorted.slice(0, state.pm).map(function (r, i) { return pcard(r, i, 0, pv); }).join("") + (sorted.length ? "" : '<p class="empty">No players match.</p>') + moreBtn(sorted.length);
       out = '<div class="tiles">' + leaderTile(rows, "pts", "Points leader", all) + leaderTile(rows, "g", "Goals leader", all) + leaderTile(rows, "a", "Assists leader", all) + leaderTile(GK.filter(function (r) { return state.team === "ALL" || r.team === state.team; }), "w", "Goalie wins", all) + "</div>" +
         '<div class="mob">' + mobSk + '</div><div class="card desk"><div class="wrap">' + ptStartC(cols, cfg.key === "rank" ? { key: "pts", dir: -1 } : cfg) + "<tbody>" + (body || '<tr><td class="empty" colspan="22">No players match.</td></tr>') + "</tbody></table></div>" +
         '<div class="morerow">' + moreBtn(sorted.length) + '</div></div>';
@@ -662,7 +670,8 @@
       var mw = grows.slice().sort(function (a, b) { return b.w - a.w; })[0];
       var ms = grows.slice().sort(function (a, b) { return b.so - a.so; })[0];
       mrow = msortCtlC(gc);
-      var mobGk = gs.slice(0, state.pm).map(function (r, i) { return pcard(r, i, 1); }).join("") + (gs.length ? "" : '<p class="empty">No goalies match.</p>') + moreBtn(gs.length);
+      var pv = pval(gcols, gc, "gaa");
+      var mobGk = gs.slice(0, state.pm).map(function (r, i) { return pcard(r, i, 1, pv); }).join("") + (gs.length ? "" : '<p class="empty">No goalies match.</p>') + moreBtn(gs.length);
       out = '<div class="tiles">' + (best ? tile("Best GAA", f2(best.gaa), esc(best.name) + (all ? " (" + best.team + ")" : "") + ", 60+ min") : tile("Best GAA", "–", "needs 60+ min")) +
         (mw ? tile("Most wins", mw.w, esc(mw.name) + (all ? " (" + mw.team + ")" : "")) : "") + (ms ? tile("Most shutouts", ms.so, esc(ms.name) + (all ? " (" + ms.team + ")" : "")) : "") + tile("Goalies", grows.length, "in this view") + "</div>" +
         '<div class="mob">' + mobGk + '</div><div class="card desk"><div class="wrap">' + ptStartC(gcols, gc.key === "rank" ? { key: "gaa", dir: 1 } : gc) + "<tbody>" + (gb || '<tr><td class="empty" colspan="22">No goalies match.</td></tr>') + "</tbody></table></div>" +
@@ -688,7 +697,8 @@
       }).join("");
       var mxp = Math.max.apply(null, sorted.map(function (r) { return r.pts; }).concat([1]));
       mrow = msortCtl(cfg);
-      var mobSk = sorted.slice(0, state.pm).map(function (r, i) { return pcard(r, i, 0); }).join("") + (sorted.length ? "" : '<p class="empty">No players match.</p>') + moreBtn(sorted.length);
+      var pv = pval(cols, cfg, "pts");
+      var mobSk = sorted.slice(0, state.pm).map(function (r, i) { return pcard(r, i, 0, pv); }).join("") + (sorted.length ? "" : '<p class="empty">No players match.</p>') + moreBtn(sorted.length);
       out = '<div class="tiles">' + leaderTile(rows, "pts", "Points leader", all) + leaderTile(rows, "g", "Goals leader", all) + leaderTile(rows, "a", "Assists leader", all) + leaderTile(rows, "ppg", "Power-play goals", all) + "</div>" +
         '<div class="mob">' + mobSk + '</div><div class="card desk"><div class="wrap">' + ptStart(cols, cfg.key === "rank" ? { key: "pts", dir: -1 } : cfg) + "<tbody>" + (body || '<tr><td class="empty" colspan="18">No players match.</td></tr>') + "</tbody></table></div>" +
         '<div class="morerow">' + moreBtn(sorted.length) + '</div></div>';
@@ -707,7 +717,8 @@
       var mw = grows.slice().sort(function (a, b) { return b.w - a.w; })[0];
       var ms = grows.slice().sort(function (a, b) { return b.so - a.so; })[0];
       mrow = msortCtl(gc);
-      var mobGk = gs.slice(0, state.pm).map(function (r, i) { return pcard(r, i, 1); }).join("") + (gs.length ? "" : '<p class="empty">No goalies match.</p>') + moreBtn(gs.length);
+      var pv = pval(gcols, gc, "gaa");
+      var mobGk = gs.slice(0, state.pm).map(function (r, i) { return pcard(r, i, 1, pv); }).join("") + (gs.length ? "" : '<p class="empty">No goalies match.</p>') + moreBtn(gs.length);
       out = '<div class="tiles">' + (best ? tile("Best GAA", f2(best.gaa), esc(best.name) + (all ? " (" + best.team + ")" : "") + ", min " + MINGP_GK + " GP") : tile("Best GAA", "–", "needs " + MINGP_GK + " GP")) +
         (mw ? tile("Most wins", mw.w, esc(mw.name) + (all ? " (" + mw.team + ")" : "")) : "") + (ms ? tile("Most shutouts", ms.so, esc(ms.name) + (all ? " (" + ms.team + ")" : "")) : "") + tile("Goalies", grows.length, "in this view") + "</div>" +
         '<div class="mob">' + mobGk + '</div><div class="card desk"><div class="wrap">' + ptStart(gcols, gc.key === "rank" ? { key: "gaa", dir: 1 } : gc) + "<tbody>" + (gb || '<tr><td class="empty" colspan="13">No goalies match.</td></tr>') + "</tbody></table></div>" +
