@@ -164,7 +164,6 @@
   var state = { div: "ALL", team: "ALL", sf: "upcoming", ptab: "skaters", q: "", open: 0, sk: { key: "pts", dir: -1 }, gk: { key: "gaa", dir: 1 }, pm: 10, adv: false, view: "auto", sv: "table", sadv: false, pv: "cards" };
   try { var sd = localStorage.getItem(KEY + "-div"); if (DIVS.some(function (d) { return d.id === sd; })) state.div = sd; } catch (e) { }
   try { var stv = localStorage.getItem(KEY + "-standings"); if (stv === "grid") state.sv = "grid"; if (stv === "special" || localStorage.getItem(KEY + "-standings-adv") === "1") { state.sadv = true; state.sv = "table"; } } catch (e) { }
-  try { if (localStorage.getItem(KEY + "-players-view") === "list") state.pv = "list"; } catch (e) { }
   try { var sv = localStorage.getItem(KEY + "-view"); if (sv === "mobile" || sv === "desktop") state.view = sv; } catch (e) { }
   var mq = window.matchMedia("(max-width:720px)");
   function applyView() {
@@ -559,12 +558,12 @@
   /* ---------- leader cards (Players, Cards view) ----------
      One card per stat: the leader large with a silhouette in team colour, then the next four. */
   function silhouette(t, gk) {
-    var c = BADGE[t] || "#2B6CB0";
-    return '<svg class="fsvg" viewBox="0 0 120 120" aria-hidden="true"><rect width="120" height="120" fill="' + c + '"/><rect width="120" height="120" fill="url(#fshade)"/>' +
-      '<path d="M18 120c0-26 17-41 42-41s42 15 42 41z" fill="#fff" fill-opacity=".9"/><path d="M48 80l12 15 12-15" fill="none" stroke="' + c + '" stroke-width="4" stroke-linejoin="round" opacity=".55"/>' +
-      '<circle cx="60" cy="50" r="19" fill="#fff" fill-opacity=".9"/>' +
-      (gk ? '<path d="M41 47a19 19 0 0 1 38 0v9a19 19 0 0 1-38 0z" fill="#fff"/><path d="M47 52h26M47 59h26M54 46v20M60 46v21M66 46v20" stroke="' + c + '" stroke-width="2" opacity=".6"/>'
-          : '<path d="M40 49a20 20 0 0 1 40 0v3H40z" fill="' + c + '" opacity=".75"/><path d="M38 52h44" stroke="#fff" stroke-width="2.5" stroke-opacity=".9"/>') + "</svg>";
+    var c = BADGE[t] || "#2B6CB0", lg = LOGOS;
+    return (lg ? '<span class="fbg t-' + t + '" aria-hidden="true"></span>' : "") + '<svg class="fsvg" viewBox="0 0 120 120" aria-hidden="true">' + (lg ? "" : '<rect width="120" height="120" fill="' + c + '"/><rect width="120" height="120" fill="url(#fshade)"/>') +
+      '<path d="M18 120c0-26 17-41 42-41s42 15 42 41z" fill="' + (lg ? "#0F1B2A" : "#fff") + '" fill-opacity="' + (lg ? ".82" : ".9") + '"/><path d="M48 80l12 15 12-15" fill="none" stroke="' + (lg ? "#fff" : c) + '" stroke-width="4" stroke-linejoin="round" opacity=".55"/>' +
+      '<circle cx="60" cy="50" r="19" fill="' + (lg ? "#0F1B2A" : "#fff") + '" fill-opacity="' + (lg ? ".82" : ".9") + '"/>' +
+      (gk ? '<path d="M41 47a19 19 0 0 1 38 0v9a19 19 0 0 1-38 0z" fill="' + (lg ? "#0F1B2A" : "#fff") + '"/><path d="M47 52h26M47 59h26M54 46v20M60 46v21M66 46v20" stroke="' + (lg ? "#fff" : c) + '" stroke-width="2" opacity=".6"/>'
+          : '<path d="M40 49a20 20 0 0 1 40 0v3H40z" fill="' + (lg ? "#0F1B2A" : c) + '" opacity="' + (lg ? "1" : ".75") + '"/><path d="M38 52h44" stroke="#fff" stroke-width="2.5" stroke-opacity=".9"/>') + "</svg>";
   }
   function cardsHTML() {
     var all = state.team === "ALL";
@@ -574,7 +573,7 @@
     if (state.ptab === "skaters") {
       var sks = SK.filter(inTeam);
       defs = [
-        { t: "Points", rows: sks, k: "pts", u: "PTS", tie: function (a, b) { return b.g - a.g; }, sub: function (r) { return r.g + " G · " + r.a + " A"; } },
+        { t: "Points", rows: sks, k: "pts", u: "PTS", tie: function (a, b) { return b.g - a.g; }, sub: function (r) { return "<b>" + r.g + " G · " + r.a + " A</b>"; } },
         { t: "Goals", rows: sks, k: "g", u: "G", tie: byPts },
         { t: "Assists", rows: sks, k: "a", u: "A", tie: byPts },
         { t: "Penalty minutes", rows: sks, k: "pen", u: "PIM", tie: byPts }
@@ -605,7 +604,7 @@
   var FCARDS = [];
   function heroHTML(ci, i) {
     var c = FCARDS[ci], r = c.top[i], d = c.d;
-    return '<div class="fsil">' + silhouette(r.team, d.gk) + badge(r.team) + '</div><div class="fwho"><div class="frank">#' + (i + 1) + (i === 0 ? " · Leader" : "") + '</div><div class="fname">' + esc(r.name) + '</div><div class="fteam">' + esc(TEAMS[r.team]) + "</div>" +
+    return '<div class="fsil' + (LOGOS ? " haslg" : "") + '">' + silhouette(r.team, d.gk) + (LOGOS ? "" : badge(r.team)) + '</div><div class="fwho"><div class="frank">#' + (i + 1) + (i === 0 ? " · Leader" : "") + '</div><div class="fname">' + esc(r.name) + '</div><div class="fteam">' + esc(TEAMS[r.team]) + "</div>" +
       (d.sub ? '<div class="fsub">' + d.sub(r) + "</div>" : "") + '<div class="fval">' + c.f(r[d.k]) + "<small>" + d.u + "</small></div></div>";
   }
   function featureRow(btn) {
@@ -1110,7 +1109,7 @@ function makeModel(played, sheets, teams, opt) {
     if (b.dataset.sv) { state.sv = b.dataset.sv; state.sadv = false; try { localStorage.setItem(KEY + "-standings", state.sv); localStorage.setItem(KEY + "-standings-adv", "0"); } catch (x) { } renderStandings(); return; }
     if (b.dataset.sadv) { state.sadv = !state.sadv; if (state.sadv) state.sv = "table"; try { localStorage.setItem(KEY + "-standings", state.sv); localStorage.setItem(KEY + "-standings-adv", state.sadv ? "1" : "0"); } catch (x) { } renderStandings(); return; }
     if (b.hasAttribute("data-adv")) { state.adv = !state.adv; renderPlayers(); return; }
-    if (b.dataset.pv) { state.pv = b.dataset.pv; try { localStorage.setItem(KEY + "-players-view", state.pv); } catch (x) { } renderPlayers(); return; }
+    if (b.dataset.pv) { state.pv = b.dataset.pv; renderPlayers(); return; }
     if (b.dataset.pt) { state.ptab = b.dataset.pt; state.pm = 10; renderPlayers(); return; }
     if (b.dataset.key) {
       var cfg = state.ptab === "skaters" ? state.sk : state.gk, k = b.dataset.key;

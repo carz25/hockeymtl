@@ -559,3 +559,10 @@ table.advt th,table.advt td{white-space:nowrap}
 .m .tools .seg.pvseg{width:auto;flex:none;margin-left:0}
 .m .tools .pvseg button{flex:none;padding:8px 12px}
 .m .tbrk{display:block;flex-basis:100%;height:0}
+/* leader cards: the team logo fills the picture behind the silhouette */
+.fsil.haslg{border-radius:6px;overflow:hidden;background:#fff;border:1px solid var(--rule)}
+.fbg{position:absolute;inset:8%;background-repeat:no-repeat;background-position:center;background-size:contain;opacity:.5}
+.fsil.haslg .fsvg{position:relative;border-radius:0}
+.fsub b{color:var(--ink);font-weight:700}
+/* phones: the List view drops the four leader boxes (the Cards view covers them) */
+.m #p-players .tiles{display:none}
