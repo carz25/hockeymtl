@@ -161,7 +161,7 @@
   function topGoalie(t) { return GK.filter(function (r) { return r.team === t; }).sort(function (a, b) { return b.min - a.min; })[0]; }
 
   /* ---------- state ---------- */
-  var state = { div: "ALL", team: "ALL", sf: "upcoming", ptab: "skaters", q: "", open: 0, sk: { key: "pts", dir: -1 }, gk: { key: "gaa", dir: 1 }, pm: 10, adv: false, view: "auto", sv: "table", sadv: false, pv: "cards" };
+  var state = { div: "ALL", team: "ALL", sf: "upcoming", ptab: "skaters", q: "", open: 0, sk: { key: "pts", dir: -1 }, gk: { key: "gaa", dir: 1 }, pm: 10, adv: false, view: "auto", sv: "table", sadv: false, pv: "cards", pteam: "ALL" };
   try { var sd = localStorage.getItem(KEY + "-div"); if (DIVS.some(function (d) { return d.id === sd; })) state.div = sd; } catch (e) { }
   try { var stv = localStorage.getItem(KEY + "-standings"); if (stv === "grid") state.sv = "grid"; if (stv === "special" || localStorage.getItem(KEY + "-standings-adv") === "1") { state.sadv = true; state.sv = "table"; } } catch (e) { }
   try { var sv = localStorage.getItem(KEY + "-view"); if (sv === "mobile" || sv === "desktop") state.view = sv; } catch (e) { }
@@ -437,7 +437,7 @@
   /* ---------- players ---------- */
   function filt(rows) {
     var q = norm(state.q.trim());
-    return rows.filter(function (r) { return inDiv(r.team) && (state.team === "ALL" || r.team === state.team) && (!q || norm(r.name).indexOf(q) >= 0); });
+    return rows.filter(function (r) { return inDiv(r.team) && (state.team === "ALL" || r.team === state.team) && (state.pteam === "ALL" || r.team === state.pteam) && (!q || norm(r.name).indexOf(q) >= 0); });
   }
   function sortRows(rows, cfg, tie) {
     return rows.slice().sort(function (x, y) {
@@ -470,7 +470,21 @@
   }
   function msortCtlC(cfg) {
     var opts = MSORT_C[state.ptab].concat(state.adv && state.ptab === "skaters" ? ADV_C : []), cur = opts.some(function (o) { return o[0] === cfg.key; }) ? cfg.key : opts[0][0];
-    return '<div class="mtools"><select id="msort" aria-label="Sort by">' + opts.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === cur ? " selected" : "") + ">Sort: " + o[1] + "</option>"; }).join("") + "</select></div>";
+    var lbl = opts.filter(function (o) { return o[0] === cur; })[0][1];
+    return '<div class="mtools"><label class="pick"><span>Sort: ' + esc(lbl) + '</span><select id="msort" aria-label="Sort by">' + opts.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === cur ? " selected" : "") + ">" + o[1] + "</option>"; }).join("") + "</select></label>" + teamPick() + "</div>";
+  }
+  function teamPick() {
+    if (state.team !== "ALL") return "";
+    var cur = state.pteam === "ALL" ? "All teams" : SHORT[state.pteam];
+    return '<label class="pick"><span>' + esc(cur) + '</span><select id="mteam" aria-label="Team">' + [["ALL", "All teams"]].concat(DT().map(function (t) { return [t, SHORT[t]]; })).map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === state.pteam ? " selected" : "") + ">" + esc(o[1]) + "</option>"; }).join("") + "</select></label>";
+  }
+  /* one player row in the phone List view: logo, name, team and stats underneath, big value on the right */
+  function pcard(r, i, gk) {
+    var dot = '<i class="dt">·</i>';
+    var line = gk ? "<span><b>" + r.w + "-" + r.l + "-" + r.t + "</b> " + (OT ? "W-L-OTL" : "W-L-T") + "</span>" + dot + "<span><b>" + r.so + "</b> SO</span>" + dot + "<span><b>" + r.ga + "</b> GA</span>"
+      : "<span><b>" + r.g + "</b> Goals</span>" + dot + "<span><b>" + r.a + "</b> Assists</span>" + dot + "<span><b>" + r.pts + "</b> Points</span>";
+    return '<div class="pc pc2' + (mine(r.team) ? " me" : "") + '"><div class="r">' + (i + 1) + "</div>" + badge(r.team) + '<div class="pn"><b class="nm">' + esc(r.name) + '</b><div class="pst"><span class="ptm">' + esc(SHORT[r.team]) + "</span></div>" + '<div class="pst">' + line + "</div></div>" +
+      '<div class="pv">' + (gk ? f2(r.gaa) + "<small>GAA</small>" : r.pts + "<small>PTS</small>") + "</div></div>";
   }
   var MINGP_SK = 5, MINGP_GK = 3;
   function ptStart(cols, cfg) {
@@ -485,7 +499,8 @@
   var MSORT = { skaters: [["pts", "Points", -1], ["g", "Goals", -1], ["a", "Assists", -1], ["pgp", "Points per game", -1], ["ggp", "Goals per game", -1], ["ppg", "Power-play goals", -1], ["ppp", "Power-play points", -1], ["shp", "Short-handed points", -1], ["gwg", "Game-winning goals", -1], ["pen", "Penalty minutes", -1]], goalies: [["gaa", "Best GAA", 1], ["w", "Wins", -1], ["so", "Shutouts", -1], ["wpct", "Win %", -1], ["gp", "Games played", -1], ["gs", "Games started", -1], ["min", "Minutes", -1]] };
   function msortCtl(cfg) {
     var opts = MSORT[state.ptab], cur = opts.some(function (o) { return o[0] === cfg.key; }) ? cfg.key : opts[0][0];
-    return '<div class="mtools"><select id="msort" aria-label="Sort by">' + opts.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === cur ? " selected" : "") + ">Sort: " + o[1] + "</option>"; }).join("") + "</select></div>";
+    var lbl = opts.filter(function (o) { return o[0] === cur; })[0][1];
+    return '<div class="mtools"><label class="pick"><span>Sort: ' + esc(lbl) + '</span><select id="msort" aria-label="Sort by">' + opts.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === cur ? " selected" : "") + ">" + o[1] + "</option>"; }).join("") + "</select></label>" + teamPick() + "</div>";
   }
   function moreBtn(n) { return n > state.pm ? '<button class="btn" data-more="1">Show 10 more</button> <button class="btn" data-all="1">Show all ' + n + "</button>" : ""; }
   function f3(x) { return x.toFixed(3).replace(/^0/, ""); }
@@ -616,7 +631,7 @@
     return tools.replace('<div class="seg" role="group" aria-label="Player type">' + seg + "</div>", '<div class="seg ptseg" role="group" aria-label="Player type">' + seg + "</div>" + pv + '<span class="tbrk"></span>');
   }
   function renderPlayersC() {
-    var all = state.team === "ALL", out = "";
+    var all = state.team === "ALL", out = "", mrow = "";
     var seg = [["skaters", "Skaters"], ["goalies", "Goalies"]].map(function (x) { return '<button data-pt="' + x[0] + '" aria-pressed="' + (state.ptab === x[0]) + '">' + x[1] + "</button>"; }).join("");
     var advBtn = state.ptab === "skaters" ? '<button class="advbtn" data-adv aria-pressed="' + state.adv + '">' + (state.adv ? "Hide advanced" : "Advanced stats") + "</button>" : "";
     var tools = '<div class="tools"><div class="seg" role="group" aria-label="Player type">' + seg + '</div><input class="search" id="q" type="search" placeholder="Search a player" value="' + esc(state.q) + '" aria-label="Search players">' + advBtn + "</div>";
@@ -630,10 +645,8 @@
           "<td>" + r.gp + "</td><td>" + r.g + "</td><td>" + r.a + '</td><td class="strong pts">' + r.pts + "</td><td>" + f2(r.ppg) + "</td><td>" + r.pen + '</td><td class="adv">' + r.pwg + '</td><td class="adv">' + r.pwa + '</td><td class="adv">' + r.shg + '</td><td class="adv">' + r.sha + '</td><td class="adv">' + r.mp + "</td>" + "</tr>";
       }).join("");
       var mxp = Math.max.apply(null, sorted.map(function (r) { return r.pts; }).concat([1]));
-      var mobSk = msortCtlC(cfg) + sorted.slice(0, state.pm).map(function (r, i) {
-        return '<div class="pc' + (mine(r.team) && all ? " me" : "") + '"><div class="r">' + (i + 1) + '</div><div class="pn"><div class="pl"><b class="nm">' + esc(r.name) + '</b>' + (all ? badgeC(r.team) : "") + '</div><div class="pst"><span>GP <b>' + r.gp + '</b></span><span>G <b>' + r.g + '</b></span><span>A <b>' + r.a + '</b></span>' + (state.adv ? '<span class="sm">PPG <b>' + r.pwg + '</b></span><span class="sm">PPA <b>' + r.pwa + '</b></span><span class="sm">SHG <b>' + r.shg + '</b></span><span class="sm">SHA <b>' + r.sha + '</b></span>' : "") + "</div></div>" +
-          '<div class="pv">' + r.pts + "<small>PTS</small></div>" + '<div class="bar" aria-hidden="true"><i style="width:' + Math.round(r.pts / mxp * 100) + '%"></i></div></div>';
-      }).join("") + (sorted.length ? "" : '<p class="empty">No players match.</p>') + moreBtn(sorted.length);
+      mrow = msortCtlC(cfg);
+      var mobSk = sorted.slice(0, state.pm).map(function (r, i) { return pcard(r, i, 0); }).join("") + (sorted.length ? "" : '<p class="empty">No players match.</p>') + moreBtn(sorted.length);
       out = '<div class="tiles">' + leaderTile(rows, "pts", "Points leader", all) + leaderTile(rows, "g", "Goals leader", all) + leaderTile(rows, "a", "Assists leader", all) + leaderTile(GK.filter(function (r) { return state.team === "ALL" || r.team === state.team; }), "w", "Goalie wins", all) + "</div>" +
         '<div class="mob">' + mobSk + '</div><div class="card desk"><div class="wrap">' + ptStartC(cols, cfg.key === "rank" ? { key: "pts", dir: -1 } : cfg) + "<tbody>" + (body || '<tr><td class="empty" colspan="22">No players match.</td></tr>') + "</tbody></table></div>" +
         '<div class="morerow">' + moreBtn(sorted.length) + '</div></div>';
@@ -648,10 +661,8 @@
       var best = grows.filter(function (r) { return r.min >= 60; }).sort(function (a, b) { return a.gaa - b.gaa; })[0];
       var mw = grows.slice().sort(function (a, b) { return b.w - a.w; })[0];
       var ms = grows.slice().sort(function (a, b) { return b.so - a.so; })[0];
-      var mobGk = msortCtlC(gc) + gs.slice(0, state.pm).map(function (r, i) {
-        return '<div class="pc' + (mine(r.team) && all ? " me" : "") + '"><div class="r">' + (i + 1) + '</div><div class="pn"><b>' + esc(r.name) + '</b><span class="ps">' + (all ? badgeC(r.team) : "") + "<span>GP <b>" + r.gp + "</b></span><span>W-L-T <b>" + r.w + "-" + r.l + "-" + r.t + "</b></span><span>SO <b>" + r.so + "</b></span><span>GA <b>" + r.ga + "</b></span></span></div>" +
-          '<div class="pv">' + f2(r.gaa) + "<small>GAA</small></div></div>";
-      }).join("") + (gs.length ? "" : '<p class="empty">No goalies match.</p>') + moreBtn(gs.length);
+      mrow = msortCtlC(gc);
+      var mobGk = gs.slice(0, state.pm).map(function (r, i) { return pcard(r, i, 1); }).join("") + (gs.length ? "" : '<p class="empty">No goalies match.</p>') + moreBtn(gs.length);
       out = '<div class="tiles">' + (best ? tile("Best GAA", f2(best.gaa), esc(best.name) + (all ? " (" + best.team + ")" : "") + ", 60+ min") : tile("Best GAA", "–", "needs 60+ min")) +
         (mw ? tile("Most wins", mw.w, esc(mw.name) + (all ? " (" + mw.team + ")" : "")) : "") + (ms ? tile("Most shutouts", ms.so, esc(ms.name) + (all ? " (" + ms.team + ")" : "")) : "") + tile("Goalies", grows.length, "in this view") + "</div>" +
         '<div class="mob">' + mobGk + '</div><div class="card desk"><div class="wrap">' + ptStartC(gcols, gc.key === "rank" ? { key: "gaa", dir: 1 } : gc) + "<tbody>" + (gb || '<tr><td class="empty" colspan="22">No goalies match.</td></tr>') + "</tbody></table></div>" +
@@ -659,12 +670,12 @@
     }
     var focusQ = document.activeElement && document.activeElement.id === "q";
     $("p-players").innerHTML = '<div class="sec-head"><div><h2>Players</h2></div></div>' +
-      '<div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">' + pvTools(tools, seg) + (state.pv === "cards" ? cardsHTML() : '<div class="pout' + (state.pv === "table" ? " ptable" : "") + '">' + out + "</div>" + leadersHTML()) + "</div>";
+      '<div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">' + pvTools(tools, seg) + (state.pv === "cards" ? cardsHTML() : mrow + '<div class="pout' + (state.pv === "table" ? " ptable" : "") + '">' + out + "</div>" + leadersHTML()) + "</div>";
     if (focusQ) { var el = $("q"); el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
   }
   function renderPlayers() {
     if (!OFFICIAL) return renderPlayersC();
-    var all = state.team === "ALL", out = "";
+    var all = state.team === "ALL", out = "", mrow = "";
     var seg = [["skaters", "Skaters"], ["goalies", "Goalies"]].map(function (x) { return '<button data-pt="' + x[0] + '" aria-pressed="' + (state.ptab === x[0]) + '">' + x[1] + "</button>"; }).join("");
     var tools = '<div class="tools"><div class="seg" role="group" aria-label="Player type">' + seg + '</div><input class="search" id="q" type="search" placeholder="Search a player" value="' + esc(state.q) + '" aria-label="Search players">' + '<button class="advbtn" data-adv aria-pressed="' + state.adv + '">' + (state.adv ? "Hide advanced" : "Advanced stats") + "</button></div>";
     if (state.ptab === "skaters") {
@@ -676,11 +687,8 @@
           "<td>" + r.gp + "</td><td>" + r.g + "</td><td>" + r.a + '</td><td class="strong pts">' + r.pts + "</td><td>" + f2(r.pgp) + "</td><td>" + r.pen + '</td><td class="grp">' + r.ppg + "</td><td>" + r.ppa + "</td><td>" + r.ppp + '</td><td class="grp">' + r.shg + "</td><td>" + r.sha + "</td><td>" + r.shp + '</td><td class="grp">' + r.gwg + "</td><td>" + r.gtg + "</td></tr>";
       }).join("");
       var mxp = Math.max.apply(null, sorted.map(function (r) { return r.pts; }).concat([1]));
-      var mobSk = msortCtl(cfg) + sorted.slice(0, state.pm).map(function (r, i) {
-        return '<div class="pc' + (mine(r.team) && all ? " me" : "") + '"><div class="r">' + (i + 1) + '</div><div class="pn"><div class="pl"><b class="nm">' + esc(r.name) + '</b>' + (all ? badgeC(r.team) : "") + '</div><div class="pst"><span>GP <b>' + r.gp + '</b></span><span>G <b>' + r.g + '</b></span><span>A <b>' + r.a + '</b></span>' +
-          (state.adv ? '<span class="sm">P/GP <b>' + f2(r.pgp) + '</b></span><span class="sm">PIM <b>' + r.pen + '</b></span><span class="sm">PPG <b>' + r.ppg + '</b></span><span class="sm">PPA <b>' + r.ppa + '</b></span><span class="sm">PPP <b>' + r.ppp + '</b></span><span class="sm">SHG <b>' + r.shg + '</b></span><span class="sm">SHA <b>' + r.sha + '</b></span><span class="sm">SHP <b>' + r.shp + '</b></span><span class="sm">GWG <b>' + r.gwg + '</b></span><span class="sm">GTG <b>' + r.gtg + '</b></span>' : "") + "</div></div>" +
-          '<div class="pv">' + r.pts + "<small>PTS</small></div>" + '<div class="bar" aria-hidden="true"><i style="width:' + Math.round(r.pts / mxp * 100) + '%"></i></div></div>';
-      }).join("") + (sorted.length ? "" : '<p class="empty">No players match.</p>') + moreBtn(sorted.length);
+      mrow = msortCtl(cfg);
+      var mobSk = sorted.slice(0, state.pm).map(function (r, i) { return pcard(r, i, 0); }).join("") + (sorted.length ? "" : '<p class="empty">No players match.</p>') + moreBtn(sorted.length);
       out = '<div class="tiles">' + leaderTile(rows, "pts", "Points leader", all) + leaderTile(rows, "g", "Goals leader", all) + leaderTile(rows, "a", "Assists leader", all) + leaderTile(rows, "ppg", "Power-play goals", all) + "</div>" +
         '<div class="mob">' + mobSk + '</div><div class="card desk"><div class="wrap">' + ptStart(cols, cfg.key === "rank" ? { key: "pts", dir: -1 } : cfg) + "<tbody>" + (body || '<tr><td class="empty" colspan="18">No players match.</td></tr>') + "</tbody></table></div>" +
         '<div class="morerow">' + moreBtn(sorted.length) + '</div></div>';
@@ -698,11 +706,8 @@
       var best = qual.slice().sort(function (a, b) { return a.gaa - b.gaa; })[0];
       var mw = grows.slice().sort(function (a, b) { return b.w - a.w; })[0];
       var ms = grows.slice().sort(function (a, b) { return b.so - a.so; })[0];
-      var mobGk = msortCtl(gc) + gs.slice(0, state.pm).map(function (r, i) {
-        return '<div class="pc' + (mine(r.team) && all ? " me" : "") + '"><div class="r">' + (i + 1) + '</div><div class="pn"><div class="pl"><b class="nm">' + esc(r.name) + '</b>' + (all ? badgeC(r.team) : "") + '</div><div class="pst"><span>GP <b>' + r.gp + '</b></span><span>W-L-OTL <b>' + r.w + "-" + r.l + "-" + r.t + '</b></span><span>SO <b>' + r.so + '</b></span>' +
-          (state.adv ? '<span class="sm">GS <b>' + r.gs + '</b></span><span class="sm">GA <b>' + r.ga + '</b></span><span class="sm">W% <b>' + f3(r.wpct) + '</b></span><span class="sm">MIN <b>' + f1(r.min) + '</b></span>' : "") + "</div></div>" +
-          '<div class="pv">' + f2(r.gaa) + "<small>GAA</small></div></div>";
-      }).join("") + (gs.length ? "" : '<p class="empty">No goalies match.</p>') + moreBtn(gs.length);
+      mrow = msortCtl(gc);
+      var mobGk = gs.slice(0, state.pm).map(function (r, i) { return pcard(r, i, 1); }).join("") + (gs.length ? "" : '<p class="empty">No goalies match.</p>') + moreBtn(gs.length);
       out = '<div class="tiles">' + (best ? tile("Best GAA", f2(best.gaa), esc(best.name) + (all ? " (" + best.team + ")" : "") + ", min " + MINGP_GK + " GP") : tile("Best GAA", "–", "needs " + MINGP_GK + " GP")) +
         (mw ? tile("Most wins", mw.w, esc(mw.name) + (all ? " (" + mw.team + ")" : "")) : "") + (ms ? tile("Most shutouts", ms.so, esc(ms.name) + (all ? " (" + ms.team + ")" : "")) : "") + tile("Goalies", grows.length, "in this view") + "</div>" +
         '<div class="mob">' + mobGk + '</div><div class="card desk"><div class="wrap">' + ptStart(gcols, gc.key === "rank" ? { key: "gaa", dir: 1 } : gc) + "<tbody>" + (gb || '<tr><td class="empty" colspan="13">No goalies match.</td></tr>') + "</tbody></table></div>" +
@@ -710,7 +715,7 @@
     }
     var focusQ = document.activeElement && document.activeElement.id === "q";
     $("p-players").innerHTML = '<div class="sec-head"><div><h2>Players</h2></div></div>' +
-      '<div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">' + pvTools(tools, seg) + (state.pv === "cards" ? cardsHTML() : '<div class="pout' + (state.pv === "table" ? " ptable" : "") + '">' + out + "</div>" + leadersHTML()) + "</div>";
+      '<div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">' + pvTools(tools, seg) + (state.pv === "cards" ? cardsHTML() : mrow + '<div class="pout' + (state.pv === "table" ? " ptable" : "") + '">' + out + "</div>" + leadersHTML()) + "</div>";
     if (focusQ) { var el = $("q"); el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
   }
 
@@ -1115,6 +1120,7 @@ function makeModel(played, sheets, teams, opt) {
   });
   document.addEventListener("input", function (e) { if (e.target.id === "q") { state.q = e.target.value; state.pm = 10; renderPlayers(); } });
   document.addEventListener("change", function (e) {
+    if (e.target.id === "mteam") { state.pteam = e.target.value; state.pm = 10; renderPlayers(); return; }
     if (e.target.id !== "msort") return;
     var o = (OFFICIAL ? MSORT : MSORT_C)[state.ptab].concat(OFFICIAL ? [] : ADV_C).filter(function (x) { return x[0] === e.target.value; })[0], cfg = state.ptab === "skaters" ? state.sk : state.gk;
     cfg.key = o[0]; cfg.dir = o[2]; state.pm = 10; renderPlayers();
