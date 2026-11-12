@@ -708,7 +708,8 @@ table.pt tr.grp th.g0{border-left:1px solid var(--rule)}
 body:not(.m) table.pt td.pts,body:not(.m) table.pt th.pts{background:var(--soft)}
 /* players: search sits left of Cards / List on desktop */
 body:not(.m) #p-players .tools .search{order:2;margin-left:auto}
-body:not(.m) #p-players .tools .pvseg{order:3;margin-left:0}
+body:not(.m) #p-players .tools .pvseg{order:3;margin-left:auto}
+body:not(.m) #p-players .tools:has(.search) .pvseg{margin-left:0}
 body:not(.m) #p-players .tools .advbtn{order:4}
 /* schedule: two games across per day; an opened matchup takes the full width */
 body:not(.m) .dgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-items:start}
@@ -718,3 +719,8 @@ body:not(.m) .dgrid .g,body:not(.m) .dgrid .grow>summary{grid-template-columns:7
 .gbar{display:flex;gap:2px;height:5px;border-radius:3px;overflow:hidden;margin-top:3px}
 .gbar i{background:var(--side-a)}.gbar i.t{background:var(--rule)}.gbar i.h{background:var(--side-h)}
 .m .gbar{display:none}
+/* players table on desktop: text 1px larger */
+body:not(.m) table.pt{font-size:16px}
+body:not(.m) table.pt thead tr:not(.grp) th{font-size:13px}
+body:not(.m) table.pt td.pts{font-size:19px}
+body:not(.m) table.pt .tn b{font-size:16px}
