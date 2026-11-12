@@ -587,22 +587,34 @@
         { t: "Shutouts", rows: gks, k: "so", u: "SO", tie: byGp, gk: 1 }
       ];
     }
-    var html = defs.map(function (d) {
+    FCARDS = [];
+    var html = defs.map(function (d, ci) {
       var f = d.f || function (v) { return v; };
-      var top = d.rows.filter(function (r) { return d.zero || r[d.k] > 0; }).sort(function (a, b) { return (d.asc ? a[d.k] - b[d.k] : b[d.k] - a[d.k]) || d.tie(a, b) || a.name.localeCompare(b.name); }).slice(0, 5);
+      var top = d.rows.filter(function (r) { return d.zero || r[d.k] > 0; }).sort(function (a, b) { return (d.asc ? a[d.k] - b[d.k] : b[d.k] - a[d.k]) || d.tie(a, b) || a.name.localeCompare(b.name); }).slice(0, 10);
       if (!top.length) return '<div class="card fcard"><h3>' + d.t + '</h3><p class="fnone">No leader yet.</p></div>';
-      var L = top[0];
-      return '<div class="card fcard"><h3>' + d.t + "</h3>" +
-        '<div class="fhero' + (mine(L.team) ? " me" : "") + '"><div class="fsil">' + silhouette(L.team, d.gk) + badge(L.team) + '</div><div class="fwho"><div class="fname">' + esc(L.name) + '</div><div class="fteam">' + esc(TEAMS[L.team]) + "</div>" +
-        (d.sub ? '<div class="fsub">' + d.sub(L) + "</div>" : "") + '<div class="fval">' + f(L[d.k]) + "<small>" + d.u + "</small></div></div></div>" +
-        '<ol class="flist" start="2">' + top.slice(1).map(function (r, i) {
-          return '<li class="' + (mine(r.team) ? "me" : "") + '"><span class="frk">' + (i + 2) + "</span>" + badge(r.team) + '<span class="fn">' + esc(r.name) + "<small>" + esc(SHORT[r.team]) + '</small></span><b class="fv">' + f(r[d.k]) + "</b></li>";
-        }).join("") + "</ol>" + (d.note ? '<p class="fnote">' + d.note + "</p>" : "") + "</div>";
+      FCARDS[ci] = { d: d, f: f, top: top };
+      return '<div class="card fcard"><h3>' + d.t + "</h3>" + '<div class="fbody"><div class="fhero" id="fh' + ci + '">' + heroHTML(ci, 0) + "</div>" +
+        '<ol class="flist">' + top.map(function (r, i) {
+          return '<li><button class="frow' + (i === 0 ? " on" : "") + (mine(r.team) ? " me" : "") + '" data-fc="' + ci + '" data-fi="' + i + '"><span class="frk">' + (i + 1) + "</span>" + badge(r.team) + '<span class="fn">' + esc(r.name) + "<small>" + esc(SHORT[r.team]) + '</small></span><b class="fv">' + f(r[d.k]) + "</b></button></li>";
+        }).join("") + "</ol></div>" + (d.note ? '<p class="fnote">' + d.note + "</p>" : "") + "</div>";
     }).join("");
     return '<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="fshade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".18"/><stop offset="1" stop-color="#000" stop-opacity=".28"/></linearGradient></defs></svg>' +
-      '<div class="fgrid' + (state.ptab === "goalies" ? " g3" : "") + '">' + html + "</div>" +
-      '<p class="mfoot">Top 5 in each category' + (all ? "" : " for " + esc(TEAMS[state.team])) + ". Switch to List for every player and more stats.</p>";
+      '<div class="fgrid">' + html + "</div>" +
+      '<p class="mfoot">Top 10 in each category' + (all ? "" : " for " + esc(TEAMS[state.team])) + ". Tap a name to feature that player. Switch to List for every player and more stats.</p>";
   }
+  var FCARDS = [];
+  function heroHTML(ci, i) {
+    var c = FCARDS[ci], r = c.top[i], d = c.d;
+    return '<div class="fsil">' + silhouette(r.team, d.gk) + badge(r.team) + '</div><div class="fwho"><div class="frank">#' + (i + 1) + (i === 0 ? " · Leader" : "") + '</div><div class="fname">' + esc(r.name) + '</div><div class="fteam">' + esc(TEAMS[r.team]) + "</div>" +
+      (d.sub ? '<div class="fsub">' + d.sub(r) + "</div>" : "") + '<div class="fval">' + c.f(r[d.k]) + "<small>" + d.u + "</small></div></div>";
+  }
+  function featureRow(btn) {
+    var ci = +btn.dataset.fc, i = +btn.dataset.fi, h = $("fh" + ci);
+    if (!h || !FCARDS[ci] || btn.classList.contains("on")) return;
+    h.innerHTML = heroHTML(ci, i);
+    Array.prototype.forEach.call(btn.closest("ol").querySelectorAll(".frow"), function (x) { x.classList.toggle("on", x === btn); });
+  }
+  document.addEventListener("mouseover", function (e) { var b = e.target.closest && e.target.closest(".frow"); if (b && !document.body.classList.contains("m")) featureRow(b); });
   function pvTools(tools, seg) {
     var pv = '<div class="seg pvseg" role="group" aria-label="Players view">' + [["cards", "Cards"], ["list", "List"]].map(function (x) { return '<button data-pv="' + x[0] + '" aria-pressed="' + (state.pv === x[0]) + '">' + x[1] + "</button>"; }).join("") + "</div>";
     if (state.pv === "cards") return '<div class="tools"><div class="seg ptseg" role="group" aria-label="Player type">' + seg + "</div>" + pv + "</div>";
@@ -1079,6 +1091,7 @@ function makeModel(played, sheets, teams, opt) {
 
   function openTeam(t) { if (!inDiv(t)) { state.div = "ALL"; syncDiv(); } state.team = t; state.open = 0; state.pm = 10; renderAll(); goto("teams"); }
   document.addEventListener("click", function (e) {
+    var frow = e.target.closest && e.target.closest(".frow"); if (frow) { featureRow(frow); return; }
     var tp = e.target.closest("[data-tp]");
     if (tp && !tp.closest(".wkc") && !tp.closest("#p-teams .tcard")) { e.preventDefault(); openTeam(tp.dataset.tp); return; }
     var tab = e.target.closest("a[data-tab]");
