@@ -611,7 +611,7 @@
   }
   document.addEventListener("mouseover", function (e) { var b = e.target.closest && e.target.closest(".frow"); if (b && !document.body.classList.contains("m")) featureRow(b); });
   function pvTools(tools, seg) {
-    var pv = '<div class="seg pvseg" role="group" aria-label="Players view">' + [["cards", "Cards"], ["list", "List"]].map(function (x) { return '<button data-pv="' + x[0] + '" aria-pressed="' + (state.pv === x[0]) + '">' + x[1] + "</button>"; }).join("") + "</div>";
+    var pv = '<div class="seg pvseg" role="group" aria-label="Players view">' + [["cards", "Cards"], ["list", "List"], ["table", "Table"]].map(function (x) { return '<button data-pv="' + x[0] + '"' + (x[0] === "table" ? ' class="mo"' : "") + ' aria-pressed="' + (state.pv === x[0] || (x[0] === "list" && state.pv === "table" && !document.body.classList.contains("m"))) + '">' + x[1] + "</button>"; }).join("") + "</div>";
     if (state.pv === "cards") return '<div class="tools"><div class="seg ptseg" role="group" aria-label="Player type">' + seg + "</div>" + pv + "</div>";
     return tools.replace('<div class="seg" role="group" aria-label="Player type">' + seg + "</div>", '<div class="seg ptseg" role="group" aria-label="Player type">' + seg + "</div>" + pv + '<span class="tbrk"></span>');
   }
@@ -659,7 +659,7 @@
     }
     var focusQ = document.activeElement && document.activeElement.id === "q";
     $("p-players").innerHTML = '<div class="sec-head"><div><h2>Players</h2></div></div>' +
-      '<div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">' + pvTools(tools, seg) + (state.pv === "cards" ? cardsHTML() : out + leadersHTML()) + "</div>";
+      '<div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">' + pvTools(tools, seg) + (state.pv === "cards" ? cardsHTML() : '<div class="pout' + (state.pv === "table" ? " ptable" : "") + '">' + out + "</div>" + leadersHTML()) + "</div>";
     if (focusQ) { var el = $("q"); el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
   }
   function renderPlayers() {
@@ -710,7 +710,7 @@
     }
     var focusQ = document.activeElement && document.activeElement.id === "q";
     $("p-players").innerHTML = '<div class="sec-head"><div><h2>Players</h2></div></div>' +
-      '<div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">' + pvTools(tools, seg) + (state.pv === "cards" ? cardsHTML() : out + leadersHTML()) + "</div>";
+      '<div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">' + pvTools(tools, seg) + (state.pv === "cards" ? cardsHTML() : '<div class="pout' + (state.pv === "table" ? " ptable" : "") + '">' + out + "</div>" + leadersHTML()) + "</div>";
     if (focusQ) { var el = $("q"); el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
   }
 

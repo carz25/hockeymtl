@@ -566,3 +566,14 @@ table.advt th,table.advt td{white-space:nowrap}
 .fsub b{color:var(--ink);font-weight:700}
 /* phones: the List view drops the four leader boxes (the Cards view covers them) */
 .m #p-players .tiles{display:none}
+/* Players: Table view on phones shows the desktop table, sliding sideways with the player column pinned. The Table button is phone-only (List is already the table on desktop). */
+.pout{display:flex;flex-direction:column;gap:16px}
+.pvseg button.mo{display:none}
+.m .pvseg button.mo{display:inline-block}
+.m .ptable .mob{display:none}
+.m .ptable .desk{display:block}
+.m .ptable .desk table th,.m .ptable .desk table td{white-space:nowrap}
+.m .ptable .desk table{table-layout:auto;width:max-content;min-width:100%}
+.m .ptable .desk col{width:auto !important}
+.m .ptable .desk .stick{min-width:130px;max-width:150px;white-space:normal;box-shadow:1px 0 0 var(--rule)}
+.m .ptable .desk th,.m .ptable .desk td{padding-left:8px;padding-right:8px}
