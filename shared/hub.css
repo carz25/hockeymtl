@@ -92,8 +92,6 @@ th.on{color:var(--ink)}
 .wkc [data-tp]{cursor:inherit}
 .teamlink{background:none;border:0;padding:0;cursor:pointer;text-align:left}
 .teamlink:hover b{text-decoration:underline}
-.pctbar{display:inline-block;width:54px;height:5px;background:var(--rule);border-radius:3px;margin-left:8px;vertical-align:middle;overflow:hidden}
-.pctbar i{display:block;height:100%;background:var(--side-a)}
 .empty{text-align:center;color:var(--mute);padding:24px}
 
 /* chips */
@@ -489,7 +487,6 @@ th.adv,td.adv{background:color-mix(in srgb,var(--rule) 18%,transparent)}
 .m .ctable td.strong{font-size:18px}
 @media (max-width:375px){.m .ctable td.strong{font-size:16px}}
 /* standings on phones: Table / Grid switch */
-.svseg{align-self:flex-start}
 .svseg button{padding:6px 16px;min-height:34px;font-size:13px}
 .scg{display:flex;flex-direction:column;gap:8px}
 /* footer bar shared by every page (built by shared/logo.js) */
@@ -507,8 +504,12 @@ body.st-off:not(.m),body.st-sheet:not(.m){padding-bottom:46px}
 /* short pages (like Teams) still put the page footer, with the View options, at the bottom of the screen */
 body.st-off,body.st-sheet{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;box-sizing:border-box}
 body.st-off>main,body.st-sheet>main{flex:1 0 auto;width:100%}
-/* special-teams table on phones: tighter so all columns fit */
-.ctable.spt th,.ctable.spt td{padding:8px 2px}
-.ctable.spt th{font-size:10px}
-.ctable.spt td.strong{font-size:15px}
-.svseg button{padding:6px 12px}
+/* standings view bar on phones: Table | Grid on the left, Advanced stats switch on the right */
+.svbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.svseg button{padding:6px 14px}
+.advtog{display:inline-flex;align-items:center;gap:7px;background:none;border:0;padding:6px 0;min-height:34px;font:inherit;font-size:12px;font-weight:600;color:var(--ink);cursor:pointer;white-space:nowrap}
+.advtog i{width:15px;height:15px;border-radius:50%;border:1.5px solid var(--ink);box-sizing:border-box;display:inline-block;position:relative;flex:none}
+.advtog[aria-checked="true"] i::after{content:"";position:absolute;inset:2.5px;border-radius:50%;background:var(--ink)}
+.advtog:focus-visible{outline:2px solid var(--side-a);outline-offset:2px}
+/* advanced table on phones: the full desktop table, sliding sideways with the team column pinned */
+table.advt th,table.advt td{white-space:nowrap}
