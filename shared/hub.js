@@ -381,7 +381,7 @@
           '<td class="g0">' + remaining(t) + '</td><td class="l">' + formChips(t, 5) + "</td>" + nextCell(t) + "</tr>";
       }).join("");
       return divHead(d) + '<div class="card"><div class="wrap"><table class="stt' + (cls ? " " + cls : "") + '"><thead>' +
-        '<tr class="grp"><th colspan="2"></th><th colspan="' + nRec + '" class="g0">Record</th><th colspan="3" class="g0">Scoring</th><th colspan="' + nSpt + '" class="g0">Special teams</th><th colspan="3" class="g0 l">Form</th></tr>' +
+        '<tr class="grp"><th colspan="2"></th><th colspan="' + nRec + '" class="g0">Record</th><th colspan="3" class="g0">Scoring</th><th colspan="' + nSpt + '" class="g0">Special teams</th><th colspan="3" class="g0">Summary</th></tr>' +
         '<tr><th class="rk">#</th><th class="l stick">Team</th><th class="g0" title="Games played">GP</th>' + rth(true) + '<th class="ptsc" title="Points">PTS</th><th title="Points percentage">PTS%</th>' + (OT ? '<th title="Regulation wins">RW</th><th title="Sportsmanship points, included in PTS">SP</th>' : "") +
         '<th class="g0" title="Goals for">GF</th><th title="Goals against">GA</th><th title="Goal difference">DIFF</th>' +
         '<th class="g0" title="Penalty minutes">PIM</th><th title="Power-play goals">PPG</th>' + (SPT_AGAINST ? '<th title="Power-play goals against">PPGA</th>' : "") + '<th title="Short-handed goals">SHG</th>' + (SPT_AGAINST ? '<th title="Short-handed goals against">SHGA</th>' : "") +
@@ -461,8 +461,9 @@
     if (!g.played) { var wp = winProb(g.a, g.h), v = side === "a" ? wp.a : wp.h; pc = '<em class="wpc' + (v === Math.max(wp.a, wp.h) && wp.a !== wp.h ? " fav" : "") + '" title="Win probability">' + v + "%</em>"; }
     return '<div class="' + cls + '">' + tname(t) + (g.played ? '<span class="sc">' + sc + "</span>" : pc) + "</div>";
   }
+  function gbar(g) { var wp = winProb(g.a, g.h); return '<div class="gbar" aria-hidden="true"><i style="flex:' + wp.a + '"></i>' + (wp.t ? '<i class="t" style="flex:' + wp.t + '"></i>' : "") + '<i class="h" style="flex:' + wp.h + '"></i></div>'; }
   function gameInner(g, sheet) {
-    return '<div class="gtime"><b>' + g.time + "</b><span>#" + g.id + '</span></div><div class="gteams">' + (g.played ? "" : '<div class="wph">Win probability</div>') + teamLine(g, "a") + teamLine(g, "h") + '</div><div class="gmeta"><span>' + esc(g.venue) + "</span>" +
+    return '<div class="gtime"><b>' + g.time + "</b><span>#" + g.id + '</span></div><div class="gteams">' + (g.played ? "" : '<div class="wph">Win probability</div>') + teamLine(g, "a") + teamLine(g, "h") + (g.played ? "" : gbar(g)) + '</div><div class="gmeta"><span>' + esc(g.venue) + "</span>" +
       (g.played ? '<span><span class="final">' + fin(g) + '</span>' + (sheet ? ' · <span class="more">Scoring summary</span>' : "") + "</span>" : '<span><span class="more">Matchup preview</span></span>') + "</div>";
   }
   function goalList(sh, t) {
@@ -493,14 +494,16 @@
     list.forEach(function (g, i) {
       var mk = g.date.slice(0, 7), isNewMonth = months.indexOf(mk) < 0;
       if (isNewMonth) months.push(mk);
-      if (i === mark && i > 0) html += '<div class="todaybar"><span>Today · ' + dlong(today) + "</span></div>";
+      if (i === mark && i > 0) { if (cur) { html += "</div>"; cur = ""; } html += '<div class="todaybar"><span>Today · ' + dlong(today) + "</span></div>"; }
       if (g.date !== cur) {
-        cur = g.date; html += '<div class="day"' + (isNewMonth ? ' data-month="' + mk + '"' : "") + "><h3>" + dlong(g.date) + "</h3>" + (g.date === today ? '<span class="todaychip">Today</span>' : "") + "</div>";
+        if (cur) html += "</div>";
+        cur = g.date; html += '<div class="day"' + (isNewMonth ? ' data-month="' + mk + '"' : "") + "><h3>" + dlong(g.date) + "</h3>" + (g.date === today ? '<span class="todaychip">Today</span>' : "") + '</div><div class="dgrid">';
       }
       var sheet = SHEET[g.id];
       if (!g.played) html += '<details class="grow" id="m' + g.id + '"' + (g.id === state.open ? " open" : "") + "><summary>" + gameInner(g, false) + "</summary>" + matchBody(g) + "</details>";
       else html += sheet ? '<details class="grow"><summary>' + gameInner(g, true) + "</summary>" + sheetDetail(g, sheet) + "</details>" : '<div class="g">' + gameInner(g, false) + "</div>";
     });
+    if (cur) html += "</div>";
     var who = state.team === "ALL" ? (state.div === "ALL" ? "all teams" : curDivs()[0].name) : TEAMS[state.team];
     var seg = [["week", "This week"], ["upcoming", "Upcoming"], ["results", "Results"], ["all", "All"]].map(function (x) { return '<button data-sf="' + x[0] + '" aria-pressed="' + (state.sf === x[0]) + '">' + x[1] + "</button>"; }).join("");
     var jump = months.length > 1 && state.sf !== "week" ? '<div class="mjump" role="group" aria-label="Jump to month">' + months.map(function (k) { return '<button class="btn" data-jump="' + k + '">' + mlabel(k) + "</button>"; }).join("") + "</div>" : "";
@@ -524,8 +527,21 @@
       return cfg.dir * (a - b) || tie(x, y);
     });
   }
+  /* column groups shown above the player tables on desktop */
+  var PGRP = { GP: "", G: "Scoring", A: "Scoring", PTS: "Scoring", "P/GP": "Scoring", PIM: "Scoring", PPG: "Power play", PPA: "Power play", PPP: "Power play", SHG: "Short-handed", SHA: "Short-handed", SHP: "Short-handed", GWG: "Clutch", GTG: "Clutch", MP: "Clutch",
+    GS: "", W: "Record", L: "Record", T: "Record", OTL: "Record", "W%": "Record", MIN: "Goaltending", GA: "Goaltending", GAA: "Goaltending", SO: "Goaltending" };
+  function groupRow(cols) {
+    var runs = [];
+    cols.forEach(function (c) {
+      var g = c[0] === "rank" || c[0] === "name" || c[0] === "team" ? "" : (PGRP[c[1]] !== undefined ? PGRP[c[1]] : "");
+      if (c[1] === "GP" || c[1] === "GS") g = cols.some(function (x) { return x[1] === "W"; }) ? "Record" : "Scoring";
+      var last = runs[runs.length - 1];
+      if (last && last.g === g) last.n++; else runs.push({ g: g, n: 1 });
+    });
+    return '<tr class="grp">' + runs.map(function (r, i) { return '<th colspan="' + r.n + '"' + (r.g && i ? ' class="g0"' : "") + ">" + r.g + "</th>"; }).join("") + "</tr>";
+  }
   function head(cols, cfg) {
-    return "<thead><tr>" + cols.map(function (c) {
+    return "<thead>" + groupRow(cols) + "<tr>" + cols.map(function (c) {
       var on = cfg.key === c[0];
       return '<th class="' + (c[2] || "") + (on ? " on" : "") + '" aria-sort="' + (on ? (cfg.dir < 0 ? "descending" : "ascending") : "none") + '"><button class="sort" data-key="' + c[0] + '"' + (c[3] ? ' title="' + c[3] + '"' : "") + '>' + c[1] + (on ? '<span class="arr">' + (cfg.dir < 0 ? "▾" : "▴") + "</span>" : "") + "</button></th>";
     }).join("") + "</tr></thead>";
@@ -541,7 +557,7 @@
   var MSORT_C = { skaters: [["pts", "Points", -1], ["g", "Goals", -1], ["a", "Assists", -1], ["ppg", "Points per game", -1], ["pen", "PIM", -1]], goalies: [["gaa", "Best GAA", 1], ["w", "Wins", -1], ["so", "Shutouts", -1], ["gp", "Games played", -1]] };
   function ptStartC(cols, cfg) {
     var cg = cols.map(function (c) {
-      var k = c[0] === "name" ? "" : c[0] === "rank" ? "rk" : c[0] === "team" ? "tm" : "nu";
+      var k = c[0] === "name" ? "nm" : c[0] === "rank" ? "rk" : c[0] === "team" ? "tm" : "nu";
       return "<col" + (k ? ' class="' + k + '"' : "") + ">";
     }).join("");
     return '<table class="pt"><colgroup>' + cg + "</colgroup>" + head(cols, cfg);
@@ -574,7 +590,7 @@
   var MINGP_SK = 5, MINGP_GK = 3;
   function ptStart(cols, cfg) {
     var n = 0, cg = cols.map(function (c) {
-      var k = c[0] === "name" ? "" : c[0] === "rank" ? "rk" : c[0] === "team" ? "tm" : "nu";
+      var k = c[0] === "name" ? "nm" : c[0] === "rank" ? "rk" : c[0] === "team" ? "tm" : "nu";
       if (k === "nu") n++;
       return "<col" + (k ? ' class="' + k + '"' : "") + ">";
     }).join("");
@@ -673,7 +689,9 @@
         { t: "Points", rows: sks, k: "pts", u: "PTS", tie: function (a, b) { return b.g - a.g; }, sub: function (r) { return "<b>" + r.g + " G · " + r.a + " A</b>"; } },
         { t: "Goals", rows: sks, k: "g", u: "G", tie: byPts },
         { t: "Assists", rows: sks, k: "a", u: "A", tie: byPts },
-        { t: "Penalty minutes", rows: sks, k: "pen", u: "PIM", tie: byPts }
+        { t: "Penalty minutes", rows: sks, k: "pen", u: "PIM", tie: byPts },
+        { t: "Points per game", rows: sks.filter(function (r) { return r.gp >= MINGP_SK; }), k: OFFICIAL ? "pgp" : "ppg", u: "P/GP", f: f2, tie: byPts, sub: function (r) { return r.pts + " PTS · " + r.gp + " GP"; }, note: "Minimum " + MINGP_SK + " games" },
+        { t: "Short-handed goals", rows: sks, k: "shg", u: "SHG", tie: byPts }
       ];
     } else {
       var gks = GK.filter(inTeam), q = gks.filter(function (r) { return OFFICIAL ? r.gp >= MINGP_GK : r.min >= 60; });
