@@ -755,3 +755,12 @@ body:not(.m) table.pt .tn b{font-size:16px}
 .m .ptable table.pt th.pts,.m .ptable table.pt td.pts{border-right:1px solid var(--rule)}
 .m .ptable table.pt td{padding-top:6px;padding-bottom:6px}
 .m .ptable table.pt .lg{width:22px;height:22px;border-radius:4px}
+/* phone standings: # and Team columns match the Advanced stats table */
+.m .ctable th.rk,.m .ctable td.rk{box-sizing:border-box;width:28px;min-width:28px;max-width:28px;padding-left:8px;padding-right:2px}
+.m .ctable th.stick,.m .ctable td.stick{padding-left:6px}
+/* phone standings: bold division names and headings */
+.m #p-standings .divh{font-size:14px;font-weight:800;color:var(--ink)}
+.m #p-standings .ctable th{font-weight:700;color:var(--ink)}
+/* phone players: less space between the buttons and the pickers */
+.m #p-players .tools .tbrk{display:none}
+.m #p-players .mtools{margin-top:-8px}
