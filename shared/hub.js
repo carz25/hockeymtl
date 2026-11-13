@@ -396,7 +396,7 @@
       tile("Highest diff", esc(SHORT[bdf]), (ST[bdf].diff > 0 ? "+" : "") + ST[bdf].diff + " goal difference · " + ST[bdf].gf + " for, " + ST[bdf].ga + " against" + (MULTI ? " · " + esc(divOf(bdf).name) : "")) +
       tile("Best points %", esc(SHORT[bp.t]), bp.pct + (MULTI ? " · " + esc(divOf(bp.t).name) : "")) +
       tile("Best defence", esc(SHORT[bd]), f2(ST[bd].gag) + " allowed per game" + (MULTI ? " · " + esc(divOf(bd).name) : "")) + "</div>" +
-      '<div class="mob">' + svSeg + (state.sadv ? deskFor("advt") : state.sv === "grid" ? mobGrid : mobTable) + '</div><div class="desk">' + desk + "</div>" +
+      '<div class="mob">' + svSeg + (state.sadv ? deskFor("advt ctable") : state.sv === "grid" ? mobGrid : mobTable) + '</div><div class="desk">' + desk + "</div>" +
       "</div>";
     $("p-standings").insertAdjacentHTML("beforeend", recapsHTML());
   }
