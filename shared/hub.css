@@ -764,3 +764,6 @@ body:not(.m) table.pt .tn b{font-size:16px}
 /* phone players: less space between the buttons and the pickers */
 .m #p-players .tools .tbrk{display:none}
 .m #p-players .mtools{margin-top:-8px}
+/* phone standings: shaded PTS column in the normal table too, like Advanced stats */
+.m #p-standings .ctable:not(.advt) td.strong{background:var(--soft)}
+.m #p-standings .ctable:not(.advt) tr.me td.strong{background:transparent}
