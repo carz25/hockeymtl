@@ -380,7 +380,7 @@ var PPX = [
   [2897, "ROC", "Greffard", "SH"]
 ];
 
-var ORDER = ["CHE", "OIL", "PIO", "BAR", "BRA", "ROC", "HUR", "PHX", "BUL", "TOR", "ATT", "ETO"];
+var ORDER = ["CHE", "OIL", "PIO", "BAR", "ROC", "BRA", "BUL", "HUR", "PHX", "TOR", "ATT", "ETO"];
 // official standings, as of the league PDF: GP W T L PTS PTS% GF GA DIFF PIM
 var OFF = {
   CHE: [10, 8, 1, 1, 27, ".900", 27, 13, 14, 24],
