@@ -1,29 +1,45 @@
 # M11 BB data update
 
-Keeps `M11BB/data.js` current. Only that one file is ever changed. Never touch `shared/` or the design.
+Keeps `M11BB/data.js` current. Only that file (plus the files in this folder) is ever changed. Never touch `shared/`, any `index.html`, `league.js`, `logos.css` or the design.
 
 Files here:
-- `games.csv`: the league's full game list, same columns as `tools/m13aaa/games.csv`: Spordle gamesheet id and URL per game, date, start time, home, away, arena, surface, status. `game_number` M11BB-2851 is game 2851 in `SCHED`.
-- `official.json`: per played game, the league's own score, PIM, power-play goals (`ppg`), power-play chances (`ppo`) and sportsmanship point per side. Used as a check only.
-- `har2csv.py`: rebuilds both files from a browser `.har` of the Spordle schedule page (open the M11 BB schedule on page.spordle.com, scroll through every month, save as HAR).
-- `sync.py`: compares `data.js` with the two files.
+- `games.csv`: the league's full game list, same columns as `tools/m13aaa/games.csv`: Spordle gamesheet id and URL, game number (M11BB-2851 = game 2851 in `SCHED`), date, start time, home, away, arena, surface, status.
+- `official.json`: per played game, the league's own score, PIM, power-play goals (`ppg`), chances (`ppo`) and sportsmanship point (`sp`) per side. A check and the source of PIM/SP for standings.
+- `har2csv.py`: rebuilds both files from a browser `.har` of the Spordle M11 BB schedule page.
+- `sync.py`: schedule sync, standings rebuild and checks.
+- `run_log.md`: log of automatic runs.
 
-## Commands
+## Commands (always `python3 -I`, from the repo root)
 
 ```
 python3 -I tools/m11bb/har2csv.py M11BB_Full_Schedule.har   # refresh games.csv + official.json
-python3 -I tools/m11bb/sync.py check    # schedule changes, score and PPG differences (changes nothing)
-python3 -I tools/m11bb/sync.py apply    # write date / time / venue / team changes into SCHED
-python3 -I tools/m11bb/sync.py todo     # games before today with no score yet, with their sheet URL
+python3 -I tools/m11bb/sync.py check      # schedule changes, score / PPG differences vs official.json (changes nothing)
+python3 -I tools/m11bb/sync.py apply      # write date / time / venue changes into SCHED (never scores)
+python3 -I tools/m11bb/sync.py todo       # games dated today or earlier with no score yet, with their sheet URL
+python3 -I tools/m11bb/sync.py standings  # rebuild OFF and ORDER from SCHED + G (+ official.json)
+python3 -I tools/m11bb/sync.py verify     # must print OK before publishing
 ```
 
-## Weekly routine
+## Daily routine (also what the scheduled task does)
 
-1. If the user sends a new `.har`, run `har2csv.py`, then `sync.py check` and `sync.py apply`.
-2. `sync.py todo` lists the games to enter. Fetch each sheet: `https://pdf.play.spordle.com/game/<gamesheet_id>?locale=fr`.
-3. For each sheet, in `data.js`: add the score to its `SCHED` row, add a `G` entry (dressed players, goals, penalties, goalie minutes), new names in `R`, and its id in `TIMED`.
-4. Power-play / short-handed goals go in `PPX`, worked out from goal and penalty times (a minor is 2:00 and ends when the other team scores). The league's `ppg` in `official.json` wins when they disagree.
-5. Update `OFF` (GP W T L PTS PTS% GF GA DIFF PIM; PTS = 2 per win, 1 per tie, plus the sportsmanship point) and re-sort `ORDER` by PTS, then PTS%, then goal difference.
-6. `sync.py check` must show no SCORE DIFF or PPG DIFF. Commit `M11BB/data.js` (and these files) to `main` and push.
+1. `sync.py verify` must print OK first. `sync.py todo` lists games to enter. None: stop, change nothing.
+2. Fetch each sheet with WebFetch: `https://pdf.play.spordle.com/game/<gamesheet_id>?locale=fr`. Skip a game whose sheet has no final score yet (try again next run).
+3. For each finished game, edit `M11BB/data.js` by hand, keeping the exact format:
+   - `SCHED`: add the two scores to its row: `[2899, "2026-11-14", "12:00 PM", "Aréna ...", "ROC", "BRA", 3, 2],` (away goals, then home goals).
+   - `G`: append an entry at the end of the array (before `];`), same shape as the last ones:
+     ```
+     { id: 2899, a: "ROC", h: "BRA", s: [3, 2], d: { ROC: ROCD, BRA: BRAD },
+       g: [["ROC", "Henry", "Caspar", "Robert"], ...],     // goals in sheet order: team, scorer key, assist keys
+       p: [["BRA", "Poirier"], ...],                        // one per penalty: team, player key ("" if no number)
+       k: [["ROC", "Cannistraro", 33.8, 2], ["BRA", "Pathmasiri", 33.8, 3]] },  // goalie: team, key, minutes (33:48 -> 33.8), goals against
+     ```
+     `d` is the dressed list: use the team's standard list (`ROCD`, `BRAD`, ...) when the sheet's skaters match it, otherwise a string of keys in the sheet's order. A second goalie who played gets his own `k` row with his minutes.
+   - Player keys are the keys of `R[team]` (usually the last name; see `R` for doubles like `LDupuis`, `JecA`). A skater not in `R` yet: add `Key: "First Last"` to that team in `R`, with proper accents and capitals. An affiliated (call-up) player gets ` †` after the name.
+   - `TIMED`: add the game id.
+   - `PPX`: add power-play and short-handed goals, worked out from the goal and penalty times: a minor is 2:00, ends early when the other team scores, carries into the next period. `[2899, "ROC", "Henry", "PP", "Caspar"]`. Compare with the sheet's PP counters (`PPVis/PPLoc: A.N: x en y`, x = power-play goals); if they disagree, go with the sheet's count.
+4. `sync.py standings`, then `sync.py verify` must print OK. Any PROBLEM: fix it, or undo that game (`git checkout M11BB/data.js` and redo the others).
+5. Commit to `main` and push (`git pull --rebase origin main` first). Message: `M11BB: game results through YYYY-MM-DD`.
 
-Venue names: the league writes some arenas differently from the site. `VENUE` in `sync.py` maps them (for example "Aréna Mont-Royal (plateau)" is "Aréna Mont-Royal").
+Standings rules: PTS = 2 per win, 1 per tie, plus the sportsmanship point (1 per game unless the league removes it). PTS% = PTS / (3 × GP). Order: PTS, PTS%, goal difference. PIM and sportsmanship come from `official.json` when the game is in it, otherwise 2 per penalty and 1 point. `ADJ` in `sync.py` keeps two small known differences in the league's own table (OIL +2 PIM, ATT +4 PIM).
+
+Schedule changes are only visible in a new `.har` from the user: run `har2csv.py`, `sync.py check`, `sync.py apply`. Venue names the league writes differently are mapped in `VENUE` in `sync.py`.
