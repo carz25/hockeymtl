@@ -98,9 +98,9 @@ def schedule(D,path):
 # ---------- game sheets ----------
 def sheets(D,path):
     ns={}; exec(open(path,encoding='utf-8').read(),ns); SH=ns['SHEETS']
+    warn=[]; added=[]
     off=D['OFF']; pst=D['PSTATS']; gst=D['GSTATS']; R=D['R']; sched={r[0]:r for r in D['SCHED']}
     done={g['id'] for g in D['G']}; pidx={(p[0],nn(p[1])):p for p in pst}; gidx={(g[0],nn(g[1])):g for g in gst}
-    warn=[]; added=[]
     def player(t,name):
         k=(t,ALIAS.get((t,nn(name)),nn(name))); p=pidx.get(k)
         if p is None:
@@ -112,6 +112,22 @@ def sheets(D,path):
         if g is None:
             warn.append('NEW GOALIE %s %s'%(t,name)); g=[t,name,0,0,0,0,0,0,0,0]; gst.append(g); gidx[(t,nn(name))]=g
         return g
+    # the sheets print names in capitals without accents: use the spelling already in the stats, else title case
+    known={}
+    for p_ in pst+gst: known[(p_[0],nn(p_[1]))]=p_[1]
+    for t_,m_ in R.items():
+        for n_ in m_.values(): known.setdefault((t_,nn(n_)),n_)
+    def canon(t,n):
+        k=nn(n); k=ALIAS.get((t,k),k)
+        if (t,k) in known: return known[(t,k)]
+        if n==n.upper(): n=re.sub(r"[A-Za-zÀ-ÿ']+",lambda m:m.group(0).capitalize(),n)
+        warn.append('NAME %s %s: not in the stats yet, check accents/capitals'%(t,n)); return n
+    def fixnames(sh):
+        for key in ('ros','gl'):
+            for t,m in sh[key].items():
+                for num in m: m[num]=canon(t,m[num])
+    for sh in SH:
+        if sh['id'] not in done: fixnames(sh)
     for sh in SH:
         if sh['id'] in done: print('skip, already in data.js:',sh['id']); continue
         if sh['id'] not in sched: raise SystemExit('game %s is not in SCHED'%sh['id'])
