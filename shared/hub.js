@@ -13,7 +13,7 @@
   var LOGOS = !!L.logos;                  // team logo images in logos.css (true) or coloured text badges (false)
   var KEY = L.id || "hub";                // prefix for saved settings in the browser
   var GROUP = L.group || "conference";    // word used in "1st in the ..."
-  var SCHED = window.SCHED || [], TEAMS = window.TEAMS, SHORT = window.SHORT, BADGE = window.BADGE || {}, R = window.R || {}, G = window.G || [], OFF = window.OFF;
+  var SCHED = window.SCHED || [], TEAMS = window.TEAMS, SHORT = window.SHORT || window.TEAMS, BADGE = window.BADGE || {}, R = window.R || {}, G = window.G || [], OFF = window.OFF;
   var DIVS = window.DIVS || null;
   var ORDER = window.ORDER || DIVS.reduce(function (a, d) { return a.concat(d.teams); }, []);
   if (!DIVS) DIVS = [{ id: "C", name: L.groupName || "Conference", teams: ORDER.slice() }];
@@ -57,6 +57,9 @@
   function when(g) { return g.time === "TBD" ? "Date and time TBD" : dlong(g.date) + " · " + g.time; }
   function dshort(s) { if (s === TBD_DATE) return "Date TBD"; var d = pd(s); return MONTH[d.getMonth()] + " " + d.getDate(); }
   function tmin(t) { var m = t.match(/(\d+):(\d+) ([AP])M/); var h = +m[1] % 12 + (m[3] === "P" ? 12 : 0); return h * 60 + +m[2]; }
+  /* badge colours: BADGE in data.js, or a steady colour picked from the team code */
+  var PAL = ["#1F4E8C", "#8C1F2E", "#1F7A4D", "#6B3FA0", "#B45F06", "#0E7C86", "#7A5C1F", "#3D4A5C", "#A0306E", "#2F6B2F"];
+  ORDER.forEach(function (t, i) { if (!BADGE[t]) BADGE[t] = PAL[i % PAL.length]; });
   function badge(t, big) {
     if (LOGOS) return '<span class="lg t-' + t + (big ? " big" : "") + '" data-tp="' + t + '" aria-hidden="true"></span>';
     return '<span class="lg cb' + (big ? " big" : "") + '" style="background:' + BADGE[t] + '" data-tp="' + t + '" aria-hidden="true"><i>' + t + "</i></span>";
@@ -76,15 +79,49 @@
   var PLAYED = GAMES.filter(function (g) { return g.played; });
   var UPCOMING = GAMES.filter(function (g) { return !g.played; });
   var LAST = DATA_THROUGH || (PLAYED.length ? PLAYED[PLAYED.length - 1].date : "");
+  var FIRST = (GAMES.filter(function (g) { return g.date !== TBD_DATE; })[0] || { date: "" }).date;
+  if (!AS_OF) AS_OF = LAST || FIRST;
+  /* "through Sun, Nov 8" once games are played; "Season starts Sat, Oct 3" before that */
+  function thru(prefix) { return LAST ? prefix + " " + dlong(LAST) : FIRST ? "Season starts " + dlong(FIRST) : "Schedule coming soon"; }
+
+  /* Official standings (OFF) are optional: when they are missing, or a team is missing from them, the row is
+     counted from the scores in SCHED (2 points a win, 1 a tie or overtime loss; PIM from the game sheets when there are any)
+     and each division is ordered by points, points %, then goal difference. */
+  var OFF_GIVEN = !!window.OFF;
+  OFF = OFF || {};
+  (function () {
+    var calc = {}, pim = {};
+    ORDER.forEach(function (t) { calc[t] = { gp: 0, w: 0, l: 0, t: 0, gf: 0, ga: 0 }; pim[t] = 0; });
+    PLAYED.forEach(function (g) {
+      [[g.a, g.sa, g.sh], [g.h, g.sh, g.sa]].forEach(function (x) {
+        var c = calc[x[0]]; if (!c) return;
+        c.gp++; c.gf += x[1]; c.ga += x[2]; if (x[1] > x[2]) c.w++; else if (x[1] < x[2]) c.l++; else c.t++;
+      });
+    });
+    G.forEach(function (gm) { (gm.p || []).forEach(function (x) { if (pim[x[0]] !== undefined) pim[x[0]] += 2; }); });
+    var missing = false;
+    ORDER.forEach(function (t) {
+      if (OFF[t]) return;
+      missing = true;
+      var c = calc[t], pts = 2 * c.w + c.t, pct = c.gp ? (pts / (2 * c.gp)).toFixed(3).replace(/^0/, "") : ".000";
+      OFF[t] = OT ? [c.gp, c.w, c.l, c.t, pts, pct, c.gf, c.ga, c.gf - c.ga, pim[t], c.w, 0, 0, false] : [c.gp, c.w, c.t, c.l, pts, pct, c.gf, c.ga, c.gf - c.ga, pim[t]];
+    });
+    if (missing && !OFF_GIVEN) {
+      var by = function (a, b) { var x = OFF[a], y = OFF[b]; return y[4] - x[4] || parseFloat(y[5] || 0) - parseFloat(x[5] || 0) || y[8] - x[8] || ORDER.indexOf(a) - ORDER.indexOf(b); };
+      DIVS.forEach(function (d) { d.teams.sort(by); });
+      ORDER.sort(by);
+    }
+  })();
+  function per(x, gp) { return gp ? x / gp : 0; }
 
   var ST = {};
   DIVS.forEach(function (d) {
     d.teams.forEach(function (t, i) {
-      var o = OFF[t], gp = o[0];
+      var o = OFF[t], gp = o[0] || 0;
       // ties format: GP W T L PTS PTS% GF GA DIFF PIM
-      if (!OT) { ST[t] = { t: t, div: d.id, rank: i + 1, gp: gp, w: o[1], tie: o[2], l: o[3], otl: 0, pts: o[4], pct: o[5], pctn: parseFloat(o[5]), gf: o[6], ga: o[7], diff: o[8], pim: o[9], gfg: o[6] / gp, gag: o[7] / gp, pimg: o[9] / gp, dg: o[8] / gp }; return; }
+      if (!OT) { ST[t] = { t: t, div: d.id, rank: i + 1, gp: gp, w: o[1], tie: o[2], l: o[3], otl: 0, pts: o[4], pct: o[5], pctn: parseFloat(o[5]) || 0, gf: o[6], ga: o[7], diff: o[8], pim: o[9], gfg: per(o[6], gp), gag: per(o[7], gp), pimg: per(o[9], gp), dg: per(o[8], gp) }; return; }
       ST[t] = { t: t, div: d.id, rank: i + 1, gp: gp, w: o[1], l: o[2], otl: o[3], tie: 0, pts: o[4], pct: o[5], pctn: parseFloat(o[5]) || 0, gf: o[6], ga: o[7], diff: o[8], pim: o[9], rw: o[10], sow: o[11], sp: o[12], pend: o[13],
-        gfg: o[6] / gp, gag: o[7] / gp, pimg: o[9] / gp, dg: o[8] / gp };
+        gfg: per(o[6], gp), gag: per(o[7], gp), pimg: per(o[9], gp), dg: per(o[8], gp) };
     });
   });
   function divOf(t) { return DIVS.filter(function (d) { return d.id === ST[t].div; })[0]; }
@@ -285,8 +322,8 @@
     var wk = weekendDates(), wkList = UPCOMING.filter(function (g) { return g.date >= wk[0] && g.date <= wk[1] && gIn(g); });
     var upList = wkList.length ? wkList : next, ft = pickFeature(upList), hot = hotTeam(), pl = PLAYED.filter(gIn).length, tg = GAMES.filter(gIn).length;
     var band = '<div class="sband desk"><div class="sb"><span>Games played</span><b>' + pl + "<small> / " + tg + '</small></b><div class="hprog"><i style="width:' + (tg ? Math.round(pl / tg * 100) : 0) + '%"></i></div></div>' +
-      '<div class="sb"><span>Goals per game</span><b>' + f2(totGF / totGP) + "</b><em>" + totGF + " goals so far</em></div>" +
-      '<div class="sb"><span>' + (MULTI ? "Best record" : "Leader") + "</span><b>" + badge(lead.t) + esc(SHORT[lead.t]) + "</b><em>" + rec(lead) + " · " + lead.pts + " PTS</em></div>" +
+      '<div class="sb"><span>Goals per game</span><b>' + (totGP ? f2(totGF / totGP) : "–") + "</b><em>" + totGF + " goals so far</em></div>" +
+      '<div class="sb"><span>' + (MULTI ? "Best record" : "Leader") + "</span>" + (PLAYED.length ? "<b>" + badge(lead.t) + esc(SHORT[lead.t]) + "</b><em>" + rec(lead) + " · " + lead.pts + " PTS</em>" : "<b>–</b><em>No games played yet</em>") + "</div>" +
       '<div class="sb"><span>Hottest team</span>' + (hot ? "<b>" + badge(hot.t) + esc(SHORT[hot.t]) + "</b><em>" + hot.n + "-game win streak</em>" : "<b>–</b><em>No active win streak</em>") + "</div></div>";
     var deskHome = '<div class="desk hdesk">' + band + featureHTML(ft, wkList.length ? "Game of the weekend" : "Game to watch") +
       (upList.length ? '<div class="hcol"><div class="hh"><h3>' + (wkList.length ? "This weekend" : "Upcoming games") + '</h3><button class="hlink" data-sfgo="upcoming">Full schedule →</button></div>' + dayCards(upList) + "</div>" : "") +
@@ -298,9 +335,9 @@
         return '<li><span class="pr">' + (i + 1) + "</span>" + badge(r.team) + '<span class="pn">' + esc(r.name) + "<small>" + esc(SHORT[r.team]) + '</small></span><span class="pv">' + r[d[2]] + "</span></li>";
       }).join("") || '<li><span></span><span class="pr">No data yet</span><span></span></li>') + "</ol></div>";
     }).join("");
-    $("p-home").innerHTML = '<div class="home"><div class="hhero"><div class="sec-head"><div><h2>Current season</h2><p class="lede">' + (GAMES.length ? PLAYED.filter(gIn).length + " of " + GAMES.filter(gIn).length + " games played through " + dlong(LAST) + "." : "Standings as of " + dlong(LAST) + ". The schedule and game sheets will be added soon.") + '</p></div></div>' +
+    $("p-home").innerHTML = '<div class="home"><div class="hhero"><div class="sec-head"><div><h2>Current season</h2><p class="lede">' + (GAMES.length ? PLAYED.filter(gIn).length + " of " + GAMES.filter(gIn).length + " games played" + (LAST ? " through " + dlong(LAST) : "") + "." : thru("Standings as of") + ". The schedule and game sheets will be added soon.") + '</p></div></div>' +
       '<div class="hprog" role="img" aria-label="' + PLAYED.length + " of " + GAMES.length + ' games played"><i style="width:' + (GAMES.length ? Math.round(PLAYED.filter(gIn).length / GAMES.filter(gIn).length * 100) : 0) + '%"></i></div>' +
-      '<div class="hstat mob"><span><b>' + f2(totGF / totGP) + "</b> goals per game</span><span>Leader <b>" + esc(SHORT[lead.t]) + "</b> · " + lead.pts + " PTS</span><span>Best offence <b>" + esc(SHORT[off]) + "</b> · " + f2(ST[off].gfg) + " per game</span></div></div>" +
+      '<div class="hstat mob"><span><b>' + (totGP ? f2(totGF / totGP) : "–") + "</b> goals per game</span><span>Leader <b>" + esc(SHORT[lead.t]) + "</b> · " + lead.pts + " PTS</span><span>Best offence <b>" + esc(SHORT[off]) + "</b> · " + f2(ST[off].gfg) + " per game</span></div></div>" +
       deskHome + '<div class="mob hmob">' + weekendHTML() +
       '<div class="hgrid"><div class="hcol"><div class="hh"><h3>Recent results</h3><button class="hlink" data-sfgo="results">All results →</button></div><div class="hlist">' + (recent.map(homeGame).join("") || '<p class="mfoot">Results appear here once the schedule is loaded.</p>') + "</div></div>" +
       '<div class="hcol"><div class="hh"><h3>Upcoming games</h3><button class="hlink" data-sfgo="upcoming">Full schedule →</button></div><div class="hlist">' + (next.map(homeGame).join("") || '<p class="mfoot">Upcoming games appear here once the schedule is loaded.</p>') + "</div></div></div></div>" +
@@ -389,7 +426,7 @@
         '<th class="g0" title="Games remaining">GR</th><th class="l">Last 5</th><th class="l">Next game</th></tr></thead><tbody>' + body + "</tbody></table></div></div>";
     }).join(""); };
     var desk = deskFor("");
-    var lede = MULTI ? (state.div === "ALL" ? DIVS.length + " divisions of " + DIVS[0].teams.length : esc(curDivs()[0].name)) + ", as of " + dlong(LAST) : "League table through " + dlong(LAST);
+    var lede = MULTI ? (state.div === "ALL" ? DIVS.length + " divisions of " + DIVS[0].teams.length : esc(curDivs()[0].name)) + (LAST ? ", as of " + dlong(LAST) : "") : (LAST ? "League table through " + dlong(LAST) : thru(""));
     $("p-standings").innerHTML =
       '<div class="sec-head"><div><h2>Standings</h2><p class="lede">' + lede + ".</p></div></div>" +
       '<div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">' + focus +
@@ -481,7 +518,7 @@
       '<div class="gfoot"><span>Goalies: ' + gl + "</span><span>PIM: " + SHORT[g.a] + " " + pa * 2 + ", " + SHORT[g.h] + " " + ph * 2 + "</span></div></div>";
   }
   function isoOf(d) { return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
-  function mlabel(k) { return k === TBD_DATE.slice(0, 7) ? "TBD" : MONTH[+k.slice(5) - 1] + (k.slice(0, 4) === "2027" ? " 2027" : ""); }
+  function mlabel(k) { return k === TBD_DATE.slice(0, 7) ? "TBD" : MONTH[+k.slice(5) - 1] + (FIRST && k.slice(0, 4) !== FIRST.slice(0, 4) ? " " + k.slice(0, 4) : ""); }
   function renderSchedule() {
     /* Show: Upcoming (this weekend, or the next game day when the weekend is empty), Results, one month, or All. */
     var today = isoOf(new Date()), wkd = weekendDates();
@@ -636,7 +673,7 @@
         return '<li><span class="lrk">' + (i + 1) + '</span><span class="ln">' + esc(r.name) + (all ? " " + badgeC(r.team) : "") + (di === 0 ? ' <small class="lsub">' + r.g + "G " + r.a + "A</small>" : "") + '</span><b class="lv">' + r[d[2]] + '</b>' + (di === 0 ? '<span class="lbar" aria-hidden="true"><i class="sg" style="width:' + (r.g / mx * 100).toFixed(1) + '%"></i><i class="sa" style="width:' + (r.a / mx * 100).toFixed(1) + '%"></i></span></li>' : '<span class="lbar" aria-hidden="true"><i class="' + (di === 3 ? "h" : "") + '" style="width:' + Math.max(4, Math.round(r[d[2]] / mx * 100)) + '%"></i></span></li>');
       }).join("") || '<li class="lnone">No data yet</li>') + "</ol></div>";
     }).join("");
-    return '<div><h3 style="margin:8px 0 12px">Top 8 leaders · ' + (all ? "All 12 teams" : esc(TEAMS[state.team])) + '</h3><div class="lgrid">' + cards + '</div><p class="mfoot" style="margin-top:10px">PIM assumes 2 minutes per penalty. Goalie wins are credited when one goalie played the whole game. Power-play stats are counted for ' + TIMED.length + ' of ' + G.length + ' games read so far.</p></div>';
+    return '<div><h3 style="margin:8px 0 12px">Top 8 leaders · ' + (all ? "All " + DT().length + " teams" : esc(TEAMS[state.team])) + '</h3><div class="lgrid">' + cards + '</div><p class="mfoot" style="margin-top:10px">PIM assumes 2 minutes per penalty. Goalie wins are credited when one goalie played the whole game. Power-play stats are counted for ' + TIMED.length + ' of ' + G.length + ' games read so far.</p></div>';
   }
   function leadersHTML() {
     if (!OFFICIAL) return leadersHTMLC();
@@ -750,7 +787,7 @@
     var seg = [["skaters", "Skaters"], ["goalies", "Goalies"]].map(function (x) { return '<button data-pt="' + x[0] + '" aria-pressed="' + (state.ptab === x[0]) + '">' + x[1] + "</button>"; }).join("");
     var advBtn = state.ptab === "skaters" ? '<button class="advbtn" data-adv aria-pressed="' + state.adv + '">' + (state.adv ? "Hide advanced" : "Advanced stats") + "</button>" : "";
     var tools = '<div class="tools"><div class="seg" role="group" aria-label="Player type">' + seg + '</div><input class="search" id="q" type="search" placeholder="Search a player" value="' + esc(state.q) + '" aria-label="Search players">' + advBtn + "</div>";
-    var scope = all ? "All 12 teams" : esc(TEAMS[state.team]);
+    var scope = all ? "All " + DT().length + " teams" : esc(TEAMS[state.team]);
     if (state.ptab === "skaters") {
       var rows = filt(SK), cfg = state.sk;
       var cols = [["rank", "#", "rk"], ["name", "Player", "l stick"]].concat(all ? [["team", "Team", "l"]] : []).concat([["gp", "GP"], ["g", "G"], ["a", "A"], ["pts", "PTS", "pts"], ["ppg", "P/GP"], ["pen", "PIM"], ["pwg", "PPG", "adv", "Power-play goals"], ["pwa", "PPA", "adv", "Power-play assists"], ["shg", "SHG", "adv", "Short-handed goals"], ["sha", "SHA", "adv", "Short-handed assists"], ["mp", "MP", "adv", "Multi-point games (2 or more points)"]]);
@@ -830,7 +867,7 @@
       out = '<div class="tiles">' + (best ? tile("Best GAA", f2(best.gaa), esc(best.name) + (all ? " (" + best.team + ")" : "") + ", min " + MINGP_GK + " GP") : tile("Best GAA", "–", "needs " + MINGP_GK + " GP")) +
         (mw ? tile("Most wins", mw.w, esc(mw.name) + (all ? " (" + mw.team + ")" : "")) : "") + (ms ? tile("Most shutouts", ms.so, esc(ms.name) + (all ? " (" + ms.team + ")" : "")) : "") + tile("Goalies", grows.length, "in this view") + "</div>" +
         '<div class="mob">' + mobGk + '</div><div class="card desk"><div class="wrap">' + ptStart(gcols, gc.key === "rank" ? { key: "gaa", dir: 1 } : gc) + "<tbody>" + (gb || '<tr><td class="empty" colspan="13">No goalies match.</td></tr>') + "</tbody></table></div>" +
-        '<div class="morerow">' + moreBtn(gs.length) + '</div><p class="note">GAA is goals against per 45-minute game. W% is wins divided by games played. GAA sorts goalies with fewer than ' + MINGP_GK + " games last. Shots against and save percentage are not in the league stats. Official goalie stats through " + dlong(AS_OF) + ", plus game sheets through " + dlong(DATA_THROUGH) + ".</p></div>";
+        '<div class="morerow">' + moreBtn(gs.length) + '</div><p class="note">GAA is goals against per ' + GLEN + '-minute game. W% is wins divided by games played. GAA sorts goalies with fewer than ' + MINGP_GK + " games last. Shots against and save percentage are not in the league stats. Official goalie stats through " + dlong(AS_OF) + (DATA_THROUGH && DATA_THROUGH > AS_OF ? ", plus game sheets through " + dlong(DATA_THROUGH) : "") + ".</p></div>";
     }
     var focusQ = document.activeElement && document.activeElement.id === "q";
     $("p-players").innerHTML = '<div class="sec-head"><div><h2>Players</h2></div></div>' +
@@ -856,10 +893,10 @@
     }
     var t = state.team, s = ST[t], rs = results(t), ng = nextGame(t);
     var hr = recOf(rs.filter(function (x) { return x.home; })), ar = recOf(rs.filter(function (x) { return !x.home; }));
-    var head = '<div class="card thead"><div class="thl">' + badge(t, 1) + '<div><h2 class="tname">' + esc(TEAMS[t]) + '</h2><div class="sub">' + ord(s.rank) + " in the conference · " + s.w + "-" + s.tie + "-" + s.l + " · " + s.pts + ' PTS</div><div class="sub">Last 5 ' + formChips(t, 5) + " · Streak " + streakOf(t) + "</div></div></div>" +
+    var head = '<div class="card thead"><div class="thl">' + badge(t, 1) + '<div><h2 class="tname">' + esc(TEAMS[t]) + '</h2><div class="sub">' + ord(s.rank) + " in the " + GROUP + " · " + s.w + "-" + s.tie + "-" + s.l + " · " + s.pts + ' PTS</div><div class="sub">Last 5 ' + formChips(t, 5) + " · Streak " + streakOf(t) + "</div></div></div>" +
       '<div class="thr">' + (ng ? '<span class="sub">Next game</span><b>' + when(ng) + "</b><span>" + (ng.h === t ? "vs " + esc(TEAMS[ng.a]) : "at " + esc(TEAMS[ng.h])) + '</span><button class="btn pri" data-open="' + ng.id + '">Matchup preview</button>' : "") +
       '<button class="btn" data-allteams="1">All teams</button></div></div>';
-    var tiles = '<div class="tiles">' + tile("Points %", s.pct, ord(RK.pctn[t]) + " in the conference") + tile("Goals for / GP", f2(s.gfg), ord(RK.gfg[t]) + " · " + s.gf + " total") + tile("Goals against / GP", f2(s.gag), ord(RK.gag[t]) + " fewest · " + s.ga + " total") +
+    var tiles = '<div class="tiles">' + tile("Points %", s.pct, ord(RK.pctn[t]) + " in the " + GROUP) + tile("Goals for / GP", f2(s.gfg), ord(RK.gfg[t]) + " · " + s.gf + " total") + tile("Goals against / GP", f2(s.gag), ord(RK.gag[t]) + " fewest · " + s.ga + " total") +
       tile("Home record", hr, "W-T-L") + tile("Away record", ar, "W-T-L") + tile("PIM / GP", f1(s.pimg), ord(RK.pimg[t]) + " fewest · " + s.pim + " min") + "</div>";
     var sks = SK.filter(function (r) { return r.team === t; }).sort(function (a, b) { return b.pts - a.pts || b.g - a.g || a.name.localeCompare(b.name); });
     var gks = GK.filter(function (r) { return r.team === t; }).sort(function (a, b) { return b.min - a.min; });
@@ -914,7 +951,7 @@
       return '<div class="trow up"><span class="tdt">' + dshort(g.date) + (g.time === "TBD" ? "" : "<small>" + g.time + "</small>") + '</span><span class="to">' + (home ? "vs " : "at ") + tname(opp) + "<small>" + esc(g.venue) + '</small></span><button class="btn" data-open="' + g.id + '">Preview</button></div>';
     }).join("") || '<p class="empty">No games left on the schedule.</p>';
     el.innerHTML = head + '<div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">' + tiles +
-      '<div class="tgrid"><div class="tcol"><h3>Skaters</h3>' + skT + "<h3>Goalies</h3>" + gkT + '<p class="mfoot">PIM is penalty minutes. PP is power play, SH is short-handed, GWG is game-winning goals. Official player stats through ' + dlong(AS_OF) + ", plus game sheets through " + dlong(DATA_THROUGH) + '.</p></div>' +
+      '<div class="tgrid"><div class="tcol"><h3>Skaters</h3>' + skT + "<h3>Goalies</h3>" + gkT + '<p class="mfoot">PIM is penalty minutes. PP is power play, SH is short-handed, GWG is game-winning goals. Official player stats through ' + dlong(AS_OF) + (DATA_THROUGH && DATA_THROUGH > AS_OF ? ", plus game sheets through " + dlong(DATA_THROUGH) : "") + '.</p></div>' +
       '<div class="tcol"><h3>Results</h3><div class="card tlist">' + resL + "</div><h3>Upcoming</h3><div class=\"card tlist\">" + upL + "</div></div></div></div>";
   }
 
@@ -1250,7 +1287,8 @@ function makeModel(played, sheets, teams, opt) {
   if (mq.addEventListener) mq.addEventListener("change", applyView);
   window.addEventListener("hashchange", function () { route(); window.scrollTo(0, 0); });
 
-  $("asof").textContent = GAMES.length ? "Standings and results through " + dlong(LAST) + ", 2026 · " + PLAYED.length + " of " + GAMES.length + " regular-season games played." : "Standings as of " + dlong(LAST) + ", 2026. Schedule and game sheets coming soon.";
+  var YR = function (d) { return d && d !== TBD_DATE ? ", " + d.slice(0, 4) : ""; };
+  $("asof").textContent = GAMES.length ? (LAST ? "Standings and results through " + dlong(LAST) + YR(LAST) : thru("") + YR(FIRST)) + " · " + PLAYED.length + " of " + GAMES.length + " regular-season games played." : "Standings as of " + (LAST ? dlong(LAST) + YR(LAST) : "today") + ". Schedule and game sheets coming soon.";
   applyView(); renderAll(); route();
   window.__hub = { ST: ST, GAMES: GAMES, results: results, ORDER: ORDER };
 })();
