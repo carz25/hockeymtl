@@ -181,6 +181,7 @@
 
   /* ---------- standings ---------- */
   function tile(k, v, s) { return '<div class="tile"><span class="k">' + k + '</span><span class="v">' + v + '</span><span class="s">' + s + "</span></div>"; }
+  var MONTHL = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   function weekendDates() {
     var d = new Date(), dow = d.getDay(), sat = new Date(d), sun;
     if (dow === 0) sat.setDate(d.getDate() - 1); else sat.setDate(d.getDate() + (6 - dow));
@@ -482,12 +483,21 @@
   function isoOf(d) { return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
   function mlabel(k) { return k === TBD_DATE.slice(0, 7) ? "TBD" : MONTH[+k.slice(5) - 1] + (k.slice(0, 4) === "2027" ? " 2027" : ""); }
   function renderSchedule() {
-    var today = isoOf(new Date()), wk = new Date(); wk.setDate(wk.getDate() + 6); var weekEnd = isoOf(wk);
-    var list = GAMES.filter(function (g) {
-      if (!gIn(g)) return false;
-      if (state.team !== "ALL" && g.a !== state.team && g.h !== state.team) return false;
-      if (state.sf === "week") return g.date >= today && g.date <= weekEnd;
-      return state.sf === "all" || (state.sf === "upcoming" ? !g.played : g.played);
+    /* Show: Upcoming (this weekend, or the next game day when the weekend is empty), Results, one month, or All. */
+    var today = isoOf(new Date()), wkd = weekendDates();
+    if (state.sf === "week") state.sf = "upcoming";
+    var mine2 = GAMES.filter(function (g) { return gIn(g) && (state.team === "ALL" || g.a === state.team || g.h === state.team); });
+    var smonths = []; mine2.forEach(function (g) { var k = g.date.slice(0, 7); if (smonths.indexOf(k) < 0) smonths.push(k); }); smonths.sort();
+    var upFrom = wkd[0] < today ? today : wkd[0], upTo = wkd[1];
+    if (!mine2.some(function (g) { return !g.played && g.date >= upFrom && g.date <= upTo; })) {
+      var nx = mine2.filter(function (g) { return !g.played && g.date >= today; })[0];
+      if (nx) { upFrom = nx.date; upTo = nx.date; }
+    }
+    var list = mine2.filter(function (g) {
+      if (state.sf === "upcoming") return !g.played && g.date >= upFrom && g.date <= upTo;
+      if (state.sf === "results") return g.played;
+      if (state.sf.slice(0, 2) === "m:") return g.date.slice(0, 7) === state.sf.slice(2);
+      return true;
     });
     if (state.sf === "results") list = list.slice().reverse();
     var html = "", cur = "", months = [], mark = state.sf === "all" ? list.findIndex(function (g) { return g.date >= today; }) : -1;
@@ -505,12 +515,14 @@
     });
     if (cur) html += "</div>";
     var who = state.team === "ALL" ? (state.div === "ALL" ? "all teams" : curDivs()[0].name) : TEAMS[state.team];
-    var seg = [["week", "This week"], ["upcoming", "Upcoming"], ["results", "Results"], ["all", "All"]].map(function (x) { return '<button data-sf="' + x[0] + '" aria-pressed="' + (state.sf === x[0]) + '">' + x[1] + "</button>"; }).join("");
-    var jump = months.length > 1 && state.sf !== "week" ? '<div class="mjump" role="group" aria-label="Jump to month">' + months.map(function (k) { return '<button class="btn" data-jump="' + k + '">' + mlabel(k) + "</button>"; }).join("") + "</div>" : "";
+    var sopts = [["upcoming", "Upcoming"], ["results", "Results"]].concat(smonths.map(function (k) { return ["m:" + k, MONTHL[+k.slice(5, 7) - 1]]; })).concat([["all", "All"]]);
+    var scur = sopts.filter(function (o) { return o[0] === state.sf; })[0] || sopts[0];
+    var seg = '<label class="pick"><span>' + scur[1] + '</span><select id="sfsel" aria-label="Show games">' + sopts.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === scur[0] ? " selected" : "") + ">" + o[1] + "</option>"; }).join("") + "</select></label>";
+    var jump = "";
     var pending = list.some(function (g) { return g.played && !SHEET[g.id]; });
-    var empty = state.sf === "week" ? "No games this week." : "No games to show.";
+    var empty = state.sf === "upcoming" ? "No upcoming games." : "No games to show.";
     $("p-schedule").innerHTML =
-      '<div class="sec-head"><div><h2>Schedule</h2><p class="lede">' + list.length + " game" + (list.length === 1 ? "" : "s") + " for " + esc(who) + ". Open a game for the matchup preview or, once played, the scoring summary.</p></div><div class=\"tools\"><div class=\"seg\" role=\"group\" aria-label=\"Show\">" + seg + "</div></div></div>" + jump +
+      '<div class="sec-head schead"><div><h2>Schedule</h2></div><div class="tools">' + seg + "</div></div>" + jump +
       '<div class="games" style="margin-top:4px">' + (html || '<p class="empty">' + empty + "</p>") + "</div>" +
       (pending ? '<p class="mfoot" style="margin-top:12px">A few results do not have a scoring summary yet because their game sheet has not been added.</p>' : "");
   }
@@ -1207,7 +1219,7 @@ function makeModel(played, sheets, teams, opt) {
     if (tab && state.team !== "ALL") { state.team = "ALL"; state.open = 0; state.pm = 10; renderAll(); }
     var b = e.target.closest("button"); if (!b) return;
     if (b.dataset.team) { openTeam(b.dataset.team); return; }
-    if (b.dataset.open) { e.preventDefault(); state.open = +b.dataset.open; state.sf = "upcoming"; renderSchedule(); goto("schedule"); var m = $("m" + state.open); if (m) { m.open = true; setTimeout(function () { m.scrollIntoView({ block: "start" }); }, 30); } return; }
+    if (b.dataset.open) { e.preventDefault(); state.open = +b.dataset.open; state.sf = "m:" + (GAMES.filter(function (x) { return x.id === state.open; })[0] || { date: isoOf(new Date()) }).date.slice(0, 7); renderSchedule(); goto("schedule"); var m = $("m" + state.open); if (m) { m.open = true; setTimeout(function () { m.scrollIntoView({ block: "start" }); }, 30); } return; }
     if (b.dataset.go) { goto(b.dataset.go); return; }
     if (b.dataset.sfgo) { state.sf = b.dataset.sfgo; renderSchedule(); goto("schedule"); return; }
     if (b.dataset.allteams) { state.team = "ALL"; try { localStorage.setItem(KEY + "-team", "ALL"); } catch (x) { } renderAll(); return; }
@@ -1229,6 +1241,7 @@ function makeModel(played, sheets, teams, opt) {
   });
   document.addEventListener("input", function (e) { if (e.target.id === "q") { state.q = e.target.value; state.pm = 10; renderPlayers(); } });
   document.addEventListener("change", function (e) {
+    if (e.target.id === "sfsel") { state.sf = e.target.value; renderSchedule(); return; }
     if (e.target.id === "mteam") { state.pteam = e.target.value; state.pm = 10; renderPlayers(); return; }
     if (e.target.id !== "msort") return;
     var o = (OFFICIAL ? MSORT : MSORT_C)[state.ptab].concat(OFFICIAL ? [] : ADV_C).filter(function (x) { return x[0] === e.target.value; })[0], cfg = state.ptab === "skaters" ? state.sk : state.gk;
