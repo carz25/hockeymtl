@@ -1,0 +1,884 @@
+{
+"2851": {
+"away": {
+"pim": 2,
+"ppg": 0,
+"ppo": 2,
+"sp": 1
+},
+"home": {
+"pim": 4,
+"ppg": 0,
+"ppo": 1,
+"sp": 1
+},
+"score": {
+"away": 3,
+"home": 2
+}
+},
+"2852": {
+"away": {
+"pim": 4,
+"ppg": 0,
+"ppo": 0,
+"sp": 1
+},
+"home": {
+"pim": 0,
+"ppg": 1,
+"ppo": 2,
+"sp": 1
+},
+"score": {
+"away": 0,
+"home": 8
+}
+},
+"2853": {
+"away": {
+"pim": 4,
+"ppg": 0,
+"ppo": 0,
+"sp": 1
+},
+"home": {
+"pim": 0,
+"ppg": 0,
+"ppo": 2,
+"sp": 1
+},
+"score": {
+"away": 3,
+"home": 2
+}
+},
+"2854": {
+"away": {
+"pim": 6,
+"ppg": 0,
+"ppo": 1,
+"sp": 1
+},
+"home": {
+"pim": 2,
+"ppg": 0,
+"ppo": 3,
+"sp": 1
+},
+"score": {
+"away": 0,
+"home": 1
+}
+},
+"2855": {
+"away": {
+"pim": 4,
+"ppg": 0,
+"ppo": 2,
+"sp": 1
+},
+"home": {
+"pim": 4,
+"ppg": 0,
+"ppo": 2,
+"sp": 1
+},
+"score": {
+"away": 0,
+"home": 0
+}
+},
+"2856": {
+"away": {
+"pim": 0,
+"ppg": 1,
+"ppo": 1,
+"sp": 1
+},
+"home": {
+"pim": 6,
+"ppg": 0,
+"ppo": 0,
+"sp": 1
+},
+"score": {
+"away": 4,
+"home": 3
+}
+},
+"2857": {
+"away": {
+"pim": 6,
+"ppg": 0,
+"ppo": 0,
+"sp": 1
+},
+"home": {
+"pim": 8,
+"ppg": 0,
+"ppo": 0,
+"sp": 1
+},
+"score": {
+"away": 3,
+"home": 4
+}
+},
+"2858": {
+"away": {
+"pim": 2,
+"ppg": 0,
+"ppo": 3,
+"sp": 1
+},
+"home": {
+"pim": 6,
+"ppg": 0,
+"ppo": 1,
+"sp": 1
+},
+"score": {
+"away": 0,
+"home": 6
+}
+},
+"2859": {
+"away": {
+"pim": 4,
+"ppg": 1,
+"ppo": 2,
+"sp": 1
+},
+"home": {
+"pim": 4,
+"ppg": 1,
+"ppo": 2,
+"sp": 1
+},
+"score": {
+"away": 6,
+"home": 2
+}
+},
+"2860": {
+"away": {
+"pim": 2,
+"ppg": 0,
+"ppo": 1,
+"sp": 1
+},
+"home": {
+"pim": 2,
+"ppg": 0,
+"ppo": 1,
+"sp": 1
+},
+"score": {
+"away": 5,
+"home": 4
+}
+},
+"2861": {
+"away": {
+"pim": 0,
+"ppg": 0,
+"ppo": 0,
+"sp": 1
+},
+"home": {
+"pim": 0,
+"ppg": 0,
+"ppo": 0,
+"sp": 1
+},
+"score": {
+"away": 1,
+"home": 0
+}
+},
+"2862": {
+"away": {
+"pim": 2,
+"ppg": 0,
+"ppo": 0,
+"sp": 1
+},
+"home": {
+"pim": 2,
+"ppg": 0,
+"ppo": 0,
+"sp": 1
+},
+"score": {
+"away": 1,
+"home": 3
+}
+},
+"2863": {
+"away": {
+"pim": 2,
+"ppg": 0,
+"ppo": 0,
+"sp": 1
+},
+"home": {
+"pim": 16,
+"ppg": 0,
+"ppo": 0,
+"sp": 1
+},
+"score": {
+"away": 3,
+"home": 1
+}
+},
+"2864": {
+"away": {
+"pim": 6,
+"ppg": 0,
+"ppo": 0,
+"sp": 1
+},
+"home": {
+"pim": 0,
+"ppg": 1,
+"ppo": 3,
+"sp": 1
+},
+"score": {
+"away": 1,
+"home": 2
+}
+},
+"2865": {
+"away": {
+"pim": 2,
+"ppg": 0,
+"ppo": 0,
+"sp": 1
+},
+"home": {
+"pim": 0,
+"ppg": 0,
+"ppo": 1,
+"sp": 1
+},
+"score": {
+"away": 1,
+"home": 5
+}
+},
+"2866": {
+"away": {
+"pim": 2,
+"ppg": 2,
+"ppo": 2,
+"sp": 1
+},
+"home": {
+"pim": 4,
+"ppg": 0,
+"ppo": 1,
+"sp": 1
+},
+"score": {
+"away": 7,
+"home": 0
+}
+},
+"2867": {
+"away": {
+"pim": 4,
+"ppg": 1,
+"ppo": 1,
+"sp": 1
+},
+"home": {
+"pim": 2,
+"ppg": 0,
+"ppo": 2,
+"sp": 1
+},
+"score": {
+"away": 2,
+"home": 3
+}
+},
+"2868": {
+"away": {
+"pim": 4,
+"ppg": 1,
+"ppo": 1,
+"sp": 1
+},
+"home": {
+"pim": 2,
+"ppg": 0,
+"ppo": 2,
+"sp": 1
+},
+"score": {
+"away": 7,
+"home": 1
+}
+},
+"2869": {
+"away": {
+"pim": 14,
+"ppg": 1,
+"ppo": 2,
+"sp": 0
+},
+"home": {
+"pim": 4,
+"ppg": 0,
+"ppo": 1,
+"sp": 1
+},
+"score": {
+"away": 7,
+"home": 1
+}
+},
+"2870": {
+"away": {
+"pim": 2,
+"ppg": 0,
+"ppo": 2,
+"sp": 1
+},
+"home": {
+"pim": 4,
+"ppg": 0,
+"ppo": 1,
+"sp": 1
+},
+"score": {
+"away": 2,
+"home": 3
+}
+},
+"2871": {
+"away": {
+"pim": 4,
+"ppg": 0,
+"ppo": 3,
+"sp": 1
+},
+"home": {
+"pim": 6,
+"ppg": 1,
+"ppo": 2,
+"sp": 1
+},
+"score": {
+"away": 0,
+"home": 4
+}
+},
+"2872": {
+"away": {
+"pim": 0,
+"ppg": 0,
+"ppo": 2,
+"sp": 1
+},
+"home": {
+"pim": 4,
+"ppg": 0,
+"ppo": 0,
+"sp": 1
+},
+"score": {
+"away": 1,
+"home": 3
+}
+},
+"2873": {
+"away": {
+"pim": 2,
+"ppg": 1,
+"ppo": 3,
+"sp": 1
+},
+"home": {
+"pim": 6,
+"ppg": 0,
+"ppo": 1,
+"sp": 1
+},
+"score": {
+"away": 2,
+"home": 0
+}
+},
+"2874": {
+"away": {
+"pim": 6,
+"ppg": 0,
+"ppo": 2,
+"sp": 1
+},
+"home": {
+"pim": 4,
+"ppg": 0,
+"ppo": 3,
+"sp": 1
+},
+"score": {
+"away": 3,
+"home": 1
+}
+},
+"2875": {
+"away": {
+"pim": 2,
+"ppg": 0,
+"ppo": 1,
+"sp": 1
+},
+"home": {
+"pim": 2,
+"ppg": 0,
+"ppo": 1,
+"sp": 1
+},
+"score": {
+"away": 7,
+"home": 0
+}
+},
+"2876": {
+"away": {
+"pim": 6,
+"ppg": 0,
+"ppo": 4,
+"sp": 1
+},
+"home": {
+"pim": 8,
+"ppg": 0,
+"ppo": 3,
+"sp": 1
+},
+"score": {
+"away": 4,
+"home": 1
+}
+},
+"2877": {
+"away": {
+"pim": 4,
+"ppg": 1,
+"ppo": 1,
+"sp": 1
+},
+"home": {
+"pim": 2,
+"ppg": 0,
+"ppo": 2,
+"sp": 1
+},
+"score": {
+"away": 3,
+"home": 1
+}
+},
+"2878": {
+"away": {
+"pim": 2,
+"ppg": 1,
+"ppo": 1,
+"sp": 1
+},
+"home": {
+"pim": 2,
+"ppg": 0,
+"ppo": 1,
+"sp": 1
+},
+"score": {
+"away": 2,
+"home": 2
+}
+},
+"2879": {
+"away": {
+"pim": 2,
+"ppg": 0,
+"ppo": 1,
+"sp": 1
+},
+"home": {
+"pim": 2,
+"ppg": 0,
+"ppo": 1,
+"sp": 1
+},
+"score": {
+"away": 3,
+"home": 1
+}
+},
+"2880": {
+"away": {
+"pim": 4,
+"ppg": 0,
+"ppo": 2,
+"sp": 1
+},
+"home": {
+"pim": 4,
+"ppg": 0,
+"ppo": 2,
+"sp": 1
+},
+"score": {
+"away": 2,
+"home": 3
+}
+},
+"2881": {
+"away": {
+"pim": 10,
+"ppg": 0,
+"ppo": 1,
+"sp": 1
+},
+"home": {
+"pim": 2,
+"ppg": 1,
+"ppo": 5,
+"sp": 1
+},
+"score": {
+"away": 1,
+"home": 2
+}
+},
+"2882": {
+"away": {
+"pim": 2,
+"ppg": 0,
+"ppo": 0,
+"sp": 1
+},
+"home": {
+"pim": 0,
+"ppg": 0,
+"ppo": 1,
+"sp": 1
+},
+"score": {
+"away": 4,
+"home": 1
+}
+},
+"2883": {
+"away": {
+"pim": 0,
+"ppg": 0,
+"ppo": 1,
+"sp": 1
+},
+"home": {
+"pim": 2,
+"ppg": 0,
+"ppo": 0,
+"sp": 1
+},
+"score": {
+"away": 1,
+"home": 2
+}
+},
+"2884": {
+"away": {
+"pim": 4,
+"ppg": 0,
+"ppo": 2,
+"sp": 1
+},
+"home": {
+"pim": 4,
+"ppg": 0,
+"ppo": 2,
+"sp": 1
+},
+"score": {
+"away": 0,
+"home": 1
+}
+},
+"2885": {
+"away": {
+"pim": 4,
+"ppg": 0,
+"ppo": 1,
+"sp": 1
+},
+"home": {
+"pim": 2,
+"ppg": 0,
+"ppo": 2,
+"sp": 1
+},
+"score": {
+"away": 3,
+"home": 5
+}
+},
+"2886": {
+"away": {
+"pim": 4,
+"ppg": 1,
+"ppo": 3,
+"sp": 1
+},
+"home": {
+"pim": 6,
+"ppg": 1,
+"ppo": 2,
+"sp": 1
+},
+"score": {
+"away": 5,
+"home": 2
+}
+},
+"2887": {
+"away": {
+"pim": 6,
+"ppg": 0,
+"ppo": 1,
+"sp": 1
+},
+"home": {
+"pim": 2,
+"ppg": 1,
+"ppo": 3,
+"sp": 1
+},
+"score": {
+"away": 2,
+"home": 4
+}
+},
+"2888": {
+"away": {
+"pim": 4,
+"ppg": 0,
+"ppo": 1,
+"sp": 1
+},
+"home": {
+"pim": 4,
+"ppg": 1,
+"ppo": 1,
+"sp": 1
+},
+"score": {
+"away": 3,
+"home": 4
+}
+},
+"2889": {
+"away": {
+"pim": 4,
+"ppg": 0,
+"ppo": 0,
+"sp": 1
+},
+"home": {
+"pim": 0,
+"ppg": 0,
+"ppo": 2,
+"sp": 1
+},
+"score": {
+"away": 0,
+"home": 6
+}
+},
+"2890": {
+"away": {
+"pim": 0,
+"ppg": 0,
+"ppo": 0,
+"sp": 1
+},
+"home": {
+"pim": 2,
+"ppg": 1,
+"ppo": 0,
+"sp": 1
+},
+"score": {
+"away": 2,
+"home": 2
+}
+},
+"2891": {
+"away": {
+"pim": 10,
+"ppg": 0,
+"ppo": 4,
+"sp": 1
+},
+"home": {
+"pim": 8,
+"ppg": 3,
+"ppo": 5,
+"sp": 1
+},
+"score": {
+"away": 1,
+"home": 4
+}
+},
+"2892": {
+"away": {
+"pim": 2,
+"ppg": 0,
+"ppo": 0,
+"sp": 1
+},
+"home": {
+"pim": 8,
+"ppg": 0,
+"ppo": 0,
+"sp": 1
+},
+"score": {
+"away": 1,
+"home": 0
+}
+},
+"2893": {
+"away": {
+"pim": 4,
+"ppg": 0,
+"ppo": 1,
+"sp": 1
+},
+"home": {
+"pim": 4,
+"ppg": 1,
+"ppo": 1,
+"sp": 1
+},
+"score": {
+"away": 2,
+"home": 3
+}
+},
+"2894": {
+"away": {
+"pim": 4,
+"ppg": 1,
+"ppo": 2,
+"sp": 1
+},
+"home": {
+"pim": 4,
+"ppg": 1,
+"ppo": 2,
+"sp": 1
+},
+"score": {
+"away": 3,
+"home": 4
+}
+},
+"2895": {
+"away": {
+"pim": 0,
+"ppg": 0,
+"ppo": 1,
+"sp": 1
+},
+"home": {
+"pim": 2,
+"ppg": 0,
+"ppo": 0,
+"sp": 1
+},
+"score": {
+"away": 2,
+"home": 8
+}
+},
+"2896": {
+"away": {
+"pim": 6,
+"ppg": 0,
+"ppo": 0,
+"sp": 1
+},
+"home": {
+"pim": 2,
+"ppg": 0,
+"ppo": 0,
+"sp": 1
+},
+"score": {
+"away": 3,
+"home": 1
+}
+},
+"2897": {
+"away": {
+"pim": 6,
+"ppg": 0,
+"ppo": 1,
+"sp": 1
+},
+"home": {
+"pim": 2,
+"ppg": 0,
+"ppo": 3,
+"sp": 1
+},
+"score": {
+"away": 3,
+"home": 0
+}
+},
+"2898": {
+"away": {
+"pim": 6,
+"ppg": 0,
+"ppo": 5,
+"sp": 1
+},
+"home": {
+"pim": 10,
+"ppg": 0,
+"ppo": 3,
+"sp": 1
+},
+"score": {
+"away": 2,
+"home": 2
+}
+},
+"2900": {
+"away": {
+"pim": 4,
+"ppg": 0,
+"ppo": 3,
+"sp": 1
+},
+"home": {
+"pim": 6,
+"ppg": 0,
+"ppo": 2,
+"sp": 1
+},
+"score": {
+"away": 0,
+"home": 0
+}
+}
+}
