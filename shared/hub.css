@@ -778,3 +778,6 @@ body:not(.m) table.pt .tn b{font-size:16px}
 .schead .tools{margin-left:auto}
 .schead .pick{font-size:15px}
 .m .schead .pick{font-size:14px}
+/* one-line footer on the home page */
+.sitebar.slim .sitebar-in{justify-content:center;padding-top:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px))}
+.sitebar.slim .sitebar-note{margin:0;width:auto;white-space:nowrap}

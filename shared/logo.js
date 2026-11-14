@@ -13,8 +13,10 @@ window.HMTL_LOGO = '<svg class="puck" viewBox="0 0 140 140" role="img" aria-labe
 window.HMTL_WORDMARK = '<span class="wm" aria-hidden="true"><span class="wm-h">Hockey</span><span class="wm-m">MTL</span></span>';
 /* Footer bar shared by every page: home, each division site and the not-found page.
    base is the path back to the site root ("" on the home page, "../" in a division folder, "/" on the 404 page). */
-window.HMTL_SITEBAR = function (base) {
+window.HMTL_SITEBAR = function (base, slim) {
   base = base || "";
+  /* slim: one line with the copyright only (home page, where the divisions are already on screen) */
+  if (slim) return '<div class="sitebar slim"><div class="sitebar-in"><span class="sitebar-note">&copy; 2026 Hockey MTL. All Rights Reserved.</span></div></div>';
   var links = (window.LEAGUES || []).map(function (l) { return '<a href="' + base + l.folder + '/">' + l.label + "</a>"; }).join("");
   return '<div class="sitebar"><div class="sitebar-in"><a class="sitebar-home" href="' + (base || "./") + '">Hockey MTL</a>' +
     '<nav class="sitebar-nav" aria-label="All divisions">' + links + "</nav>" +
