@@ -43,7 +43,7 @@
     '<div class="lp-strip" aria-hidden="true" style="background:linear-gradient(90deg,' + strip + ')"></div>' +
     '<header class="lp-top"><a class="lp-brand" href="' + (BASE || "./") + '" aria-label="Hockey MTL home">' + LOGO + (window.HMTL_WORDMARK || "Hockey MTL") + "</a><h1" + (SHOW_HEADING ? "" : ' class="sr"') + ">" + esc(HEADING) + "</h1></header>" +
     ad("728x90", "lp-ad-top") +
-    '<nav class="hp" aria-label="Divisions" style="--n:' + LEAGUES.length + '">' + panels + "</nav>" +
+    '<nav class="hp' + (LEAGUES.length > 2 ? " many" : "") + '" aria-label="Divisions" style="--n:' + LEAGUES.length + '">' + panels + "</nav>" +
     (window.HMTL_SITEBAR ? window.HMTL_SITEBAR(BASE) : "") +
     "</div>");
 })();

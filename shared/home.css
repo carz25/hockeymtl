@@ -99,3 +99,16 @@ body{margin:0;background:var(--seam);color:#fff;font-family:var(--body);overflow
 @media (min-width:768px) and (max-width:1100px), (min-width:768px) and (max-height:700px){
   .lp-brand .puck{width:84px;height:84px}.lp-brand .wm-h{font-size:17px}.lp-brand .wm-m{font-size:56px}
 }
+/* three or more divisions: names centred in each panel and sized to fit; on phones the bands start below the logo */
+.hp.many{margin:0 -5vw}
+.hp.many .hp-name{left:50%;transform:translateX(-50%);font-size:clamp(30px,calc(15vw / var(--n)),96px);bottom:14vh}
+.hp.many .hp-p:first-child .hp-name{transform:translateX(calc(-50% + 3vw))}
+.hp.many .hp-p:last-child .hp-name{transform:translateX(calc(-50% - 6vw))}
+.hp.many .hp-num{font-size:min(50vh,calc(70vw / var(--n)))}
+@media (max-width:767px), (max-aspect-ratio:4/5){
+  .hp.many{top:96px;bottom:84px;margin:0}
+  .hp.many .hp-name{left:28px;transform:none;top:50%;bottom:auto;margin-top:calc(-.42em);font-size:clamp(30px,calc(30vh / var(--n)),64px)}
+  .hp.many .hp-p:last-child .hp-name{bottom:auto}
+  .hp.many .hp-num{font-size:min(calc(70vh / var(--n)),50vw);top:50%}
+  .hp.many .hp-p:first-child .hp-num{top:50%}
+}

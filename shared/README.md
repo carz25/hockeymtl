@@ -54,19 +54,22 @@ A league has divisions when its `data.js` defines `DIVS`. That adds the division
 The data files hold the same variables as before the split, so the format hasn't changed:
 
 - `SCHED`: one row per game: `[id, "YYYY-MM-DD", "h:mm AM", venue, awayCode, homeCode, awayGoals, homeGoals]`. Leave the two scores off for games not played yet.
-- `TEAMS`, `SHORT`, `BADGE`: full names, short names and badge colours by team code.
+- `TEAMS`: full names by team code. `SHORT` (optional, defaults to `TEAMS`): short names. `BADGE` (optional): badge colours; without it each team gets a steady colour from a built-in palette.
 - `ORDER` (one table) or `DIVS` (divisions, each with its teams in standings order).
-- `OFF`: official standings row per team. With `record: "WTL"` the row is GP W T L PTS PTS% GF GA DIFF PIM. With `"OTL"` it's GP W L OTL PTS PTS% GF GA DIFF PIM RW OT/SO-wins SP incomplete.
+- `OFF` (optional): official standings row per team. When `OFF` is left out, or a team is missing from it, that team's row is counted from the scores in `SCHED` (2 points a win, 1 a tie; PIM from the game sheets) and the table is ordered by points, points %, then goal difference. Use `OFF` when the league's own table has rules the scores can't show (fair-play points, overtime losses). With `record: "WTL"` the row is GP W T L PTS PTS% GF GA DIFF PIM. With `"OTL"` it's GP W L OTL PTS PTS% GF GA DIFF PIM RW OT/SO-wins SP incomplete.
 - `R`: player names by team and key. `G`: game sheets (dressed players, goals, penalties, goalies).
 - Sheet-stat leagues only: `PPX` and `TIMED` (power-play and short-handed goals).
-- Official-stat leagues only: `AS_OF`, `DATA_THROUGH`, `PSTATS`, `GSTATS`, `GLEN` (minutes per game).
+- Official-stat leagues only: `PSTATS`, `GSTATS` (may be empty early in the season), and optionally `AS_OF` (date of the official stats; defaults to the last played game), `DATA_THROUGH` (latest game sheet added on top) and `GLEN` (minutes per game, default 60).
+- Nothing played yet is fine: leave the scores off every `SCHED` row and the site shows "Season starts …", zero records and the upcoming games.
 
 ## Adding a league (e.g. M11AA)
 
-1. Copy `M11BB/index.html` into the new folder and change the two names in it (`<title>` and `copyright`). Remove the `logos.css` line if there are no logos yet.
+No code changes are needed: the template was tested with every combination of `record` (WTL/OTL), `stats` (sheets/official), with and without divisions, logos, `OFF`, `BADGE`, game sheets and played games, on desktop and phones, and with 3 and 5 divisions on the home page.
+
+1. Copy `M11BB/index.html` into the new folder and replace the league name and folder in its head (`<title>`, the `og:` title, description and URL, and `copyright`). Point `og:image` at `og-<FOLDER>.png` if you add one to `shared/icons/`, otherwise at `og-home.png`. Remove the `logos.css` line if there are no logos yet.
 2. Copy `M11BB/league.js` (if the league is like M11 BB) or `M13AAA/league.js` (if it's like M13 AAA) and change the settings.
 3. Create `data.js` from the league's schedule, standings and game sheets.
-4. Add one line for it to `shared/leagues.js` so it gets a panel on the home page.
+4. Add one line for it to `shared/leagues.js` so it gets a panel on the home page and a link in the footer. The home page lays out any number of panels (side by side on computers, stacked bands on phones).
 
 ## Notes
 

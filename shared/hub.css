@@ -635,7 +635,8 @@ table.stt tr.me .ptsc{background:transparent}
 .gf-m{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:20px;align-items:center}
 .gf-t{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:16px;align-items:center}
 .gf-t.home{grid-template-columns:auto minmax(0,1fr) auto}
-.gf-t .lg.big{width:72px;height:72px;border-radius:12px;background-color:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.25)}
+.gf-t .lg.big{width:72px;height:72px;border-radius:12px;box-shadow:0 0 0 3px rgba(255,255,255,.25)}
+.gf-t .lg.big:not(.cb){background-color:#fff}
 .gf-n{font-family:var(--display);font-weight:800;font-size:30px;line-height:1;text-transform:uppercase;letter-spacing:.01em}
 .gf-r{font-size:13px;color:rgba(255,255,255,.78);margin-top:4px}
 .gf-f{margin-top:8px}
