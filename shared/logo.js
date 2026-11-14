@@ -18,5 +18,5 @@ window.HMTL_SITEBAR = function (base) {
   var links = (window.LEAGUES || []).map(function (l) { return '<a href="' + base + l.folder + '/">' + l.label + "</a>"; }).join("");
   return '<div class="sitebar"><div class="sitebar-in"><a class="sitebar-home" href="' + (base || "./") + '">Hockey MTL</a>' +
     '<nav class="sitebar-nav" aria-label="All divisions">' + links + "</nav>" +
-    '<span class="sitebar-note">Unofficial fan site, not affiliated with any league or club. &copy; 2026 Hockey MTL</span></div></div>';
+    '<span class="sitebar-note"><span class="sb-long">Unofficial fan site, not affiliated with any league or club. &copy; 2026 Hockey MTL</span><span class="sb-short">Unofficial fan site &middot; &copy; 2026 Hockey MTL</span></span></div></div>';
 };

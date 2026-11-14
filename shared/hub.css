@@ -452,7 +452,7 @@ td.pts{font-size:17px}
 
 /* ---- leagues whose player stats are counted from game sheets (LEAGUE.stats = "sheets") ---- */
 .st-sheet table.pt col.nu{width:58px}
-.st-sheet .card .wrap:has(table.pt){overflow-x:hidden}
+body:not(.m).st-sheet .card .wrap:has(table.pt){overflow-x:hidden}
 @media (max-width:1000px){.st-sheet table.pt col.nu{width:50px}}
 th.adv,td.adv{background:color-mix(in srgb,var(--rule) 18%,transparent)}
 .brand .home{display:flex;flex-direction:row;align-items:center;gap:10px;flex:none;color:#fff;text-decoration:none;padding-right:14px;margin-right:2px;border-right:1px solid rgba(255,255,255,.18)}
@@ -767,3 +767,13 @@ body:not(.m) table.pt .tn b{font-size:16px}
 /* phone standings: shaded PTS column in the normal table too, like Advanced stats */
 .m #p-standings .ctable:not(.advt) td.strong{background:var(--soft)}
 .m #p-standings .ctable:not(.advt) tr.me td.strong{background:transparent}
+/* footer: short one-line note on phones */
+.sb-short{display:none}
+@media (max-width:720px){.sb-long{display:none}.sb-short{display:inline;white-space:nowrap}}
+/* phone players Table: PTS 1px smaller */
+.m .ptable table.pt td.pts{font-size:16px}
+/* schedule: the Show picker sits on the heading line */
+.schead{align-items:center}
+.schead .tools{margin-left:auto}
+.schead .pick{font-size:15px}
+.m .schead .pick{font-size:14px}
