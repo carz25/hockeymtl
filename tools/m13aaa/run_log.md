@@ -14,3 +14,11 @@ Skipped (do not add up, retry tomorrow): 1266 (895518) visitor goalie 5 GA vs 6 
 2026-11-15 (correction): 1073 goals fixed from the top of the sheet: CAN P1 4:44 scorer #16 (Michaud); ASQ P2 2:04 #2 (assist #3) and P2 2:28 #2 (scoreLoc fields are scorer numbers). Goalie per-period GA at the bottom of the sheet ignored.
 
 2026-11-15 (owner confirmed): added 1337 SDN 2-1 PLA (shootout win, printed score = winner+1; owner confirmed via checkmarks) and 1169 CAS 1-2 NOM (same pattern, shootout, home winner by printed score). 1337 notes: duplicate SDN #88 A48 at P3 9:50 entered once; PLA #20 has A25+A22 at 9:50 (the "other" entry skipped); new player SDN Elliot Laplante (spelling unverified).
+
+## Lessons for future sheets (owner-confirmed 2026-11-15)
+- WebFetch returns PDF form fields, not the printed layout. Roster rows (playerNameVis1/playerNumVis1...) are NOT goals; do not read a roster row as a goal scorer.
+- Goals: use goalTime/goalPeriod/scorer fields at the top. Home scorer numbers are in scoreLoc1..N (not a running score); visitor scorers in scorerVis1..N; assists in assistOne/TwoLoc/Vis. Ignore the per-period goalie GA block at the bottom if it disagrees with the goals.
+- Goalie GA lower than goals scored, or minutes under 45, is normal when the trailing team pulled its goalie (empty-net goal): accept, do not skip.
+- Shootout/OT games: the printed final score is winner = loser+1 with equal goals listed; enter with so=True and s = printed score. Do not skip for goals != score in that case.
+- PP/PK fields read "x en y": PP = goals on y chances, PK = kills on y chances. Penalty counts can be off by one from coincident penalties; do not skip for that. Exact duplicate penalty rows: enter once unless the PP/PK counts need both.
+- Skip only when a score cannot be determined or goals clearly contradict the score without an empty-net or shootout explanation.
