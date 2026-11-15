@@ -72,7 +72,7 @@ SHEETS = [
   ros={"CAN":{8:"Kyle Thibodeau",10:"Karel Poulin",13:"Derek Berthiaume",14:"Liam Roy",16:"Mathis Michaud",17:"Mathias Maheux",18:"Louis-Félix Mercier",19:"Antoine Lessard",21:"Xavier Doyon",22:"Léo-Félix Lessard",23:"Zack Paré",24:"William Roy",35:"Vincent Archambault",40:"Édouard Giguère"},
        "ASQ":{2:"Zachary Martineau",3:"Vincent Després",4:"Mayson Gauvin",5:"Samuel Landry",7:"Charles-Olivier Paré",10:"Jacob Blain",12:"Antoine Garneau",13:"Nathan Desjardins",14:"Hubert Lessard",15:"Jérôme Landry",16:"Zack Samson",17:"Viktor Côté",18:"Jacob Morissette",19:"Alex Thibodeau",80:"Jayzon D'Almeida"}},
   gl={"CAN":{30:"Ludovik Lachance",31:"Zane Cliche"},"ASQ":{1:"Antoine Ruel",30:"Félix Jobidon"}},
-  goals=[("CAN",1,"4:44",None,[]),("ASQ",2,"2:04",2,[3]),("ASQ",2,"2:28",None,[])],
+  goals=[("CAN",1,"4:44",16,[]),("ASQ",2,"2:04",2,[3]),("ASQ",2,"2:28",2,[])],
   pens=[("CAN",2,"1:36",35,"A48"),("CAN",2,"12:40",40,"A25"),("CAN",3,"4:08",10,"A22"),("ASQ",2,"9:44",15,"A39"),("ASQ",2,"14:12",7,"A56")],
   goalies=[("CAN",30,20.9,0,False),("CAN",31,23.4,2,True),("ASQ",1,21.6,0,False),("ASQ",30,23.4,1,True)], pp={"CAN":0,"ASQ":1}),
 ]
