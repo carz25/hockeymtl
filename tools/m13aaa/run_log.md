@@ -8,3 +8,5 @@ No games added. 7 played games dated 2026-11-14 still have no score (1264, 1265,
 
 2026-11-15 (second run, fetches worked): added 1264 MEL 2-6 ROC, 1265 GRE 2-4 SEN, 1170 LBL 5-CFR 1. No WARNINGs/PP CHECK. Notes: 1264 Élite goalie 42.7 min / 5 GA vs 6 goals and 1265 GRE goalie 43.9 min = empty-net time (goal at 14:49 P3 in 1264); accepted like earlier games.
 Skipped (do not add up, retry tomorrow): 1266 (895518) visitor goalie 5 GA vs 6 goals at 45.0 min, suspended #13 not on roster; 1073 (885987) goal 3 has no scorer, one scorer conflict (#16 vs #8); 1337 (899356) score 2-1 but one goal each, shootout result not recorded; 1169 (893387) printed home 2 but one home goal, shootout, result not recorded.
+
+2026-11-15 (owner follow-up): added 1266 CBL 3-6 SMI (visitor goalie 5 GA vs 6 goals = empty-net goal, owner confirmed goalie was pulled) and 1073 CAN 1-2 ASQ (two goals entered with scorer unknown: CAN P1 4:44 sheet has scorer #16 vs name #8 conflict; ASQ P2 2:28 no scorer on sheet). Still skipped: 1337 and 1169 (shootout decided, result not recorded on sheet).
