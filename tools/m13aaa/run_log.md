@@ -12,3 +12,5 @@ Skipped (do not add up, retry tomorrow): 1266 (895518) visitor goalie 5 GA vs 6 
 2026-11-15 (owner follow-up): added 1266 CBL 3-6 SMI (visitor goalie 5 GA vs 6 goals = empty-net goal, owner confirmed goalie was pulled) and 1073 CAN 1-2 ASQ (two goals entered with scorer unknown: CAN P1 4:44 sheet has scorer #16 vs name #8 conflict; ASQ P2 2:28 no scorer on sheet). Still skipped: 1337 and 1169 (shootout decided, result not recorded on sheet).
 
 2026-11-15 (correction): 1073 goals fixed from the top of the sheet: CAN P1 4:44 scorer #16 (Michaud); ASQ P2 2:04 #2 (assist #3) and P2 2:28 #2 (scoreLoc fields are scorer numbers). Goalie per-period GA at the bottom of the sheet ignored.
+
+2026-11-15 (owner confirmed): added 1337 SDN 2-1 PLA (shootout win, printed score = winner+1; owner confirmed via checkmarks) and 1169 CAS 1-2 NOM (same pattern, shootout, home winner by printed score). 1337 notes: duplicate SDN #88 A48 at P3 9:50 entered once; PLA #20 has A25+A22 at 9:50 (the "other" entry skipped); new player SDN Elliot Laplante (spelling unverified).
