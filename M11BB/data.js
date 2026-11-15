@@ -49,11 +49,11 @@ var SCHED = [
   [2896, "2026-11-08", "3:30 PM", "Aréna Mont-Royal", "BUL", "PHX", 3, 1],
   [2897, "2026-11-08", "3:30 PM", "Aréna Howie-Morenz", "ROC", "TOR", 3, 0],
   [2898, "2026-11-08", "5:00 PM", "Aréna Clément-Jetté", "BRA", "BAR", 2, 2],
-  [2899, "2026-11-14", "2:00 PM", "Aréna Marcelin-Wilson", "ROC", "BRA"],
+  [2899, "2026-11-14", "2:00 PM", "Aréna Marcelin-Wilson", "ROC", "BRA", 1, 4],
   [2900, "2026-11-05", "7:00 PM", "Centre Gadbois", "PIO", "HUR", 0, 0],
-  [2901, "2026-11-14", "2:30 PM", "Aréna Howie-Morenz", "CHE", "TOR"],
+  [2901, "2026-11-14", "2:30 PM", "Aréna Howie-Morenz", "CHE", "TOR", 3, 4],
   [2902, "2026-11-21", "1:00 PM", "Aréna Martin-Brodeur", "BAR", "BUL"],
-  [2903, "2026-11-14", "3:30 PM", "Centre Sportif Saint-Charles", "PHX", "ATT"],
+  [2903, "2026-11-14", "3:30 PM", "Centre Sportif Saint-Charles", "PHX", "ATT", 4, 4],
   [2904, "2026-11-15", "12:00 PM", "Aréna Rodrigue-Gilbert", "ROC", "ETO"],
   [2905, "2026-12-19", "2:00 PM", "Aréna Saint-Donat", "PHX", "BAR"],
   [2906, "2026-11-15", "5:00 PM", "Aréna Marcelin-Wilson", "PIO", "BRA"],
@@ -152,10 +152,10 @@ var R = {
   OIL: { Carzoli: "Alessio Carzoli", Trevisonno: "Antonio Trevisonno", Orobello: "Anthony Orobello", Sciangula: "Luca Sciangula", Dattoli: "Francesco Dattoli", Desnoyers: "Jacob Desnoyers", Bonaventura: "James Bonaventura", WyldeCruz: "William Wylde Cruz", Leo: "Milan Leo", Mucciarone: "Cristiano Mucciarone", Audet: "Xavier Audet", Gauthier: "Tristan Gauthier" },
   ETO: { Charest: "Éliott Charest", Sylvain: "Kaelan Sylvain", Guay: "Gabriel Guay", Chouinard: "Zachary Chouinard Labrie", Vallee: "Charles Vallée", LDupuis: "Loralie Dupuis", ZDupuis: "Zachary Dupuis", Fernandez: "Matheo Fernandez", Nolet: "Emile Nolet Gauthier", Cimon: "Zack Cimon", Metivier: "Jayden Métivier †", Cabana: "Louis Cabana Lavoie" },
   HUR: { Nelson: "Jack Nelson", Garston: "Lukas Garston", Fleiszer: "Solomon Fleiszer", Glen: "Samuel Glen", Chan: "Elliott Chan", Qisiiq: "Markusi Qisiiq", JecA: "Feliks Aleksander Jecz", Wellington: "William Wellington", Duncan: "Rylan Duncan", JecF: "Filip Marcel Jecz", Frechette: "Léo Fréchette", Sauvageau: "Louis Sauvageau", Gagnon: "Theodore Gagnon" },
-  CHE: { Bibeau: "Victor Bibeau", TonThat: "Lani Ton-That", Lague: "Arnaud Lague", David: "Julien David", Esquerre: "Novak Esquerré", Lapointe: "Léon Lapointe", Kurilko: "David Kurilko", Aubertin: "Godefroy Aubertin", Dintzner: "Paul Dintzner", Payette: "Adrien Payette", Merette: "Alexis Mérette", Escano: "Liam Escano Vides" },
+  CHE: { Bibeau: "Victor Bibeau", TonThat: "Lani Ton-That", Lague: "Arnaud Lague", David: "Julien David", Esquerre: "Novak Esquerré", Lapointe: "Léon Lapointe", Kurilko: "David Kurilko", Aubertin: "Godefroy Aubertin", Dintzner: "Paul Dintzner", Payette: "Adrien Payette", Merette: "Alexis Mérette", Escano: "Liam Escano Vides", PLapointe: "Paul Lapointe †", Rouillard: "Nils Rouillard †" },
   PIO: { Legatos: "Memphis Legatos-Lebel", Martel: "Henri Martel", Kearney: "Tom Kearney", Bourque: "Gabriel Bourque", Ducharme: "Louis Ducharme", Grondin: "Markus Grondin", Carette: "Laurent Carette", Lavoie: "Miika Lavoie", Haney: "Elliott Haney", Douville: "Elliott Douville", Brisebois: "Lambert Brisebois †", Lebrun: "Théodore Lebrun", Hijji: "Adam Hijji" },
   BRA: { Bomhower: "Alyssia-Adelina Bomhower Gonzalez", Moussaoui: "Juba Moussaoui", Gagnon: "Vincent Gagnon", Chartrand: "William Chartrand", Legare: "Zavier Légaré Poulin", Nadon: "Philippe Nadon", Prince: "Tyler Prince Sénéchal Augustin", Delisle: "Philippe Delisle", Caron: "Arnaud Caron", Poirier: "Edouard Poirier", Desroches: "Samuel Desroches †", Pathmasiri: "Damien Pathmasiri" },
-  ROC: { Jolicoeur: "Olivier Jolicoeur", Robert: "Nathan Robert", Greffard: "Nathan Greffard", Henry: "Keyshawn Henry", Caspar: "Noah Caspar", Moncion: "Henri Moncion Gaudet", HuardRoy: "Felix Huard-Roy", Gaudreau: "Alexis Gaudreau", Cusson: "Hector Cusson", Bedard: "Paul Bédard", Gauthier: "Raphaël Gauthier", Cannistraro: "Lorenzo Cannistraro" },
+  ROC: { Jolicoeur: "Olivier Jolicoeur", Robert: "Nathan Robert", Greffard: "Nathan Greffard", Henry: "Keyshawn Henry", Caspar: "Noah Caspar", Moncion: "Henri Moncion Gaudet", HuardRoy: "Felix Huard-Roy", Gaudreau: "Alexis Gaudreau", Cusson: "Hector Cusson", Bedard: "Paul Bédard", Gauthier: "Raphaël Gauthier", Cannistraro: "Lorenzo Cannistraro", Petosa: "Nicola Petosa †" },
   PHX: { Boivin: "Eliot Boivin", Santerre: "Lexon Santerre Gomez", Dallaire: "Henri Dallaire Lamontagne", Rocco: "Preston Rocco", Gilbert: "Émile Gilbert", Gonzalez: "Ivan Gonzalez", Malouf: "Gustave Malouf", Vouillot: "Jonas Vouillot Demptos", Yang: "Nolan Yang", Dejean: "Felix Dejean", Carrier: "Antoine Carrier †", Balan: "Elias Balan-Van Dembroucke †", Lessard: "Théodore Lessard", Legault: "Emmett Legault †" },
   BUL: { Courtois: "Romeo Courtois Laberge", Caouette: "Antoine Caouette", Beauchamp: "Antoine Beauchamp", Lacroix: "Isaac Lacroix Hernandez", Ferreira: "Matteo Ferreira", Desbiens: "Raphaël Desbiens", Tosi: "James Tosi", Martinez: "George Louis Martinez", Iskizzi: "Samy Iskizzi", Sousa: "James Sousa", Sorice: "Julius Sorice", Charlebois: "Renaud Charlebois", Chun: "Everett Chun", Liu: "Jerry Yunze Liu" },
   BAR: { Vaccaro: "Adamo Vaccaro", Testa: "Aiden Testa", Piccirilli: "Emilio Piccirilli", DiFulvio: "Matteo Di Fulvio", Gouin: "Rafael Gouin", Simonetto: "Derek Simonetto", Camarda: "Dante Camarda", Lombardi: "Vincent Lombardi", Enea: "Fabiano Enea", Long: "Guandong Long", Madi: "Zack Madi", Lapenna: "Mathis Lapenna" },
@@ -329,11 +329,21 @@ var G = [
   { id: 2898, a: "BRA", h: "BAR", s: [2, 2], d: { BRA: BRAD, BAR: BARD },
     g: [["BAR", "Gouin", "Simonetto"], ["BAR", "Enea", "Simonetto"], ["BRA", "Chartrand"], ["BRA", "Legare", "Nadon"]],
     p: [["BAR", "Lombardi"], ["BAR", "Testa"], ["BRA", "Bomhower"], ["BAR", "DiFulvio"], ["BAR", "Lombardi"], ["BAR", "Enea"], ["BRA", "Poirier"], ["BRA", "Gagnon"]], k: [["BRA", "Pathmasiri", 33.8, 2], ["BAR", "Lapenna", 33.8, 2]] }
+  ,
+  { id: 2899, a: "ROC", h: "BRA", s: [1, 4], d: { ROC: "Jolicoeur Robert Greffard Henry Caspar HuardRoy Cusson Bedard Moncion Petosa", BRA: BRAD },
+    g: [["BRA", "Prince", "Gagnon"], ["BRA", "Legare", "Chartrand", "Poirier"], ["ROC", "Cusson"], ["BRA", "Legare", "Delisle"], ["BRA", "Delisle"]],
+    p: [["ROC", "Henry"], ["ROC", "Henry"]], k: [["ROC", "Cannistraro", 32.7, 4], ["BRA", "Pathmasiri", 32.7, 1]] },
+  { id: 2901, a: "CHE", h: "TOR", s: [3, 4], d: { CHE: "PLapointe Bibeau TonThat Lague Esquerre Lapointe Kurilko Dintzner Rouillard Payette", TOR: TORD },
+    g: [["CHE", "Bibeau", "PLapointe"], ["TOR", "Dupras"], ["TOR", "Dupras"], ["CHE", "Rouillard"], ["CHE", "PLapointe"], ["TOR", "OPoulin"], ["TOR", "Rahman", "OPoulin"]],
+    p: [["TOR", "Luna"], ["CHE", "Lapointe"], ["TOR", "Luna"], ["TOR", "McNicoll"]], k: [["CHE", "Merette", 29.6, 4], ["TOR", "FPoulin", 29.6, 3]] },
+  { id: 2903, a: "PHX", h: "ATT", s: [4, 4], d: { PHX: PHXD, ATT: ATTD },
+    g: [["PHX", "Yang"], ["PHX", "Yang"], ["ATT", "Maislin"], ["PHX", "Dejean"], ["PHX", "Dejean"], ["ATT", "Campbell"], ["ATT", "Maislin"], ["ATT", "Konar"]],
+    p: [["ATT", "Wong"], ["PHX", "Boivin"], ["ATT", "Neron"], ["PHX", "Rocco"], ["PHX", "Gonzalez"], ["ATT", "Alshalalfah"]], k: [["PHX", "Lessard", 30.0, 4], ["ATT", "Requeima", 30.0, 4]] }
 ];
 
 /* Special-teams goals, worked out from goal and penalty times on the sheets (every minor = 2:00, ends when the other team scores,
    carries into the next period). [game, team, scorer, "PP"|"SH", assists...]. Only games listed in TIMED have been read for times. */
-var TIMED = [2851, 2852, 2853, 2854, 2855, 2856, 2857, 2858, 2859, 2860, 2861, 2862, 2863, 2864, 2865, 2866, 2867, 2868, 2869, 2870, 2871, 2872, 2873, 2874, 2875, 2876, 2877, 2878, 2879, 2880, 2881, 2882, 2883, 2884, 2885, 2886, 2887, 2888, 2889, 2890, 2891, 2892, 2893, 2894, 2895, 2896, 2897, 2898, 2900];
+var TIMED = [2851, 2852, 2853, 2854, 2855, 2856, 2857, 2858, 2859, 2860, 2861, 2862, 2863, 2864, 2865, 2866, 2867, 2868, 2869, 2870, 2871, 2872, 2873, 2874, 2875, 2876, 2877, 2878, 2879, 2880, 2881, 2882, 2883, 2884, 2885, 2886, 2887, 2888, 2889, 2890, 2891, 2892, 2893, 2894, 2895, 2896, 2897, 2898, 2899, 2900, 2901, 2903];
 var PPX = [
   [2851, "PIO", "Carette", "SH"],
   [2852, "CHE", "Lague", "PP", "Lapointe"],
@@ -375,23 +385,26 @@ var PPX = [
   [2894, "OIL", "Orobello", "PP", "Leo", "WyldeCruz"],
   [2894, "CHE", "Dintzner", "PP", "David"],
   [2895, "PIO", "Grondin", "SH"],
-  [2897, "ROC", "Greffard", "SH"]
+  [2897, "ROC", "Greffard", "SH"],
+  [2903, "PHX", "Yang", "PP"],
+  [2903, "PHX", "Dejean", "PP"],
+  [2903, "ATT", "Campbell", "PP"]
 ];
 
-var ORDER = ["CHE", "OIL", "PIO", "BAR", "ROC", "BRA", "BUL", "HUR", "PHX", "TOR", "ATT", "ETO"];
+var ORDER = ["CHE", "OIL", "PIO", "BRA", "ROC", "BAR", "BUL", "PHX", "TOR", "HUR", "ATT", "ETO"];
 // official standings, as of the league PDF: GP W T L PTS PTS% GF GA DIFF PIM
 var OFF = {
-  CHE: [10, 8, 1, 1, 27, ".900", 27, 13, 14, 24],
+  CHE: [11, 8, 1, 2, 28, ".848", 30, 17, 13, 26],
   OIL: [8, 6, 1, 1, 21, ".875", 33, 14, 19, 32],
   BAR: [8, 4, 1, 3, 17, ".708", 22, 12, 10, 44],
   PIO: [10, 5, 1, 4, 21, ".700", 22, 20, 2, 32],
-  BRA: [9, 3, 1, 5, 16, ".593", 19, 29, -10, 26],
-  ROC: [8, 3, 3, 2, 17, ".708", 18, 11, 7, 20],
-  PHX: [8, 2, 1, 5, 13, ".542", 11, 24, -13, 22],
+  BRA: [10, 4, 1, 5, 19, ".633", 23, 30, -7, 26],
+  ROC: [9, 3, 3, 3, 18, ".667", 19, 15, 4, 24],
+  PHX: [9, 2, 2, 5, 15, ".556", 15, 28, -13, 28],
   BUL: [9, 3, 0, 6, 15, ".556", 23, 22, 1, 42],
-  TOR: [8, 2, 0, 6, 12, ".500", 14, 36, -22, 22],
+  TOR: [9, 3, 0, 6, 15, ".556", 18, 39, -21, 28],
   HUR: [7, 3, 1, 3, 14, ".667", 14, 12, 2, 36],
-  ATT: [8, 2, 0, 6, 12, ".500", 15, 37, -22, 28],
+  ATT: [9, 2, 1, 6, 14, ".519", 19, 41, -22, 34],
   ETO: [5, 3, 0, 2, 10, ".667", 21, 9, 12, 42]
 };
 var SHORT = { OIL: "Oilers", ETO: "Étoiles", HUR: "Hurricanes", CHE: "Chevaliers", PIO: "Pionniers", BRA: "Braves", ROC: "Rocket", PHX: "Phénix", BUL: "Bulldogs", BAR: "Barons", TOR: "Tornade", ATT: "Attack" };
