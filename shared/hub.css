@@ -781,3 +781,29 @@ body:not(.m) table.pt .tn b{font-size:16px}
 /* one-line footer on the home page */
 .sitebar.slim .sitebar-in{justify-content:center;padding-top:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px))}
 .sitebar.slim .sitebar-note{margin:0;width:auto;white-space:nowrap}
+/* ---------- Nov 16 ---------- */
+/* phone standings: stats centred, PTS 2px smaller, Advanced uses the same cell padding as the normal table */
+.m #p-standings .ctable td,.m #p-standings .ctable th{text-align:center}
+.m #p-standings .ctable td.l,.m #p-standings .ctable th.l{text-align:left}
+.m #p-standings .ctable td.strong{font-size:16px}
+.m table.advt td,.m table.advt th{padding-left:2px;padding-right:2px}
+.m table.advt td.rk,.m table.advt th.rk{padding-left:8px;padding-right:2px}
+.m table.advt th.stick,.m table.advt td.stick{padding-left:6px}
+.m table.advt td.stick{overflow:hidden;text-overflow:ellipsis}
+.m table.advt tbody td:nth-child(n+8){padding-left:7px;padding-right:7px}
+/* desktop standings: PTS 1px smaller */
+body:not(.m) table.stt td.strong{font-size:17px}
+@media (max-width:375px){.m #p-standings .ctable td.strong{font-size:14px}}
+.m table.advt thead tr:not(.grp) th:nth-child(n+8){padding-left:7px;padding-right:7px}
+/* phone schedule: the Show picker sits on the title line, at the right */
+.m .schead{flex-direction:row;align-items:center;justify-content:space-between;flex-wrap:nowrap}
+.m .schead .tools{width:auto;margin:0}
+/* home: result tiles open the game summary */
+button.rt2{font:inherit;color:inherit;text-align:left;cursor:pointer;width:100%}
+button.rt2:hover{border-color:var(--ink)}
+button.rt2:focus-visible{outline:2px solid var(--side-a);outline-offset:2px}
+/* played game without a sheet: tidy lists */
+.gdetail ul{list-style:none;margin:4px 0 0;padding:0}
+.gdetail li{display:flex;gap:10px;align-items:center;padding:3px 0}
+.gdetail li small{color:var(--mute)}
+.gdetail li .lg{width:22px;height:22px;border-radius:4px}
