@@ -6,7 +6,7 @@ flt = {"order": ["startTime ASC", "number ASC"],
        "where": {"and": [{"date": {"between": ["2026-11-14", "2026-11-15"]}}, {"scheduleId": 199330}, {"officeId": 6082}]},
        "include": ["teamStats", "awayTeam", "homeTeam"]}
 url = "https://pub-api.play.spordle.com/api/sp/games?filter=" + urllib.parse.quote(json.dumps(flt, separators=(",", ":")))
-req = urllib.request.Request(url, headers={"Accept": "application/json", "User-Agent": "hockeymtl.ca fan site updater (nightly, one request)"})
+req = urllib.request.Request(url, headers={"Accept": "application/json", "X-Page-Type": "LEAGUE", "User-Agent": "hockeymtl.ca fan site updater (nightly, one request)"})
 try:
     with urllib.request.urlopen(req, timeout=30) as r:
         body = r.read(); status = r.status; ctype = r.headers.get("content-type", "")
