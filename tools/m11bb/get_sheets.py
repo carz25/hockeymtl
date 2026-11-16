@@ -12,10 +12,19 @@ ids.txt: one gamesheet ID per line, for example
 Each sheet is saved as sheets/<id>.pdf next to this script.
 A sheet that already exists is skipped.
 
-If Spordle answers with its "are you human" page instead of a PDF, the script
-does not try to get past it. It opens that sheet in your normal browser
-instead, so you can pass the check yourself and save the PDF. While it waits,
-it watches your Downloads folder and moves any new PDF into sheets/<id>.pdf.
+If Spordle refuses the direct download (its "are you human" check), the script
+does not try to get past it. It opens each sheet in your normal browser
+instead, one at a time, and watches your Downloads folder: any new PDF is
+moved to sheets/<id>.pdf.
+
+To make that step automatic, tell your browser to download PDFs instead of
+showing them (one-time setting):
+  Chrome:  Settings > Privacy and security > Site settings >
+           Additional content settings > PDF documents > Download PDFs
+  Edge:    Settings > Cookies and site permissions > PDF documents >
+           Always download PDF files
+  Firefox: Settings > General > Applications > PDF > Save File
+With that on, you only act when the browser shows the human check.
 """
 import os, sys, time, glob, shutil, webbrowser, urllib.request, urllib.error
 
@@ -64,8 +73,8 @@ def pdfs_in_downloads():
 def by_hand(gid, dest):
     """Open the sheet in the normal browser and wait for a new PDF in Downloads."""
     before = pdfs_in_downloads()
-    print("  %s: opening it in your browser. Pass the check if asked, then save it" % gid)
-    print("      (Ctrl+S / Cmd+S, or Print > Save as PDF) into your Downloads folder.")
+    print("  %s: opening it in your browser. Pass the check if asked. If the PDF shows" % gid)
+    print("      instead of downloading, save it (Ctrl+S) into your Downloads folder.")
     webbrowser.open(URL.format(id=gid))
     end = time.time() + WAIT_SECONDS
     while time.time() < end:
@@ -87,13 +96,18 @@ def main():
     os.makedirs(OUT, exist_ok=True)
     ids = read_ids(sys.argv[1])
     got, missing = [], []
+    direct = True   # stop trying direct downloads after the first refusal
     for gid in ids:
         dest = os.path.join(OUT, gid + ".pdf")
         if os.path.exists(dest):
             print("  %s: already have it" % gid)
             got.append(gid)
             continue
-        if try_download(gid, dest) or by_hand(gid, dest):
+        ok = direct and try_download(gid, dest)
+        if direct and not ok:
+            direct = False
+            print("  direct download refused, using your browser for the rest")
+        if ok or by_hand(gid, dest):
             print("  %s: saved %s" % (gid, dest))
             got.append(gid)
         else:
