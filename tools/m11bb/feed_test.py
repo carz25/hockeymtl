@@ -4,7 +4,7 @@ Asks for the M11 BB games of Nov 14-15, 2026 and prints the scores. Changes noth
 import json, sys, urllib.parse, urllib.request, urllib.error
 flt = {"order": ["startTime ASC", "number ASC"],
        "where": {"and": [{"date": {"between": ["2026-11-14", "2026-11-15"]}}, {"scheduleId": 199330}, {"officeId": 6082}]},
-       "include": ["teamStats", "awayTeam", "homeTeam"]}
+       "include": ["teamStats", "surface", "office", "category", "awayTeam", "homeTeam", "externalProviders"]}
 url = "https://pub-api.play.spordle.com/api/sp/games?filter=" + urllib.parse.quote(json.dumps(flt, separators=(",", ":")))
 req = urllib.request.Request(url, headers={"Accept": "application/json", "X-Page-Type": "LEAGUE", "User-Agent": "hockeymtl.ca fan site updater (nightly, one request)"})
 try:
