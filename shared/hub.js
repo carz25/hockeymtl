@@ -905,11 +905,13 @@
   }
 
   /* ---------- team pages ---------- */
+  /* home/away record from scores. Overtime leagues: scores can't tell an overtime loss from a regulation one, so W-L (plus T for a rare tie). */
   function recOf(list) {
     var w = 0, tt = 0, l = 0;
     list.forEach(function (x) { if (x.r === "W") w++; else if (x.r === "T") tt++; else l++; });
-    return w + "-" + tt + "-" + l;
+    return OT ? w + "-" + l + (tt ? "-" + tt : "") : w + "-" + tt + "-" + l;
   }
+  function recOfLbl(list) { return OT ? (list.some(function (x) { return x.r === "T"; }) ? "W-L-T" : "W-L") : "W-T-L"; }
   /* Teams tab: one layout for every league. Sheet leagues count player stats from the game sheets; official leagues use the league's tables. */
   function renderTeams() {
     var el = $("p-teams");
@@ -928,7 +930,7 @@
       '<div class="thr">' + (ng ? '<span class="sub">Next game</span><b>' + when(ng) + "</b><span>" + (ng.h === t ? "vs " + esc(TEAMS[ng.a]) : "at " + esc(TEAMS[ng.h])) + '</span><button class="btn pri" data-open="' + ng.id + '">Matchup preview</button>' : "") +
       '<button class="btn" data-allteams="1">All teams</button></div></div>';
     var tiles = '<div class="tiles">' + tile("Points %", s.pct, ord(RK.pctn[t]) + " in the " + GROUP) + tile("Goals for / GP", f2(s.gfg), ord(RK.gfg[t]) + " · " + s.gf + " total") + tile("Goals against / GP", f2(s.gag), ord(RK.gag[t]) + " fewest · " + s.ga + " total") +
-      tile("Home record", hr, recLbl) + tile("Away record", ar, recLbl) + tile("PIM / GP", f1(s.pimg), ord(RK.pimg[t]) + " fewest · " + s.pim + " min") + "</div>";
+      tile("Home record", hr, recOfLbl(rs.filter(function (x) { return x.home; }))) + tile("Away record", ar, recOfLbl(rs.filter(function (x) { return !x.home; }))) + tile("PIM / GP", f1(s.pimg), ord(RK.pimg[t]) + " fewest · " + s.pim + " min") + "</div>";
     /* the same columns in every league; sheet leagues keep power-play goals as pwg/pwa and points per game as ppg */
     var V = OFFICIAL ? { pgp: "pgp", ppg: "ppg", ppa: "ppa" } : { pgp: "ppg", ppg: "pwg", ppa: "pwa" };
     var sks = SK.filter(function (r) { return r.team === t; }).sort(function (a, b) { return b.pts - a.pts || b.g - a.g || a.name.localeCompare(b.name); });
