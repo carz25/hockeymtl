@@ -22,3 +22,4 @@
 - Power-play goals added: 2904 ETO Guay PP, ETO Cimon PP (sheet: 2 en 4); 2907 OIL Leo SH, OIL Leo PP (1 en 4), HUR Garston PP (1 en 5).
 - 2906 PIO at BRA: sheet is blank and dated 2027-04-01 00:00 (league placeholder), so the game was not played. SCHED and games.csv now show it as date TBD.
 - Spordle sheets now sit behind a Cloudflare human check: WebFetch and scripts get 403. Sheets come from the owner's PC (get_sheets.py opens them in his browser).
+- Feed test (2026-11-16): pub-api.play.spordle.com/api/sp/games read from GitHub Actions answers HTTP 422 "Invalid Permissions" (custom.unauthorized), with or without X-Page-Type: LEAGUE and with the schedule page's exact query. Not usable from a server without pretending to be the Spordle web page, so not pursued. Test job removed.
