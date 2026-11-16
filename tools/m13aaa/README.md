@@ -3,6 +3,7 @@
 Keeps `M13AAA/data.js` current. Only that one file is ever changed. Never touch `shared/` or the design.
 
 Files here:
+- `get_sheets.py`, `run_nightly.bat`, `setup_task.ps1`: the download scripts that run on the owner's PC (copy of the M11 BB ones, reading `M13AAA/data.js` and `games.csv` from GitHub). Setup: `Desktop\M13AAA\Gamesheet Downloader`, then `powershell -ExecutionPolicy Bypass -File setup_task.ps1` once.
 - `update.py` applies changes to `M13AAA/data.js` in the exact existing format (`python3 -I tools/m13aaa/update.py check` must print `OK` before and after).
 - `games.csv` is the league's game list (Spordle gamesheet id + URL per game, status, venue). `game_number` M13AAA-1264 is game id 1264 in `SCHED`.
 - `sheets_log.py` is the record of every game sheet already entered (the format example). Append new ones to it.
@@ -10,8 +11,8 @@ Files here:
 
 ## Daily routine
 
-1. Today (America/Toronto). Games to enter = rows of `SCHED` with 6 columns (no score) whose date is before today, and that `games.csv` does not mark Postponed. Look up each one's Spordle URL in `games.csv`. If there are none, stop (write nothing, change nothing).
-2. Fetch each sheet (WebFetch, `https://pdf.play.spordle.com/game/<gamesheet_id>?locale=fr`). A game that is not finished or has no score yet: skip it, try again tomorrow.
+1. Today (America/Toronto). Games to enter = rows of `SCHED` with 6 columns (no score) whose date is before today, and that `games.csv` does not mark Postponed. Look up each one's gamesheet id in `games.csv`. If there are none, stop (change nothing, write nothing, no notification).
+2. Get the sheets as PDFs. Spordle now puts its sheets behind a Cloudflare human check, so WebFetch and scripts get 403: never try to get past it. The owner's PC fetches them instead: `get_sheets.py --auto` (run every night at 9:30 PM and after sign-in by the Windows task made by `setup_task.ps1`, via `run_nightly.bat`) opens each missing sheet in his own browser and saves it as `<gamesheet_id>.pdf` in `Desktop\M13AAA\Gamesheet Downloader\sheets` on his computer. Read them from there with the remote-devices file tools (`device_list_dir`, `device_stage_files`). If the computer cannot be reached (it is off or asleep), stop quietly: no commit, no log line, no notification. A game with no PDF there is skipped until the next run. Read a staged PDF two ways and compare: form fields (`pypdf.PdfReader(f).get_fields()`, the same text WebFetch used to return, see the lessons in `run_log.md`) and the picture (`pdftoppm -jpeg -r 110`, then Read the image: left block = visitors' goals and penalties, right block = home). A sheet with no final score and no officials is not played yet; one dated far in the future at 00:00 was postponed: set its `SCHED` row to `[id, "<that date>", "12:00 AM", "TBD", away, home]` and the same date with `00:00` in `games.csv`.
 3. Write `/tmp/new_sheets.py` with `SHEETS = [dict(...), ...]` (format below). Check each against the sheet: score = number of goals, penalties, goalie minutes add to the game length.
 4. `python3 -I tools/m13aaa/update.py sheets /tmp/new_sheets.py`. Read every WARNING. `NEW PLAYER x (close to an existing player: y)` is almost always a spelling difference between the sheet and the league's stats: add `(team, normalized sheet name): normalized stats name` to `ALIAS` in `update.py` and redo it from a clean `data.js` (`git checkout M13AAA/data.js`). `PP CHECK` means the power-play goals derived from penalty times differ from what the sheet says: recheck the transcription.
 5. Append the new dicts to `sheets_log.py` (keep it valid Python: `SHEETS = [` … `]`).

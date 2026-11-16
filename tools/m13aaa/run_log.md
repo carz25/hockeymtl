@@ -25,3 +25,6 @@ Skipped (do not add up, retry tomorrow): 1266 (895518) visitor goalie 5 GA vs 6 
 
 ## 2026-11-16
 No games added. 7 played games dated 2026-11-15 still have no score (1224, 1323, 1267, 1171, 1329, 1172, 1268; gamesheets 893331, 897153, 895516, 893382, 898100, 893383, 895515). Every WebFetch of pdf.play.spordle.com failed with PROVENANCE_REQUIRED ("permission request for this URL was not answered in time"), so nothing was transcribed. All skipped; they will be retried on the next run. data.js unchanged.
+
+## 2026-11-16 (owner)
+Spordle sheets are behind a Cloudflare human check: WebFetch no longer works. Switched to PDFs downloaded by the owner's PC (`get_sheets.py`, same as M11 BB). The scheduled task now requires the computer and reads `Desktop\M13AAA\Gamesheet Downloader\sheets`.
