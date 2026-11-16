@@ -54,10 +54,10 @@ var SCHED = [
   [2901, "2026-11-14", "2:30 PM", "Aréna Howie-Morenz", "CHE", "TOR", 3, 4],
   [2902, "2026-11-21", "1:00 PM", "Aréna Martin-Brodeur", "BAR", "BUL"],
   [2903, "2026-11-14", "3:30 PM", "Centre Sportif Saint-Charles", "PHX", "ATT", 4, 4],
-  [2904, "2026-11-15", "12:00 PM", "Aréna Rodrigue-Gilbert", "ROC", "ETO"],
+  [2904, "2026-11-15", "12:00 PM", "Aréna Rodrigue-Gilbert", "ROC", "ETO", 0, 8],
   [2905, "2026-12-19", "2:00 PM", "Aréna Saint-Donat", "PHX", "BAR"],
-  [2906, "2026-11-15", "5:00 PM", "Aréna Marcelin-Wilson", "PIO", "BRA"],
-  [2907, "2026-11-15", "6:00 PM", "Aréna Clément-Jetté", "HUR", "OIL"],
+  [2906, "2027-04-01", "12:00 AM", "TBD", "PIO", "BRA"],
+  [2907, "2026-11-15", "6:00 PM", "Aréna Clément-Jetté", "HUR", "OIL", 3, 5],
   [2908, "2026-11-21", "10:45 AM", "Centre Étienne-Desmarteau", "TOR", "CHE"],
   [2909, "2026-11-21", "2:00 PM", "Aréna Marcelin-Wilson", "ETO", "ROC"],
   [2910, "2026-11-21", "2:30 PM", "Centre Sportif Saint-Charles", "OIL", "ATT"],
@@ -338,12 +338,18 @@ var G = [
     p: [["TOR", "Luna"], ["CHE", "Lapointe"], ["TOR", "Luna"], ["TOR", "McNicoll"]], k: [["CHE", "Merette", 29.6, 4], ["TOR", "FPoulin", 29.6, 3]] },
   { id: 2903, a: "PHX", h: "ATT", s: [4, 4], d: { PHX: PHXD, ATT: ATTD },
     g: [["PHX", "Yang"], ["PHX", "Yang"], ["ATT", "Maislin"], ["PHX", "Dejean"], ["PHX", "Dejean"], ["ATT", "Campbell"], ["ATT", "Maislin"], ["ATT", "Konar"]],
-    p: [["ATT", "Wong"], ["PHX", "Boivin"], ["ATT", "Neron"], ["PHX", "Rocco"], ["PHX", "Gonzalez"], ["ATT", "Alshalalfah"]], k: [["PHX", "Lessard", 30.0, 4], ["ATT", "Requeima", 30.0, 4]] }
+    p: [["ATT", "Wong"], ["PHX", "Boivin"], ["ATT", "Neron"], ["PHX", "Rocco"], ["PHX", "Gonzalez"], ["ATT", "Alshalalfah"]], k: [["PHX", "Lessard", 30.0, 4], ["ATT", "Requeima", 30.0, 4]] },
+  { id: 2904, a: "ROC", h: "ETO", s: [0, 8], d: { ROC: "Jolicoeur Robert Greffard Henry Caspar HuardRoy Cusson Bedard", ETO: ETOD },
+    g: [["ETO", "Guay", "Sylvain"], ["ETO", "Guay", "Cimon", "Chouinard"], ["ETO", "LDupuis", "ZDupuis"], ["ETO", "Guay", "Sylvain"], ["ETO", "Sylvain", "Guay"], ["ETO", "Guay"], ["ETO", "Sylvain", "Cimon"], ["ETO", "Cimon", "Vallee"]],
+    p: [["ROC", "Cusson"], ["ROC", "Bedard"], ["ROC", "Henry"], ["ROC", "Caspar"], ["ETO", "Charest"]], k: [["ROC", "Cannistraro", 30.6, 8], ["ETO", "Cabana", 30.6, 0]] },
+  { id: 2907, a: "HUR", h: "OIL", s: [3, 5], d: { HUR: HURD, OIL: "Carzoli Trevisonno Sciangula Dattoli Desnoyers Bonaventura WyldeCruz Leo Mucciarone" },
+    g: [["HUR", "Frechette"], ["HUR", "Qisiiq", "Duncan"], ["HUR", "Garston"], ["OIL", "Leo", "Sciangula"], ["OIL", "Leo"], ["OIL", "Carzoli", "Leo"], ["OIL", "Sciangula", "WyldeCruz"], ["OIL", "Leo"]],
+    p: [["HUR", "Wellington"], ["HUR", "Chan"], ["HUR", "JecA"], ["HUR", "Nelson"], ["OIL", "Carzoli"], ["OIL", "Carzoli"], ["OIL", "Dattoli"], ["OIL", "Dattoli"], ["OIL", "Trevisonno"]], k: [["HUR", "Gagnon", 29.0, 5], ["OIL", "Gauthier", 28.9, 3]] }
 ];
 
 /* Special-teams goals, worked out from goal and penalty times on the sheets (every minor = 2:00, ends when the other team scores,
    carries into the next period). [game, team, scorer, "PP"|"SH", assists...]. Only games listed in TIMED have been read for times. */
-var TIMED = [2851, 2852, 2853, 2854, 2855, 2856, 2857, 2858, 2859, 2860, 2861, 2862, 2863, 2864, 2865, 2866, 2867, 2868, 2869, 2870, 2871, 2872, 2873, 2874, 2875, 2876, 2877, 2878, 2879, 2880, 2881, 2882, 2883, 2884, 2885, 2886, 2887, 2888, 2889, 2890, 2891, 2892, 2893, 2894, 2895, 2896, 2897, 2898, 2899, 2900, 2901, 2903];
+var TIMED = [2851, 2852, 2853, 2854, 2855, 2856, 2857, 2858, 2859, 2860, 2861, 2862, 2863, 2864, 2865, 2866, 2867, 2868, 2869, 2870, 2871, 2872, 2873, 2874, 2875, 2876, 2877, 2878, 2879, 2880, 2881, 2882, 2883, 2884, 2885, 2886, 2887, 2888, 2889, 2890, 2891, 2892, 2893, 2894, 2895, 2896, 2897, 2898, 2899, 2900, 2901, 2903, 2904, 2907];
 var PPX = [
   [2851, "PIO", "Carette", "SH"],
   [2852, "CHE", "Lague", "PP", "Lapointe"],
@@ -388,24 +394,29 @@ var PPX = [
   [2897, "ROC", "Greffard", "SH"],
   [2903, "PHX", "Yang", "PP"],
   [2903, "PHX", "Dejean", "PP"],
-  [2903, "ATT", "Campbell", "PP"]
+  [2903, "ATT", "Campbell", "PP"],
+  [2904, "ETO", "Guay", "PP", "Cimon", "Chouinard"],
+  [2904, "ETO", "Cimon", "PP", "Vallee"],
+  [2907, "OIL", "Leo", "SH"],
+  [2907, "OIL", "Leo", "PP"],
+  [2907, "HUR", "Garston", "PP"]
 ];
 
-var ORDER = ["CHE", "OIL", "PIO", "BRA", "ROC", "BAR", "BUL", "PHX", "TOR", "HUR", "ATT", "ETO"];
+var ORDER = ["CHE", "OIL", "PIO", "ROC", "BRA", "BAR", "HUR", "BUL", "PHX", "TOR", "ATT", "ETO"];
 // official standings, as of the league PDF: GP W T L PTS PTS% GF GA DIFF PIM
 var OFF = {
   CHE: [11, 8, 1, 2, 28, ".848", 30, 17, 13, 26],
-  OIL: [8, 6, 1, 1, 21, ".875", 33, 14, 19, 32],
+  OIL: [9, 7, 1, 1, 24, ".889", 38, 17, 21, 42],
   BAR: [8, 4, 1, 3, 17, ".708", 22, 12, 10, 44],
   PIO: [10, 5, 1, 4, 21, ".700", 22, 20, 2, 32],
   BRA: [10, 4, 1, 5, 19, ".633", 23, 30, -7, 26],
-  ROC: [9, 3, 3, 3, 18, ".667", 19, 15, 4, 24],
+  ROC: [10, 3, 3, 4, 19, ".633", 19, 23, -4, 32],
   PHX: [9, 2, 2, 5, 15, ".556", 15, 28, -13, 28],
   BUL: [9, 3, 0, 6, 15, ".556", 23, 22, 1, 42],
   TOR: [9, 3, 0, 6, 15, ".556", 18, 39, -21, 28],
-  HUR: [7, 3, 1, 3, 14, ".667", 14, 12, 2, 36],
+  HUR: [8, 3, 1, 4, 15, ".625", 17, 17, 0, 44],
   ATT: [9, 2, 1, 6, 14, ".519", 19, 41, -22, 34],
-  ETO: [5, 3, 0, 2, 10, ".667", 21, 9, 12, 42]
+  ETO: [6, 4, 0, 2, 13, ".722", 29, 9, 20, 44]
 };
 var SHORT = { OIL: "Oilers", ETO: "Étoiles", HUR: "Hurricanes", CHE: "Chevaliers", PIO: "Pionniers", BRA: "Braves", ROC: "Rocket", PHX: "Phénix", BUL: "Bulldogs", BAR: "Barons", TOR: "Tornade", ATT: "Attack" };
 var BADGE = { OIL: "#E2631A", ETO: "#2563A8", HUR: "#B83240", CHE: "#6B4FA3", PIO: "#2F7D5B", BRA: "#1F7F8E", ROC: "#A8730B", PHX: "#B5427A", BUL: "#5C7F1F", BAR: "#3A4FA3", TOR: "#8A4FB0", ATT: "#3F7A7A" };

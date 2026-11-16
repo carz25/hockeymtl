@@ -16,3 +16,9 @@
 ## 2026-11-16 (scheduled run)
 - Games added: none.
 - Skipped (sheet could not be fetched: WebFetch permission request for pdf.play.spordle.com not answered, PROVENANCE_REQUIRED): 2904 ROC at ETO (929122), 2906 PIO at BRA (929120), 2907 HUR at OIL (929121), all 2026-11-15. Will retry next run.
+
+## 2026-11-16 (manual, from PDFs the owner downloaded with get_sheets.py)
+- Games added: 2904 ROC 0 – ETO 8; 2907 HUR 3 – OIL 5 (both 2026-11-15).
+- Power-play goals added: 2904 ETO Guay PP, ETO Cimon PP (sheet: 2 en 4); 2907 OIL Leo SH, OIL Leo PP (1 en 4), HUR Garston PP (1 en 5).
+- 2906 PIO at BRA: sheet is blank and dated 2027-04-01 00:00 (league placeholder), so the game was not played. SCHED and games.csv now show it as date TBD.
+- Spordle sheets now sit behind a Cloudflare human check: WebFetch and scripts get 403. Sheets come from the owner's PC (get_sheets.py opens them in his browser).

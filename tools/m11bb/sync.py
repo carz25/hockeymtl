@@ -37,6 +37,7 @@ today=datetime.date.today().isoformat()
 changes=[]
 for gid,c in sorted(csvrows.items()):
     want=[c['date'],t12(c['start_local']),VENUE.get(c['arena'],c['arena']),code(c['away']),code(c['home'])]
+    if c['start_local']=='00:00': want[2]='TBD'   # league placeholder for a postponed game: shows as "Date TBD"
     if c['status']!='Active': print('STATUS',gid,c['status'])
     if gid not in idx: changes.append((gid,None,want)); continue
     j,r=idx[gid]
