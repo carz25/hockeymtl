@@ -22,3 +22,6 @@ Skipped (do not add up, retry tomorrow): 1266 (895518) visitor goalie 5 GA vs 6 
 - Shootout/OT games: the printed final score is winner = loser+1 with equal goals listed; enter with so=True and s = printed score. Do not skip for goals != score in that case.
 - PP/PK fields read "x en y": PP = goals on y chances, PK = kills on y chances. Penalty counts can be off by one from coincident penalties; do not skip for that. Exact duplicate penalty rows: enter once unless the PP/PK counts need both.
 - Skip only when a score cannot be determined or goals clearly contradict the score without an empty-net or shootout explanation.
+
+## 2026-11-16
+No games added. 7 played games dated 2026-11-15 still have no score (1224, 1323, 1267, 1171, 1329, 1172, 1268; gamesheets 893331, 897153, 895516, 893382, 898100, 893383, 895515). Every WebFetch of pdf.play.spordle.com failed with PROVENANCE_REQUIRED ("permission request for this URL was not answered in time"), so nothing was transcribed. All skipped; they will be retried on the next run. data.js unchanged.
