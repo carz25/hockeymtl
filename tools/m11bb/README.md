@@ -23,7 +23,7 @@ python3 -I tools/m11bb/sync.py verify     # must print OK before publishing
 ## Daily routine (also what the scheduled task does)
 
 1. `sync.py verify` must print OK first. `sync.py todo` lists games to enter. None: stop, change nothing.
-2. Fetch each sheet with WebFetch: `https://pdf.play.spordle.com/game/<gamesheet_id>?locale=fr`. Skip a game whose sheet has no final score yet (try again next run).
+2. Get each sheet as a PDF. Since Nov 2026 Spordle puts the sheets behind a Cloudflare human check, so WebFetch and scripts get 403: never try to get past it. The owner's PC fetches them instead: `get_sheets.py --auto` (run nightly by `run_nightly.bat`) opens each missing sheet in his own browser and saves it as `<gamesheet_id>.pdf` in `Desktop\M11BB\Gamesheet Downloader\sheets` on his computer. Read them from there with the remote-devices file tools (device_list_dir, device_stage_files), then `pdftotext -layout` and `pdftoppm -jpeg -r 110` + Read the image: the picture is the reliable view (left block = visitors' goals and penalties, right block = home). A game with no PDF there is skipped until the next run. A sheet with no final score and no officials is not played yet; one dated far in the future at 00:00 means the game was postponed: set its `SCHED` row to `[id, "<that date>", "12:00 AM", "TBD", away, home]` and the same date with `00:00` in `games.csv`.
 3. For each finished game, edit `M11BB/data.js` by hand, keeping the exact format:
    - `SCHED`: add the two scores to its row: `[2899, "2026-11-14", "12:00 PM", "Aréna ...", "ROC", "BRA", 3, 2],` (away goals, then home goals).
    - `G`: append an entry at the end of the array (before `];`), same shape as the last ones:
