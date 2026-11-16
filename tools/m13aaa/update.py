@@ -131,11 +131,13 @@ def sheets(D,path):
     for sh in SH:
         if sh['id'] in done: print('skip, already in data.js:',sh['id']); continue
         if sh['id'] not in sched: raise SystemExit('game %s is not in SCHED'%sh['id'])
-        a,h=sh['a'],sh['h']; sa,ss=sh['s']; win=h if ss>sa else a; lose=a if win==h else h
+        a,h=sh['a'],sh['h']; sa,ss=sh['s']; tie=(sa==ss and not sh['so'])  # a tie (no shootout): 1 point each, no W/L/OTL
+        win=None if tie else (h if ss>sa else a); lose=None if tie else (a if win==h else h)
         for t,gf,ga in ((a,sa,ss),(h,ss,sa)):
             o=off[t]; o[0]+=1; o[6]+=gf; o[7]+=ga; o[8]+=gf-ga; o[12]+=sh['fp'][t]
             o[9]+=2*sum(1 for p in sh['pens'] if p[0]==t)
-            if t==win:
+            if tie: add=1
+            elif t==win:
                 o[1]+=1
                 if sh['so']: o[11]+=1; add=2
                 else: o[10]+=1; add=3
@@ -183,7 +185,8 @@ def sheets(D,path):
                     cum+=g[2]*60
                     if x<cum-1e-6: return g
                 return order[-1]
-            if sh['so']: dec=order[-1]
+            if tie: dec=None
+            elif sh['so']: dec=order[-1]
             else:
                 wgoals=[g for g in goals_out if g[0]==win]; k=(sa if win==h else ss)+1; dg=wgoals[k-1]; dec=in_net(sec(dg[1],dg[2]))
             for g in order:

@@ -127,4 +127,10 @@ SHEETS = [
   goals=[('ROC', 1, '0:25', 13, [9, 15]), ('ROC', 1, '8:40', 13, [16, 23]), ('ROC', 1, '8:59', 16, [23]), ('ROC', 2, '6:10', 20, [23]), ('LSI', 1, '4:29', 33, [21, 25]), ('LSI', 1, '14:27', 21, [29]), ('LSI', 3, '9:02', 27, [17])],
   pens=[('ROC', 1, '5:56', 7, 'A39'), ('ROC', 2, '6:44', 7, 'A56'), ('ROC', 3, '14:39', 22, 'A56'), ('LSI', 1, '7:58', 15, 'A47'), ('LSI', 3, '3:32', 25, 'A48'), ('LSI', 3, '12:26', 21, 'A48')],
   goalies=[('ROC', 29, 45.0, 3, True), ('ROC', 31, 0.0, 0, False), ('LSI', 39, 45.0, 4, True), ('LSI', 41, 0.0, 0, False)], pp={'ROC':1,'LSI':0}),
+ dict(id=1224, date='2026-11-15', a='CFR', h='HAR', s=(3,3), so=False, fp={'CFR':1,'HAR':1}, url="https://pdf.play.spordle.com/game/893331",
+  ros={'CFR': {3: 'PHILIPPE BOUTHILLIER', 5: 'NATHAN CAMIRE', 8: 'JADEN MOUSSETTE', 10: 'JACOB BÉDARD', 26: 'ZACHARY LAMBERT', 62: 'FELIX CARRIER', 67: 'EDOUARD MURAVSKY', 72: 'NATHAN BEAULIEU-LAPIERRE', 75: 'MALIK PITT-BEAUCHEMIN', 83: 'BENJAMIN RICHARD', 92: 'ROCK MANIK', 95: 'TIAGO BEVILACQUA', 96: 'LOGAN ROUSSEAU', 97: 'MASON CHARLAND'}, 'HAR': {3: 'ELIOT MORIN', 4: 'MAYSON GALIPEAU', 5: 'JACOB QUINTAL', 6: 'CHRISTOPHE COTE', 7: 'CÉDRIK TREMBLAY', 8: 'JACOB LUSSIER', 9: 'ANDREW LAPOINTE', 10: 'PETER FONTANEL', 11: 'LOUIS MACLURE', 12: 'MADDOX PARKER', 13: 'CLÉMENT BOUCHARD', 14: 'JULIEN TURCOTTE', 16: 'WILLIAM PEPIN', 17: 'LOGAN PARÉ', 18: 'BENJAMIN BOURQUE'}},
+  gl={'CFR': {40: 'GABRIEL POITRAS', 70: 'PHILIPPE CHARTRAND'}, 'HAR': {1: 'LILIANE BISSON', 30: 'LIAM POTHIER'}},
+  goals=[('CFR', 1, '2:01', 67, [72]), ('CFR', 3, '0:43', 97, [62, 75]), ('CFR', 3, '13:45', 67, [3]), ('HAR', 1, '0:22', 12, [18]), ('HAR', 3, '3:07', 9, [4]), ('HAR', 3, '3:33', 9, [6, 3])],
+  pens=[('CFR', 2, '1:26', 26, 'A53'), ('CFR', 3, '5:40', 92, 'A53'), ('HAR', 1, '13:47', 5, 'A53'), ('HAR', 2, '4:02', 4, 'A53')],
+  goalies=[('CFR', 40, 45.0, 3, True), ('CFR', 70, 0.0, 0, False), ('HAR', 1, 21.8, 1, True), ('HAR', 30, 23.2, 2, False)], pp={'CFR':0,'HAR':0}),
 ]

@@ -32,6 +32,7 @@ dict(id=1056, date="2026-11-08", a="ESP", h="NCO", s=(0,4), so=False, fp={"ESP":
   pp={"NCO":1})                                            # power-play goals per team as printed on the sheet (check only)
 ```
 - `a` = away team code, `h` = home team code, `s=(away goals, home goals)`. `so=True` when decided by overtime or shootout (the team that wins gets 2 pts, the loser 1). Period 4 = overtime.
+- A tie (equal goals, no shootout, `so=False`, `s` equal) is entered as printed: 1 point each (plus the sportsmanship point), no W, L or OTL, no goalie decision. The league accepted game 1224 (Nov 15, 3-3) as an exceptional tie. Standings from an official file replace these numbers.
 - `fp` = sportsmanship point per team (SP column, 0 or 1, included in PTS). Use what the sheet shows. If it does not show it, 1 unless the team took a misconduct or match penalty (like game 1347, PLA, code C61 → 0). Mention the guess in the log.
 - Team codes: EDH division CAN ASQ COR NCO EST ESP BLI ALB; HEX division HAR NOM DYN CAS GRE FAD CFR LBL; SRO division MEL ROC SEN LSI SDN SMI CBL PLA.
 - Names: the sheets print them in capitals without accents. Write them as printed; `update.py` swaps in the spelling already in the stats (accents, capitals) and prints `WARNING NAME ...` for any name it has not seen before: fix those by hand (proper accents and capitals) in the SHEETS entry and rerun from a clean `data.js`.

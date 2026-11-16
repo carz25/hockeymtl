@@ -32,3 +32,5 @@ Spordle sheets are behind a Cloudflare human check: WebFetch no longer works. Sw
 ## 2026-11-16 (owner, PDFs from his PC)
 Added 1171 GRE 2-4 CAS, 1172 LBL 1-7 NOM, 1267 MEL 4-1 SEN, 1268 PLA 4-2 CBL, 1323 COR 4-1 EST, 1329 ROC 4-3 LSI (all 2026-11-15). Fields and pictures agree; PP counts match; no warnings. New tool `pdf2sheet.py` drafts SHEETS from the PDF form fields.
 Held: 1224 CFR 3-3 HAR: three goals each, printed 3-3, shootout boxes empty (a tie). The site has no tie column, so not entered until the owner says how the league scores it. HAR had an affiliated player (Louis Maclure, #11).
+
+2026-11-16 (owner confirmed): added 1224 CFR 3-3 HAR as a tie (league accepts it as an exceptional case). Scored 1 point each plus the sportsmanship point, no W/L/OTL, no goalie decision; `update.py` now supports ties. New player HAR Louis Maclure (affiliated, #11).
