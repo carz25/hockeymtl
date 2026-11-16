@@ -2,7 +2,13 @@
 """Download Spordle game sheets (PDF) for a list of gamesheet IDs.
 
 Usage (Windows, Mac or Linux, Python 3.8+, nothing to install):
-    python get_sheets.py ids.txt
+    python get_sheets.py ids.txt      sheets listed in ids.txt
+    python get_sheets.py --auto       sheets the site is still missing (no list to keep)
+
+--auto reads the site's own data from GitHub (M11BB/data.js and
+tools/m11bb/games.csv), finds every game dated today or earlier that has no
+score on the site yet, and fetches those sheets. A sheet fetched too early
+(game not finished) is simply fetched again on the next run.
 
 ids.txt: one gamesheet ID per line, for example
     929122
@@ -29,6 +35,7 @@ With that on, you only act when the browser shows the human check.
 import os, sys, time, glob, shutil, webbrowser, urllib.request, urllib.error
 
 URL = "https://pdf.play.spordle.com/game/{id}?locale=fr"
+RAW = "https://raw.githubusercontent.com/carz25/hockeymtl/main/"
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "sheets")
 DOWNLOADS = os.path.join(os.path.expanduser("~"), "Downloads")
@@ -43,6 +50,28 @@ def read_ids(path):
             if not line.isdigit():
                 sys.exit("Not a gamesheet ID: %r" % line)
             ids.append(line)
+    return ids
+
+
+def auto_ids():
+    """Gamesheet IDs of games dated today or earlier with no score on the site."""
+    import csv, io, json, datetime
+    get = lambda path: urllib.request.urlopen(RAW + path, timeout=30).read().decode("utf-8-sig")
+    sheet = {int(r["game_number"].split("-")[1]): r["gamesheet_id"]
+             for r in csv.DictReader(io.StringIO(get("tools/m11bb/games.csv")))}
+    src = get("M11BB/data.js")
+    block = src[src.index("var SCHED = ["):]
+    block = block[:block.index("\n];")]
+    today = datetime.date.today().isoformat()
+    ids = []
+    for line in block.split("\n")[1:]:
+        line = line.strip().rstrip(",")
+        if not line:
+            continue
+        row = json.loads(line)
+        if len(row) == 6 and row[3] != "TBD" and row[1] <= today and row[0] in sheet:
+            print("  game %d (%s, %s at %s) has no score yet" % (row[0], row[1], row[4], row[5]))
+            ids.append(sheet[row[0]])
     return ids
 
 
@@ -94,11 +123,17 @@ def main():
     if len(sys.argv) != 2:
         sys.exit(__doc__)
     os.makedirs(OUT, exist_ok=True)
-    ids = read_ids(sys.argv[1])
+    auto = sys.argv[1] == "--auto"
+    ids = auto_ids() if auto else read_ids(sys.argv[1])
+    if not ids:
+        print("Nothing to fetch.")
+        return
     got, missing = [], []
     direct = True   # stop trying direct downloads after the first refusal
     for gid in ids:
         dest = os.path.join(OUT, gid + ".pdf")
+        if os.path.exists(dest) and auto:
+            os.remove(dest)   # still unscored on the site: the earlier copy was too early
         if os.path.exists(dest):
             print("  %s: already have it" % gid)
             got.append(gid)
