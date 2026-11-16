@@ -12,3 +12,7 @@
 - Power-play goals added: 2903 PHX Yang PP, PHX Dejean PP, ATT Campbell PP (matches sheet counters 2 en 3 / 1 en 3).
 - Note: 2901 sheet has odd times (CHE and TOR goals both at P3 02:25, TOR penalty at P1 00:00, penalties at the same times as goals) and PP counters 0 en 0 despite 4 penalties; no PP goals possible either way. Goals, scores and goalie minutes add up.
 - Not yet played: 2904, 2906, 2907 (2026-11-15).
+
+## 2026-11-16 (scheduled run)
+- Games added: none.
+- Skipped (sheet could not be fetched: WebFetch permission request for pdf.play.spordle.com not answered, PROVENANCE_REQUIRED): 2904 ROC at ETO (929122), 2906 PIO at BRA (929120), 2907 HUR at OIL (929121), all 2026-11-15. Will retry next run.
