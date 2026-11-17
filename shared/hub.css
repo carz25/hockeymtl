@@ -122,11 +122,11 @@ th.on{color:var(--ink)}
 .day{padding:18px 0 8px;display:flex;align-items:baseline;gap:12px}
 .day::after{content:"";flex:1;height:1px;background:var(--rule)}
 .games{display:flex;flex-direction:column;gap:8px}
-.g,.grow>summary{display:grid;grid-template-columns:84px minmax(0,1fr) minmax(0,260px);gap:8px 16px;align-items:center;padding:10px 16px;list-style:none}
+.g,.grow>summary,.grow>.grs{display:grid;grid-template-columns:84px minmax(0,1fr) minmax(0,260px);gap:8px 16px;align-items:center;padding:10px 16px;list-style:none}
 .grow>summary::-webkit-details-marker{display:none}
 .g,.grow{background:var(--card);border:1px solid var(--rule);border-radius:6px}
-.grow>summary{cursor:pointer;border-radius:6px}
-.grow>summary:hover{background:var(--soft)}
+.grow>summary,.grow>.grs{cursor:pointer;border-radius:6px}
+.grow>summary:hover,.grow>.grs:hover{background:var(--soft)}
 .gtime{display:flex;flex-direction:column;font-size:13px;color:var(--mute)}
 .gtime b{color:var(--ink);font-weight:600;font-size:14px}
 .gteams{display:flex;flex-direction:column;gap:5px;min-width:0}
@@ -246,7 +246,7 @@ footer p{margin:0;max-width:90ch}
 .m .tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .m #p-standings .tiles{display:none}
 .m .tile{padding:10px 12px}.m .tile .v{font-size:30px}
-.m .g,.m .grow>summary{grid-template-columns:64px minmax(0,1fr)}
+.m .g,.m .grow>summary,.m .grow>.grs{grid-template-columns:64px minmax(0,1fr)}
 .m .gl .sc{font-size:28px}
 .m .gmeta{grid-column:1/-1;flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px 16px}
 .m .gmeta>span:last-child{margin-left:auto;text-align:right}
@@ -474,7 +474,7 @@ th.adv,td.adv{background:color-mix(in srgb,var(--rule) 18%,transparent)}
 .m.multi .brand h1{white-space:normal;min-width:0}
 .m.multi .brand h1 span{display:block;margin:3px 0 0}
 /* schedule cards: time and game number on one row, level with "Win probability" */
-.m .g,.m .grow>summary{grid-template-columns:minmax(0,1fr) auto;align-items:center}
+.m .g,.m .grow>summary,.m .grow>.grs{grid-template-columns:minmax(0,1fr) auto;align-items:center}
 .m .gtime{flex-direction:row;align-items:baseline;gap:10px}
 .m .gteams{display:contents}
 .m .gteams .wph{grid-column:2;grid-row:1;align-self:center}
@@ -716,7 +716,7 @@ body:not(.m) #p-players .tools .advbtn{order:4}
 body:not(.m) .dgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-items:start}
 body:not(.m) .dgrid>.grow[open]{grid-column:1/-1}
 .m .dgrid{display:flex;flex-direction:column;gap:8px}
-body:not(.m) .dgrid .g,body:not(.m) .dgrid .grow>summary{grid-template-columns:76px minmax(0,1fr) minmax(0,190px)}
+body:not(.m) .dgrid .g,body:not(.m) .dgrid .grow>summary,body:not(.m) .dgrid .grow>.grs{grid-template-columns:76px minmax(0,1fr) minmax(0,190px)}
 .gbar{display:flex;gap:2px;height:5px;border-radius:3px;overflow:hidden;margin-top:3px}
 .gbar i{background:var(--side-a)}.gbar i.t{background:var(--rule)}.gbar i.h{background:var(--side-h)}
 .m .gbar{display:none}
@@ -897,3 +897,13 @@ button.rt2:focus-visible{outline:2px solid var(--side-a);outline-offset:2px}
 .gs-ev.nt .tm{display:none}
 .m .gs-gk{grid-template-columns:minmax(0,1fr);padding:12px 14px 14px;font-size:13px}
 @media (max-width:1100px){body:not(.m) .gs-two{grid-template-columns:minmax(0,1fr)}}
+
+/* game page (#game/<id>) */
+.grow>.grs{color:inherit;text-decoration:none}
+.grow>.grs:focus-visible{outline:2px solid var(--lgc,#2563EB);outline-offset:2px}
+.gpage{padding-top:4px}
+.gback{display:inline-flex;align-items:center;gap:6px;margin:0 0 14px;padding:8px 14px 8px 10px;border:1px solid var(--rule);border-radius:999px;background:var(--card);color:var(--ink);font-family:inherit;font-weight:600;font-size:14px;line-height:1.2;cursor:pointer}
+.gback:hover{background:var(--soft)}
+.gback:focus-visible{outline:2px solid var(--lgc,#2563EB);outline-offset:2px}
+.gpbody{background:var(--card);border:1px solid var(--rule);border-radius:8px;overflow:hidden}
+.m .gback{margin:0 0 10px;font-size:13px}
