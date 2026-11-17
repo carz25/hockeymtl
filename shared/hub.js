@@ -634,7 +634,7 @@
       return '<div class="gs-s3' + (i ? "" : " first") + '"><div>' + starSvg(i, 18) + badge(r.t) + "</div><b>" + esc(lastName(nm(r.t, r.k))) + "</b><span>" + starLine(r, true) + "</span></div>";
     }).join("") + "</div></div>" : "";
     /* scoring and penalty tables (desktop) */
-    var gTags = function (x) { return tag("GOAL", "g") + (x.kind === "pp" ? tag("PPG", "pp") : x.kind === "sh" ? tag("SHG", "pp") : "") + (x.gw ? tag("GWG", "gw") : ""); };
+    var gTags = function (x, desk) { return (desk ? "" : tag("GOAL", "g")) + (x.kind === "pp" ? tag("PPG", "pp") : x.kind === "sh" ? tag("SHG", "pp") : "") + (x.gw ? tag("GWG", "gw") : ""); };
     var scoreTxt = function (x) { var d = x.sa - x.sh; return d === 0 ? x.sa + "–" + x.sh : esc(SHORT[d > 0 ? a : h]) + " " + Math.max(x.sa, x.sh) + "–" + Math.min(x.sa, x.sh); };
     var asTxt = function (x) { return x.as.length ? x.as.map(function (k) { return esc(nm(x.t, k)); }).join(", ") : "unassisted"; };
     var byPer = function (list, row, empty, extra) {
@@ -645,7 +645,7 @@
       }).join("");
     };
     var scoring = '<div class="gs-sec"><h3>Scoring summary</h3><table class="gs-t"><thead><tr><th>' + (D.timed ? "Time" : "#") + "</th><th>Team</th><th>Goal (assists)</th><th>Type</th><th class=\"r\">Score</th></tr></thead><tbody>" +
-      (so ? "" : "") + byPer(D.goals, function (x, i) { return "<tr><td>" + (D.timed ? x.time : D.goals.indexOf(x) + 1) + "</td><td>" + badge(x.t) + "</td><td><b>" + esc(nm(x.t, x.k) || "Unknown") + "</b> <small>(" + asTxt(x) + ")</small></td><td class=\"gs-tags\">" + gTags(x) + '</td><td class="r b">' + scoreTxt(x) + "</td></tr>"; }, "No scoring.") + (so ? '<tr class="gs-ph"><th colspan="5" scope="rowgroup">Shootout</th></tr><tr><td></td><td>' + badge(D.win) + '</td><td colspan="2"><b>' + esc(SHORT[D.win]) + '</b> wins the shootout</td><td class="r b">' + esc(SHORT[D.win]) + " " + Math.max(g.sa, g.sh) + "–" + Math.min(g.sa, g.sh) + "</td></tr>" : "") + "</tbody></table></div>";
+      (so ? "" : "") + byPer(D.goals, function (x, i) { return "<tr><td>" + (D.timed ? x.time : D.goals.indexOf(x) + 1) + "</td><td>" + badge(x.t) + "</td><td><b>" + esc(nm(x.t, x.k) || "Unknown") + "</b> <small>(" + asTxt(x) + ")</small></td><td class=\"gs-tags\">" + gTags(x, 1) + '</td><td class="r b">' + scoreTxt(x) + "</td></tr>"; }, "No scoring.") + (so ? '<tr class="gs-ph"><th colspan="5" scope="rowgroup">Shootout</th></tr><tr><td></td><td>' + badge(D.win) + '</td><td colspan="2"><b>' + esc(SHORT[D.win]) + '</b> wins the shootout</td><td class="r b">' + esc(SHORT[D.win]) + " " + Math.max(g.sa, g.sh) + "–" + Math.min(g.sa, g.sh) + "</td></tr>" : "") + "</tbody></table></div>";
     var penalties = '<div class="gs-sec"><h3>Penalty summary</h3><table class="gs-t"><thead><tr><th>' + (D.timed ? "Time" : "#") + "</th><th>Team</th><th>Player</th>" + (D.timed ? "<th>Infraction</th>" : "") + '<th class="r">Min</th></tr></thead><tbody>' +
       byPer(D.pens, function (x) { return "<tr><td>" + (D.timed ? x.time : D.pens.indexOf(x) + 1) + "</td><td>" + badge(x.t) + "</td><td><b>" + (x.k ? esc(nm(x.t, x.k)) : "Bench") + "</b></td>" + (D.timed ? "<td>" + esc(x.what) + (x.mins !== 2 && x.lbl ? " <small>(" + x.lbl + ")</small>" : "") + "</td>" : "") + '<td class="r">' + x.mins + "</td></tr>"; }, "No penalties.",
         function (p) { return esc(SHORT[a]) + " " + pimOf(a, p) + " · " + esc(SHORT[h]) + " " + pimOf(h, p); }) + "</tbody></table></div>";
