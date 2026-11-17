@@ -75,3 +75,7 @@ No code changes are needed: the template was tested with every combination of `r
 
 - After a change, GitHub Pages can take a few minutes to update, and browsers may keep the old `hub.css`/`hub.js` for a short while. A hard refresh shows the new version right away.
 - A few page sections still have two versions in `hub.js`, because the two leagues currently show different things. Those are standings and the home-page standings snapshot (one table vs divisions), and the players and team pages (sheet stats vs official stats). They're the functions ending in `C` (the M11 BB style) next to the ones without it (the M13 AAA style). If you want both leagues to look the same there, that's a change in one place.
+
+## Changing the shared code
+
+Each league page loads `hub.js` and `hub.css` as `?v=C`, where `C` is set near the top of every league's `index.html` (`var C = "20261117b"`). Browsers keep their copy until `C` changes, so after any change to `shared/hub.js` or `shared/hub.css`, give `C` a new value in **every** league's `index.html` (the same value everywhere). `data.js` needs nothing: its `?v=` changes every 5 minutes on its own.
