@@ -995,3 +995,5 @@ a.plink:focus-visible{outline:2px solid var(--lgc,#2563EB);outline-offset:2px;bo
 .pshare{display:inline-flex;align-items:center;padding:6px 14px;border-radius:999px;border:1px solid var(--rule);background:var(--card);color:var(--ink);font-family:inherit;font-weight:600;font-size:13px;cursor:pointer}
 .pshare:hover{background:var(--soft)}
 .pshare:focus-visible{outline:2px solid var(--lgc,#2563EB);outline-offset:2px}
+.jt .jn{width:40px;min-width:40px;max-width:40px;text-align:center;color:var(--mute);font-variant-numeric:tabular-nums;padding-left:6px;padding-right:6px}
+.jt .stick.s2{left:40px}

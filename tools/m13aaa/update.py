@@ -142,20 +142,22 @@ def sheets(D,path):
         if sh['id'] in done: print('skip, already in data.js:',sh['id']); continue
         if sh['id'] not in sched: raise SystemExit('game %s is not in SCHED'%sh['id'])
         a,h=sh['a'],sh['h']; sa,ss=sh['s']; tie=(sa==ss and not sh['so'])  # a tie (no shootout): 1 point each, no W/L/OTL
+        full=sh['date']>D['AS_OF'] or len(sched[sh['id']])==6
         win=None if tie else (h if ss>sa else a); lose=None if tie else (a if win==h else h)
-        for t,gf,ga in ((a,sa,ss),(h,ss,sa)):
-            o=off[t]; o[0]+=1; o[6]+=gf; o[7]+=ga; o[8]+=gf-ga; o[12]+=sh['fp'][t]
-            o[9]+=2*sum(1 for p in sh['pens'] if p[0]==t)
-            if tie: add=1
-            elif t==win:
-                o[1]+=1
-                if sh['so']: o[11]+=1; add=2
-                else: o[10]+=1; add=3
-            else:
-                if sh['so']: o[3]+=1; add=1
-                else: o[2]+=1; add=0
-            if not o[13]: o[4]+=add+sh['fp'][t]
-            o[5]="–" if o[13] else ("%.3f"%(o[4]/(4*o[0]))).lstrip('0')
+        if full:  # games before AS_OF are already in the official standings and stats: add the details only
+            for t,gf,ga in ((a,sa,ss),(h,ss,sa)):
+                o=off[t]; o[0]+=1; o[6]+=gf; o[7]+=ga; o[8]+=gf-ga; o[12]+=sh['fp'][t]
+                o[9]+=2*sum(1 for p in sh['pens'] if p[0]==t)
+                if tie: add=1
+                elif t==win:
+                    o[1]+=1
+                    if sh['so']: o[11]+=1; add=2
+                    else: o[10]+=1; add=3
+                else:
+                    if sh['so']: o[3]+=1; add=1
+                    else: o[2]+=1; add=0
+                if not o[13]: o[4]+=add+sh['fp'][t]
+                o[5]="–" if o[13] else ("%.3f"%(o[4]/(4*o[0]))).lstrip('0')
         pens=[[p[0],sec(p[1],p[2]),sec(p[1],p[2])+120] for p in sh['pens']]
         def active(t,x): return sum(1 for pt,s0,e0 in pens if pt==t and s0<=x<e0)
         ppc={a:0,h:0}; goals_out=[]; nth={a:0,h:0}
@@ -170,47 +172,49 @@ def sheets(D,path):
             goals_out.append((t,per,tm,sc,ast,kind,isgw))
         for t,v in sh['pp'].items():
             if ppc[t]!=v: warn.append('PP CHECK game %s %s derived %s, sheet %s'%(sh['id'],t,ppc[t],v))
-        for t in (a,h):
-            for num,name in sh['ros'][t].items(): player(t,name)[2]+=1
         def pname(t,num): return sh['ros'][t][num] if num in sh['ros'][t] else sh['gl'][t].get(num)
-        for (t,per,tm,sc,ast,kind,isgw) in goals_out:
-            if sc is not None:
-                p=player(t,pname(t,sc)); p[3]+=1
-                if kind=='sh': p[8]+=1
-                if kind=='pp': p[6]+=1
-                if isgw: p[10]+=1
-            for n in ast:
-                p=player(t,pname(t,n)); p[4]+=1
-                if kind=='pp': p[7]+=1
-                if kind=='sh': p[9]+=1
-        for (t,per,tm,pl,code) in sh['pens']:
-            if pl is not None and pname(t,pl):
-                nmx=pname(t,pl)
-                if (t,nn(nmx)) in pidx or nmx in sh['ros'][t].values(): player(t,nmx)[5]+=2
-        for t in (a,h):
-            order=sorted([g for g in sh['goalies'] if g[0]==t and g[2]>0],key=lambda g:not g[4]); win_t=(t==win)
-            def in_net(x):
-                cum=0
+        if full:
+            for t in (a,h):
+                for num,name in sh['ros'][t].items(): player(t,name)[2]+=1
+            for (t,per,tm,sc,ast,kind,isgw) in goals_out:
+                if sc is not None:
+                    p=player(t,pname(t,sc)); p[3]+=1
+                    if kind=='sh': p[8]+=1
+                    if kind=='pp': p[6]+=1
+                    if isgw: p[10]+=1
+                for n in ast:
+                    p=player(t,pname(t,n)); p[4]+=1
+                    if kind=='pp': p[7]+=1
+                    if kind=='sh': p[9]+=1
+            for (t,per,tm,pl,code) in sh['pens']:
+                if pl is not None and pname(t,pl):
+                    nmx=pname(t,pl)
+                    if (t,nn(nmx)) in pidx or nmx in sh['ros'][t].values(): player(t,nmx)[5]+=2
+            for t in (a,h):
+                order=sorted([g for g in sh['goalies'] if g[0]==t and g[2]>0],key=lambda g:not g[4]); win_t=(t==win)
+                def in_net(x):
+                    cum=0
+                    for g in order:
+                        cum+=g[2]*60
+                        if x<cum-1e-6: return g
+                    return order[-1]
+                if tie: dec=None
+                elif sh['so']: dec=order[-1]
+                else:
+                    wgoals=[g for g in goals_out if g[0]==win]; k=(sa if win==h else ss)+1; dg=wgoals[k-1]; dec=in_net(sec(dg[1],dg[2]))
                 for g in order:
-                    cum+=g[2]*60
-                    if x<cum-1e-6: return g
-                return order[-1]
-            if tie: dec=None
-            elif sh['so']: dec=order[-1]
-            else:
-                wgoals=[g for g in goals_out if g[0]==win]; k=(sa if win==h else ss)+1; dg=wgoals[k-1]; dec=in_net(sec(dg[1],dg[2]))
-            for g in order:
-                r=goalie_row(t,sh['gl'][t][g[1]])
-                r[2]+=1; r[9]+=1 if g[4] else 0; r[8]=round(r[8]+g[2],2); r[7]+=g[3]
-                if g is dec:
-                    if win_t: r[3]+=1
-                    elif sh['so']: r[5]+=1
-                    else: r[4]+=1
-                if len(order)==1 and g[3]==0 and g[2]>=45: r[6]+=1
+                    r=goalie_row(t,sh['gl'][t][g[1]])
+                    r[2]+=1; r[9]+=1 if g[4] else 0; r[8]=round(r[8]+g[2],2); r[7]+=g[3]
+                    if g is dec:
+                        if win_t: r[3]+=1
+                        elif sh['so']: r[5]+=1
+                        else: r[4]+=1
+                    if len(order)==1 and g[3]==0 and g[2]>=45: r[6]+=1
         # schedule score, page records
         s=sched[sh['id']]
         if len(s)==6: s+=[sa,ss]
-        else: s[6],s[7]=sa,ss
+        elif full: s[6],s[7]=sa,ss
+        elif (s[6],s[7])!=(sa,ss): warn.append('SCORE game %s: site has %s-%s, sheet %s-%s (details added, score left as is)'%(sh['id'],s[6],s[7],sa,ss))
         for t in (a,h):
             for n in list(sh['ros'][t].values())+list(sh['gl'][t].values()): R.setdefault(t,{})[nn_key(n)]=n
         pn=lambda t,n: sh['ros'][t].get(n) or sh['gl'][t].get(n)
@@ -226,14 +230,18 @@ def sheets(D,path):
         D['DATA_THROUGH']=max(D['DATA_THROUGH'],sh['date'])
     divsort(D); return added,warn
 
-def numbers_from(D,SH):
-    """jersey numbers: each player's number on his most recent sheet"""
+def numbers_from(D,SH,rebuild=False):
+    """jersey numbers: each player's number on his most recent sheet. A past game (before AS_OF) added later only fills in missing numbers."""
+    known={(p[0],nn(p[1])):p[1] for p in D['PSTATS']+D['GSTATS']}  # same spelling as the stats, which the site uses
     for sh in sorted(SH,key=lambda x:x['date']):
+        newer=rebuild or sh['date']>D['AS_OF']
         for key in ('ros','gl'):
             for t,m in sh[key].items():
-                for num,name in m.items(): D['NUM'].setdefault(t,{})[name]=int(num)
+                for num,name in m.items():
+                    name=known.get((t,ALIAS.get((t,nn(name)),nn(name))),name)
+                    if newer or name not in D['NUM'].get(t,{}): D['NUM'].setdefault(t,{})[name]=int(num)
 def numbers(D,path):
-    ns={}; exec(open(path,encoding='utf-8').read(),ns); numbers_from(D,ns['SHEETS'])
+    ns={}; exec(open(path,encoding='utf-8').read(),ns); D['NUM']={}; numbers_from(D,ns['SHEETS'],rebuild=True)
     print('numbers for',sum(len(v) for v in D['NUM'].values()),'players')
 def goal_kinds(sh):
     """(team, period, time, kind) for each goal in time order: kind pp / sh / ev from the penalties running at that moment."""
