@@ -21,6 +21,7 @@
   var PSTATS = window.PSTATS || [], GSTATS = window.GSTATS || [], AS_OF = window.AS_OF, DATA_THROUGH = window.DATA_THROUGH;
   var GLEN = window.GLEN || L.gameMinutes || 60;
   var PPX = window.PPX || [], TIMED = window.TIMED || [];
+  var NUM = window.NUM || {};             // optional jersey numbers: NUM[team][name] = number
 
   /* Hockey MTL shield logo (same on every league site). Clicking it goes to the hockeymtl.ca home page. */
   var LOGO = window.HMTL_LOGO || "";
@@ -1479,9 +1480,10 @@ function makeModel(played, sheets, teams, opt) {
     var isG = !!gr && (!r || gr.gp >= (r.gp || 0) || log.every(function (x) { return x.goalie; }));
     var s = ST[t], col = BADGE[t] || "var(--lgc)", season = seasonLbl();
     var share = '<button class="pshare" data-share="1">Share</button>';
-    var hero = '<div class="phero" style="--tc:' + col + '"><div class="in2">' + backBtn("Back to Players") +
-      '<div class="phm"><div class="phb">' + badge(t, 1) + '</div><div class="phw"><div class="pcr">' + esc(L.title || "") + " · " + (isG ? "Goalie" : "Skater") + " · " + season + '</div><h1 class="pnm">' + esc(name) + '</h1><div class="pteam"><span data-tp="' + t + '" class="ptl">' + esc(TEAMS[t]) + "</span>" +
-      (s ? '<span class="sub">' + ord(s.rank) + " in the " + (MULTI ? esc(divOf(t).name) : GROUP) + ' · <span class="nw">' + rec(s) + "</span></span>" : "") + "</div></div>" + share + "</div></div></div>";
+    var num = NUM[t] && NUM[t][name] != null ? NUM[t][name] : null;
+    var hero = '<div class="ptop">' + backBtn("Back to Players") + share + "</div>" + '<div class="phero" style="--tc:' + col + '">' + (num != null ? '<span class="pbig" aria-hidden="true">' + num + "</span>" : "") + '<div class="in2">' +
+      '<div class="phm"><div class="phb">' + badge(t, 1) + '</div><div class="phw"><div class="pcr">' + (num != null ? "#" + num + " · " : "") + (isG ? "Goalie" : "Skater") + " · " + esc(L.title || "") + " · " + season + '</div><h1 class="pnm">' + esc(name) + '</h1><div class="pteam"><span data-tp="' + t + '" class="ptl">' + esc(TEAMS[t]) + "</span>" +
+      (s ? '<span class="sub">' + ord(s.rank) + " in the " + (MULTI ? esc(divOf(t).name) : GROUP) + ' · <span class="nw">' + rec(s) + "</span></span>" : "") + "</div></div>" + "</div></div></div>";
     var tiles, chart, hls = [], logT, split;
     var nlog = log.length, note = OFFICIAL ? "Season totals are official league stats. The chart, game log and splits use the " + nlog + " game sheet" + (nlog === 1 ? "" : "s") + " we have for " + esc(lastName(name)) + "." : "Counted from game sheets.";
     if (!isG) {

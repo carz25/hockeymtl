@@ -5,6 +5,8 @@
   python3 -I update.py schedule games.csv         apply schedule changes from the league CSV
   python3 -I update.py sheets new_sheets.py       add played game sheets (python file defining SHEETS = [dict(...)])
   python3 -I update.py standings OFFICIAL.json    replace OFF with official standings ({"CAN":[14,10,4,...],...})
+  python3 -I update.py times sheets_log.py        re-add goal/penalty times (gt/pt) to games already entered
+  python3 -I update.py numbers sheets_log.py      re-add jersey numbers (NUM) from every sheet entered
 
 Only M13AAA/data.js is ever written. See README.md for the SHEETS format."""
 import sys,re,json,csv,os,copy,unicodedata,difflib
@@ -28,6 +30,10 @@ def load():
     i,l=one('DATA_THROUGH'); D['DATA_THROUGH']=re.search(r'"(.*?)"',l).group(1)
     for n in ('DIVS','PSTATS','GSTATS','R'):
         i,l=one(n); D[n]=json.loads(l[len('var %s = '%n):].rstrip(';'))
+    # jersey numbers {team: {name: number}}; optional, added before R the first time
+    D['NUM']={}
+    for l in L:
+        if l.startswith('var NUM = '): D['NUM']=json.loads(l[len('var NUM = '):].rstrip(';'))
     i,_=one('OFF'); D['OFF']={}
     j=i+1
     while L[j]!='};':
@@ -53,7 +59,10 @@ def render(D):
         elif l.startswith('var DIVS = '): out.append('var DIVS = '+jb(D['DIVS'])+';')
         elif l.startswith('var PSTATS = '): out.append('var PSTATS = '+jb(D['PSTATS'])+';')
         elif l.startswith('var GSTATS = '): out.append('var GSTATS = '+jb(D['GSTATS'])+';')
-        elif l.startswith('var R = '): out.append('var R = '+jb(D['R'])+';')
+        elif l.startswith('var NUM = '): pass
+        elif l.startswith('var R = '):
+            if D.get('NUM'): out.append('var NUM = '+jb(D['NUM'])+';')
+            out.append('var R = '+jb(D['R'])+';')
         elif l.startswith('var OFF = '):
             j=block_end(i,'};'); out.append(l); out+=[(',\n'.join('  %s: %s'%(c,jb(v)) for c,v in D['OFF'].items()))]; out.append('};'); i=j
         elif l.startswith('var SCHED = '):
@@ -128,6 +137,7 @@ def sheets(D,path):
                 for num in m: m[num]=canon(t,m[num])
     for sh in SH:
         if sh['id'] not in done: fixnames(sh)
+    numbers_from(D,[sh for sh in SH if sh['id'] not in done])
     for sh in SH:
         if sh['id'] in done: print('skip, already in data.js:',sh['id']); continue
         if sh['id'] not in sched: raise SystemExit('game %s is not in SCHED'%sh['id'])
@@ -216,6 +226,15 @@ def sheets(D,path):
         D['DATA_THROUGH']=max(D['DATA_THROUGH'],sh['date'])
     divsort(D); return added,warn
 
+def numbers_from(D,SH):
+    """jersey numbers: each player's number on his most recent sheet"""
+    for sh in sorted(SH,key=lambda x:x['date']):
+        for key in ('ros','gl'):
+            for t,m in sh[key].items():
+                for num,name in m.items(): D['NUM'].setdefault(t,{})[name]=int(num)
+def numbers(D,path):
+    ns={}; exec(open(path,encoding='utf-8').read(),ns); numbers_from(D,ns['SHEETS'])
+    print('numbers for',sum(len(v) for v in D['NUM'].values()),'players')
 def goal_kinds(sh):
     """(team, period, time, kind) for each goal in time order: kind pp / sh / ev from the penalties running at that moment."""
     a,h=sh['a'],sh['h']
@@ -258,6 +277,8 @@ def main():
         for w in warn: print('WARNING',w)
     elif cmd=='times':
         print('games with times:',times(D,sys.argv[2]))
+    elif cmd=='numbers':
+        numbers(D,sys.argv[2])
     elif cmd=='standings':
         D['OFF']=json.load(open(sys.argv[2])); divsort(D)
     else: raise SystemExit(__doc__)
