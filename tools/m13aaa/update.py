@@ -209,9 +209,43 @@ def sheets(D,path):
             "p":[[t,nn_key(pn(t,pl))] for (t,per,tm,pl,code) in sh['pens'] if pl is not None and pn(t,pl)],
             "k":[[t,nn_key(sh['gl'][t][n]),mn,ga] for (t,n,mn,ga,st) in sh['goalies']]}
         if sh['so']: gp["so"]=1
+        # period, time and situation of each goal (same order as "g"), and every penalty with its period, time and code
+        gp["gt"]=[[per,tm,kind] for (t,per,tm,sc,ast,kind,isgw) in sorted(goals_out,key=lambda g:(g[1],int(g[2].split(':')[0])*60+int(g[2].split(':')[1])))]
+        gp["pt"]=[[t,(nn_key(pn(t,pl)) if pl is not None and pn(t,pl) else ""),per,tm,code] for (t,per,tm,pl,code) in sorted(sh['pens'],key=lambda q:sec(q[1],q[2]))]
         D['G'].append(gp); done.add(sh['id']); added.append(sh['id'])
         D['DATA_THROUGH']=max(D['DATA_THROUGH'],sh['date'])
     divsort(D); return added,warn
+
+def goal_kinds(sh):
+    """(team, period, time, kind) for each goal in time order: kind pp / sh / ev from the penalties running at that moment."""
+    a,h=sh['a'],sh['h']
+    pens=[[p[0],sec(p[1],p[2]),sec(p[1],p[2])+120] for p in sh['pens']]
+    def active(t,x): return sum(1 for pt,s0,e0 in pens if pt==t and s0<=x<e0)
+    out=[]
+    for (t,per,tm,sc,ast) in sorted(sh['goals'],key=lambda g:sec(g[1],g[2])):
+        o_=h if t==a else a; x=sec(per,tm); ia,io=active(t,x),active(o_,x)
+        kind='pp' if io>ia else ('sh' if ia>io else 'ev')
+        if kind=='pp':
+            live=[q for q in pens if q[0]==o_ and q[1]<=x<q[2]]
+            if live: min(live,key=lambda q:q[1])[2]=x
+        out.append((t,per,tm,kind))
+    return out
+
+def times(D,path):
+    """Add goal and penalty times ("gt", "pt") to games already in G, from the sheets record."""
+    ns={}; exec(open(path,encoding='utf-8').read(),ns); byid={g['id']:g for g in D['G']}; n=0
+    for sh in ns['SHEETS']:
+        g=byid.get(sh['id'])
+        if not g: continue
+        ks=sorted(goal_kinds(sh),key=lambda q:(q[1],int(q[2].split(':')[0])*60+int(q[2].split(':')[1])))
+        if len(ks)!=len(g['g']) or any(k[0]!=x[0] for k,x in zip(ks,g['g'])): print('SKIP',sh['id'],'goals do not line up'); continue
+        g['gt']=[[k[1],k[2],k[3]] for k in ks]
+        named=iter(g['p']); pt=[]
+        for (t,per,tm,pl,code) in sh['pens']:
+            has=pl is not None and (pl in sh['ros'][t] or pl in sh['gl'][t])
+            pt.append([t,next(named)[1] if has else "",per,tm,code])
+        g['pt']=sorted(pt,key=lambda q:sec(q[2],q[3])); n+=1
+    return n
 
 def main():
     cmd=sys.argv[1]; D=load()
@@ -222,6 +256,8 @@ def main():
     elif cmd=='sheets':
         added,warn=sheets(D,sys.argv[2]); print('added games:',added)
         for w in warn: print('WARNING',w)
+    elif cmd=='times':
+        print('games with times:',times(D,sys.argv[2]))
     elif cmd=='standings':
         D['OFF']=json.load(open(sys.argv[2])); divsort(D)
     else: raise SystemExit(__doc__)
