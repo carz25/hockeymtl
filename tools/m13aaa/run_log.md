@@ -34,3 +34,10 @@ Added 1171 GRE 2-4 CAS, 1172 LBL 1-7 NOM, 1267 MEL 4-1 SEN, 1268 PLA 4-2 CBL, 13
 Held: 1224 CFR 3-3 HAR: three goals each, printed 3-3, shootout boxes empty (a tie). The site has no tie column, so not entered until the owner says how the league scores it. HAR had an affiliated player (Louis Maclure, #11).
 
 2026-11-16 (owner confirmed): added 1224 CFR 3-3 HAR as a tie (league accepts it as an exceptional case). Scored 1 point each plus the sportsmanship point, no W/L/OTL, no goalie decision; `update.py` now supports ties. New player HAR Louis Maclure (affiliated, #11).
+
+## 2026-11-17 (owner request): game details for 45 past Sports Rousseau games
+Sheet ids came from the owner's Spordle schedule HAR (45 distinct games, no duplicates, every score equal to SCHED); PDFs downloaded by `get_sheets.py ids.txt`. Games dated before the official stats cut-off add details only (standings and stats untouched).
+Games: 1023 1114 1117 1134 1159 1233-1243 1246 1247 1249-1252 1254-1257 1259-1262 1301 1302 1305-1309 1322 1328 1331 1336 1340 1343 1364 1368.
+Shootouts (so=True, goals equal, printed winner = loser+1): 1023 1117 1134 1236 1239 1243 1343 1368 (1368: the "SO" goal #27 dropped).
+Goalie GA below goals scored (pulled goalie), accepted: 1233 1241 1242 1249 1262 1368; goalie minutes under 45 in 1322.
+PP CHECK warnings (no effect on the stored details; penalty/PP counts on these sheets may be off by one): 1134 PLA, 1233 MEL, 1257 SDN, 1255 MEL, 1251 ROC and SMI, 1261 SMI, 1302 SDN and MEL, 1368 SMI. Affiliated players on several sheets. Spot-checked 1023 and 1368 against the sheet picture; the rest are from the form fields only.
