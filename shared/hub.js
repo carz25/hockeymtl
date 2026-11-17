@@ -563,8 +563,11 @@
     var ppx = PPX.filter(function (x) { return x[0] === g.id; }).map(function (x) { return x.slice(); });
     var run = {}; run[a] = 0; run[h] = 0;
     var nth = {}; nth[a] = 0; nth[h] = 0;
-    var goals = sh.g.map(function (x, i) {
-      var t = x[0], tm = sh.gt && sh.gt[i], kind = tm ? tm[2] : "";
+    /* goals in time order when the sheet gives times (g itself is in sheet order: visitors' goals, then home) */
+    var gi = sh.g.map(function (x, i) { return i; });
+    if (sh.gt) gi.sort(function (i, j) { var p = sh.gt[i], q = sh.gt[j]; return (p[0] - q[0]) || (toSec(p[1]) - toSec(q[1])) || (i - j); });
+    var goals = gi.map(function (i) {
+      var x = sh.g[i], t = x[0], tm = sh.gt && sh.gt[i], kind = tm ? tm[2] : "";
       if (!tm) { var j = -1; ppx.some(function (q, k) { if (q[1] === t && q[2] === x[1]) { j = k; return true; } return false; }); if (j >= 0) { kind = ppx[j][3] === "PP" ? "pp" : "sh"; ppx.splice(j, 1); } }
       run[t]++; nth[t]++;
       var gw = !!win && !sh.so && t === win && nth[t] === (win === a ? g.sh : g.sa) + 1;
