@@ -22,26 +22,23 @@
 <meta name="CCBot" content="noindex">
 <meta name="ClaudeBot" content="noindex">
 <meta name="copyright" content="U11 BB League Hub">
-<script async src="https://www.googletagmanager.com/gtm.js?id=GTM-THDCDJCZ"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <!-- Design and code shared by every league: ../shared/ -->
-<!-- v changes every minute, so browsers always get the latest scores and code -->
-<script>var V = Math.floor(Date.now() / 60000); document.write('<link rel="stylesheet" href="../shared/hub.css?v=' + V + '">');</script>
+<!-- C = version of the shared code: bump it whenever shared/hub.js or shared/hub.css change, so browsers fetch the new copy.
+     D = data version: changes every 5 minutes, so scores are never more than 5 minutes old but repeat visits use the cached copy.
+     Both scripts are preloaded here so they download together. -->
+<script>var C = "20261117b", D = Math.floor(Date.now() / 300000);
+document.write('<link rel="stylesheet" href="../shared/hub.css?v=' + C + '"><link rel="preload" as="script" href="data.js?v=' + D + '"><link rel="preload" as="script" href="../shared/hub.js?v=' + C + '">');</script>
 <link rel="stylesheet" href="logos.css">
 </head>
 <body>
 <!-- This league's files: league.js (settings), data.js (games, standings, rosters) -->
 <script src="league.js"></script>
-<script>document.write('<script src="data.js?v=' + V + '"><\/script>');</script>
+<script>document.write('<script src="data.js?v=' + D + '"><\/script>');</script>
 <script src="../shared/logo.js"></script>
 <script src="../shared/leagues.js"></script>
-<script>document.write('<script src="../shared/hub.js?v=' + V + '"><\/script>');</script>
+<script>document.write('<script src="../shared/hub.js?v=' + C + '"><\/script>');</script>
 </body>
 </html>
