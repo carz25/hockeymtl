@@ -16,10 +16,15 @@ Files here:
 3. `python3 -I tools/m13aaa/pdf2sheet.py <folder of staged PDFs> > /tmp/draft.py` turns the PDF form fields into a draft `SHEETS` list (NOTE lines on stderr point at anything odd: tie or shootout, printed score differing from the goals, affiliated players). Check every game against the picture, fix, then write `/tmp/new_sheets.py` with `SHEETS = [dict(...), ...]` (format below). Check each against the sheet: score = number of goals, penalties, goalie minutes add to the game length.
 4. `python3 -I tools/m13aaa/update.py sheets /tmp/new_sheets.py`. Read every WARNING. `NEW PLAYER x (close to an existing player: y)` is almost always a spelling difference between the sheet and the league's stats: add `(team, normalized sheet name): normalized stats name` to `ALIAS` in `update.py` and redo it from a clean `data.js` (`git checkout M13AAA/data.js`). `PP CHECK` means the power-play goals derived from penalty times differ from what the sheet says: recheck the transcription.
    `update.py sheets` also stores each goal's and penalty's period, time, situation and code in the game's `G` entry (`gt`, `pt`), which the game summary on the site uses. `update.py times tools/m13aaa/sheets_log.py` re-adds them to games already entered.
+   It also keeps each player's jersey number (`NUM`, from `ros` and `gl`; the latest sheet wins), shown on the player profiles. `update.py numbers tools/m13aaa/sheets_log.py` rebuilds them from every sheet entered.
 5. Append the new dicts to `sheets_log.py` (keep it valid Python: `SHEETS = [` … `]`).
 6. If the league's schedule CSV is newer, replace `games.csv` and run `update.py schedule tools/m13aaa/games.csv`.
 7. `update.py check` → `OK`; `git diff --stat` must show `M13AAA/data.js`, `tools/m13aaa/sheets_log.py` (and `games.csv`, `run_log.md`) only. Commit to `main` and push (`git pull --rebase` first).
 8. If the user sends an official standings file, it wins over the sheet-derived standings: `update.py standings OFFICIAL.json` where the json is `{"CAN":[GP,W,L,OTL,PTS,"PTS%",GF,GA,DIFF,PIM,RW,OTSOW,SP,false],...}` for all 24 teams. Do not apply it unless the user supplied it.
+
+## Past games (game sheets for games already on the site)
+
+Games before `AS_OF` are already counted in the official standings and player stats. Entering their sheets (same steps 2 to 5, same `update.py sheets`) adds only the details: the game summary (`G` entry with goals, penalties, times), jersey numbers for players who have none yet, and the player game logs. Standings, `PSTATS`, `GSTATS` and the schedule score are not touched; a sheet whose score differs from the site prints `WARNING SCORE` (check it, the site's score stays). Priority set by the owner: Montréal Élite (`MEL`) first, then the other Sports Rousseau teams (`SRO` division); other divisions only if time allows. Their gamesheet ids need a league schedule export that covers past games (`games.csv` starts Nov 14).
 
 ## SHEETS format (see `sheets_log.py` for real examples)
 

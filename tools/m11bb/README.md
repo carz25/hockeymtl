@@ -39,6 +39,7 @@ python3 -I tools/m11bb/sync.py verify     # must print OK before publishing
      `d` is the dressed list: use the team's standard list (`ROCD`, `BRAD`, ...) when the sheet's skaters match it, otherwise a string of keys in the sheet's order. A second goalie who played gets his own `k` row with his minutes.
    - Player keys are the keys of `R[team]` (usually the last name; see `R` for doubles like `LDupuis`, `JecA`). A skater not in `R` yet: add `Key: "First Last"` to that team in `R`, with proper accents and capitals. An affiliated (call-up) player gets ` †` after the name.
    - `TIMED`: add the game id.
+   - `NUM`: jersey numbers, `NUM[team]["First Last"] = number` with the name exactly as in `R` (`†` included). Add any player on the sheet's roster who has no number yet, goalies too, and update a number that changed. The player profile page shows it.
    - `PPX`: add power-play and short-handed goals, worked out from the goal and penalty times: a minor is 2:00, ends early when the other team scores, carries into the next period. `[2899, "ROC", "Henry", "PP", "Caspar"]`. Compare with the sheet's PP counters (`PPVis/PPLoc: A.N: x en y`, x = power-play goals); if they disagree, go with the sheet's count.
 4. `sync.py standings`, then `sync.py verify` must print OK. Any PROBLEM: fix it, or undo that game (`git checkout M11BB/data.js` and redo the others).
 5. Commit to `main` and push (`git pull --rebase origin main` first). Message: `M11BB: game results through YYYY-MM-DD`.
