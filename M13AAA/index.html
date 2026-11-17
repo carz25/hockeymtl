@@ -32,15 +32,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <!-- Design and code shared by every league: ../shared/ -->
-<link rel="stylesheet" href="../shared/hub.css">
+<!-- v changes every minute, so browsers always get the latest scores and code -->
+<script>var V = Math.floor(Date.now() / 60000); document.write('<link rel="stylesheet" href="../shared/hub.css?v=' + V + '">');</script>
 <link rel="stylesheet" href="logos.css">
 </head>
 <body>
 <!-- This league's files: league.js (settings), data.js (games, standings, rosters) -->
 <script src="league.js"></script>
-<script src="data.js"></script>
+<script>document.write('<script src="data.js?v=' + V + '"><\/script>');</script>
 <script src="../shared/logo.js"></script>
 <script src="../shared/leagues.js"></script>
-<script src="../shared/hub.js"></script>
+<script>document.write('<script src="../shared/hub.js?v=' + V + '"><\/script>');</script>
 </body>
 </html>
