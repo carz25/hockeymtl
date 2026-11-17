@@ -34,7 +34,7 @@
     '<nav class="nav" aria-label="Sections">\n  <div class="in">\n    <div class="tabs">\n' +
     '      <a href="#home" data-tab="home">Home</a>\n      <a href="#standings" data-tab="standings">Standings</a>\n      <a href="#players" data-tab="players">Players</a>\n' +
     '      <a href="#schedule" data-tab="schedule">Schedule</a>\n      <a href="#teams" data-tab="teams">Teams</a>\n    </div>\n  </div>\n</nav>\n</div>\n\n' +
-    '<main class="in">\n  <section id="p-home"></section>\n  <section id="p-standings" hidden></section>\n  <section id="p-schedule" hidden></section>\n  <section id="p-teams" hidden></section>\n  <section id="p-players" hidden></section>\n</main>\n\n' +
+    '<main class="in">\n  <section id="p-home"></section>\n  <section id="p-standings" hidden></section>\n  <section id="p-schedule" hidden></section>\n  <section id="p-teams" hidden></section>\n  <section id="p-players" hidden></section>\n  <section id="p-game" hidden></section>\n</main>\n\n' +
     '<footer>\n  <div class="in">\n    <p id="asof"></p>\n    <div class="viewsw"><span>View</span><div class="seg" role="group" aria-label="Page layout"><button data-view="auto">Auto</button><button data-view="mobile">Mobile</button><button data-view="desktop">Desktop</button></div></div>\n' +
     "    <p>" + L.footerNote + "</p>\n" +
     '    <p class="copy">The design, layout and code of this page may not be copied, reproduced or used to train AI models without written permission.</p>\n  </div>\n</footer>\n' +
@@ -524,7 +524,7 @@
   function gbar(g) { var wp = winProb(g.a, g.h); return '<div class="gbar" aria-hidden="true"><i style="flex:' + wp.a + '"></i>' + (wp.t ? '<i class="t" style="flex:' + wp.t + '"></i>' : "") + '<i class="h" style="flex:' + wp.h + '"></i></div>'; }
   function gameInner(g, sheet) {
     return '<div class="gtime"><b>' + g.time + "</b><span>#" + g.id + '</span></div><div class="gteams">' + (g.played ? "" : '<div class="wph">Win probability</div>') + teamLine(g, "a") + teamLine(g, "h") + (g.played ? "" : gbar(g)) + '</div><div class="gmeta"><span>' + esc(g.venue) + "</span>" +
-      (g.played ? '<span><span class="final">' + fin(g) + '</span>' + (sheet ? ' · <span class="more">Scoring summary</span>' : "") + "</span>" : '<span><span class="more">Matchup preview</span></span>') + "</div>";
+      (g.played ? '<span><span class="final">' + fin(g) + '</span>' + ' · <span class="more">Game summary ›</span>' + "</span>" : '<span><span class="more">Matchup preview</span></span>') + "</div>";
   }
   function goalList(sh, t) {
     var items = sh.g.filter(function (x) { return x[0] === t; }).map(function (x) {
@@ -717,7 +717,7 @@
       }
       var sheet = SHEET[g.id];
       if (!g.played) html += '<details class="grow" id="m' + g.id + '"' + (g.id === state.open ? " open" : "") + "><summary>" + gameInner(g, false) + "</summary>" + matchBody(g) + "</details>";
-      else html += '<details class="grow" id="m' + g.id + '"' + (g.id === state.open ? " open" : "") + "><summary>" + gameInner(g, !!sheet) + "</summary>" + (sheet ? sheetDetail(g, sheet) : resultDetail(g)) + "</details>";
+      else html += '<div class="grow" id="m' + g.id + '"><a class="grs" href="#game/' + g.id + '">' + gameInner(g, !!sheet) + "</a></div>";
     });
     if (cur) html += "</div>";
     var who = state.team === "ALL" ? (state.div === "ALL" ? "all teams" : curDivs()[0].name) : TEAMS[state.team];
@@ -1378,8 +1378,33 @@ function makeModel(played, sheets, teams, opt) {
     });
   })();
   function renderAll() { renderHome(); renderStandings(); renderSchedule(); renderTeams(); renderPlayers(); }
+  /* game page: #game/<id> shows one played game's summary on its own page */
+  function gameFrom() {
+    var f = state.from || "";
+    if (f === "home") return ["home", "Back to Home"];
+    if (f === "teams") return ["teams", "Back to " + (state.team !== "ALL" ? TEAMS[state.team] : "Teams")];
+    if (f === "schedule" && state.sf !== "results") return ["schedule", "Back to Schedule"];
+    return ["schedule", "Back to Results"];
+  }
+  function renderGame(id) {
+    var g = GAMES.filter(function (x) { return x.id === id; })[0];
+    if (!g || !g.played) return false;
+    var sheet = SHEET[g.id], back = gameFrom();
+    $("p-game").innerHTML = '<div class="gpage"><button class="gback" data-back="' + back[0] + '"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' + back[1] + "</button>" +
+      '<div class="gpbody">' + (sheet ? sheetDetail(g, sheet) : resultDetail(g)) + "</div></div>";
+    return true;
+  }
   function route() {
     var h = location.hash.slice(1);
+    if (h.slice(0, 5) === "game/") {
+      if (renderGame(+h.slice(5))) {
+        TABS.forEach(function (t) { $("p-" + t).hidden = true; }); $("p-game").hidden = false;
+        Array.prototype.forEach.call(document.querySelectorAll(".nav a"), function (a) { if (a.dataset.tab === (state.from === "home" || state.from === "teams" ? state.from : "schedule")) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+        return "game";
+      }
+      h = "schedule";
+    }
+    $("p-game").hidden = true;
     if (h === "matchups") h = "schedule";
     if (TABS.indexOf(h) < 0) h = "home";
     TABS.forEach(function (t) { $("p-" + t).hidden = t !== h; });
@@ -1389,7 +1414,11 @@ function makeModel(played, sheets, teams, opt) {
   function goto(tab) { if (location.hash.slice(1) === tab) { route(); } else location.hash = tab; window.scrollTo(0, 0); }
 
   function openTeam(t) { if (!inDiv(t)) { state.div = "ALL"; syncDiv(); } state.team = t; state.open = 0; state.pm = 10; renderAll(); goto("teams"); }
+  function curTab() { var h = location.hash.slice(1); return TABS.indexOf(h) >= 0 ? h : "home"; }
+  function leaveFor(id) { state.from = curTab(); state.fromTab = state.from; state.fromY = window.scrollY; location.hash = "game/" + id; }
   document.addEventListener("click", function (e) {
+    var gl = e.target.closest && e.target.closest("a.grs");
+    if (gl && !e.metaKey && !e.ctrlKey && !e.shiftKey) { e.preventDefault(); leaveFor(+gl.getAttribute("href").slice(6)); return; }
     var frow = e.target.closest && e.target.closest(".frow"); if (frow) { featureRow(frow); return; }
     var tp = e.target.closest("[data-tp]");
     if (tp && !tp.closest(".wkc") && !tp.closest("#p-teams .tcard")) { e.preventDefault(); openTeam(tp.dataset.tp); return; }
@@ -1397,6 +1426,9 @@ function makeModel(played, sheets, teams, opt) {
     if (tab && state.team !== "ALL") { state.team = "ALL"; state.open = 0; state.pm = 10; renderAll(); }
     var b = e.target.closest("button"); if (!b) return;
     if (b.dataset.team) { openTeam(b.dataset.team); return; }
+    if (b.dataset.back) { if (state.from) { state.from = ""; history.back(); } else { state.sf = "results"; renderSchedule(); goto("schedule"); } return; }
+    if (b.dataset.open) { var pg = GAMES.filter(function (x) { return x.id === +b.dataset.open; })[0];
+      if (pg && pg.played) { e.preventDefault(); leaveFor(pg.id); return; } }
     if (b.dataset.open) { e.preventDefault(); state.open = +b.dataset.open; var og = GAMES.filter(function (x) { return x.id === state.open; })[0] || { date: isoOf(new Date()) }; state.sf = "m:" + og.date.slice(0, 7);
       /* make sure the opened game is not hidden by the team or division filter */
       if (og.a && state.team !== "ALL" && og.a !== state.team && og.h !== state.team) state.team = "ALL";
@@ -1429,7 +1461,13 @@ function makeModel(played, sheets, teams, opt) {
     cfg.key = o[0]; cfg.dir = o[2]; state.pm = 10; renderPlayers();
   });
   if (mq.addEventListener) mq.addEventListener("change", applyView);
-  window.addEventListener("hashchange", function () { route(); window.scrollTo(0, 0); });
+  window.addEventListener("hashchange", function () {
+    var r = route();
+    /* coming back from a game page: return to the same spot in the list */
+    if (r !== "game" && state.fromY != null && r === state.fromTab) { var y = state.fromY; window.scrollTo(0, y); setTimeout(function () { window.scrollTo(0, y); }, 0); }
+    else window.scrollTo(0, 0);
+    if (r !== "game") { state.fromY = null; state.fromTab = ""; state.from = ""; }
+  });
 
   var YR = function (d) { return d && d !== TBD_DATE ? ", " + d.slice(0, 4) : ""; };
   $("asof").textContent = GAMES.length ? (LAST ? "Standings and results through " + dlong(LAST) + YR(LAST) : thru("") + YR(FIRST)) + " · " + PLAYED.length + " of " + GAMES.length + " regular-season games played." : "Standings as of " + (LAST ? dlong(LAST) + YR(LAST) : "today") + ". Schedule and game sheets coming soon.";
