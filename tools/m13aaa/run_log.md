@@ -41,3 +41,6 @@ Games: 1023 1114 1117 1134 1159 1233-1243 1246 1247 1249-1252 1254-1257 1259-126
 Shootouts (so=True, goals equal, printed winner = loser+1): 1023 1117 1134 1236 1239 1243 1343 1368 (1368: the "SO" goal #27 dropped).
 Goalie GA below goals scored (pulled goalie), accepted: 1233 1241 1242 1249 1262 1368; goalie minutes under 45 in 1322.
 PP CHECK warnings (no effect on the stored details; penalty/PP counts on these sheets may be off by one): 1134 PLA, 1233 MEL, 1257 SDN, 1255 MEL, 1251 ROC and SMI, 1261 SMI, 1302 SDN and MEL, 1368 SMI. Affiliated players on several sheets. Spot-checked 1023 and 1368 against the sheet picture; the rest are from the form fields only.
+
+## 2026-11-17 (owner): game 1304 CFR 4-6 MEL (2026-10-11)
+Sheet PDF supplied by the owner (not in the Spordle schedule export). Details only (game is before AS_OF): standings and stats untouched. PP CHECK: sheet says CFR 2 en 5 and MEL 2 en 4, penalty times derive 0 and 1; no effect on stored stats. Affiliated MEL player: Benjamin Paquette (#20).
