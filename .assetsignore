@@ -1,0 +1,10 @@
+# Files in the repo that are not part of the website (same format as .gitignore)
+.git/
+.github/
+tools/
+*.md
+*.py
+__pycache__/
+wrangler.jsonc
+CNAME
+.assetsignore

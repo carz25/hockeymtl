@@ -1,0 +1,39 @@
+# How long browsers may keep each file (Cloudflare Workers reads this file; it is not served).
+# Pages: always check for a newer copy, so a publish shows up on the next visit.
+/*
+  X-Content-Type-Options: nosniff
+
+/
+  Cache-Control: public, max-age=0, must-revalidate
+/*/
+  Cache-Control: public, max-age=0, must-revalidate
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Site code: loaded as ?v=C, and C changes with every code change, so each version can be kept for a year.
+/shared/hub.js
+  Cache-Control: public, max-age=31536000, immutable
+/shared/hub.css
+  Cache-Control: public, max-age=31536000, immutable
+
+# Scores: loaded as ?v=<15-minute slot>, so keep each copy 15 minutes.
+/*/data.js
+  Cache-Control: public, max-age=900
+
+# Small shared files without a version: 10 minutes.
+/*/league.js
+  Cache-Control: public, max-age=600
+/shared/leagues.js
+  Cache-Control: public, max-age=600
+/shared/logo.js
+  Cache-Control: public, max-age=600
+/shared/home.js
+  Cache-Control: public, max-age=600
+/shared/home.css
+  Cache-Control: public, max-age=600
+
+# Team logos and icons rarely change: one day.
+/*/logos.css
+  Cache-Control: public, max-age=86400
+/shared/icons/*
+  Cache-Control: public, max-age=86400

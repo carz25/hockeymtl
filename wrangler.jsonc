@@ -1,0 +1,13 @@
+// Cloudflare Workers settings: the site is plain files served straight from Cloudflare (no code runs).
+// Cloudflare rebuilds the site from this repo each time main changes (Workers Builds, deploy command: npx wrangler deploy).
+{
+  "name": "hockeymtl",
+  "compatibility_date": "2026-11-18",
+  "assets": {
+    // the whole repo is the site; .assetsignore lists what is not published (tools, notes)
+    "directory": ".",
+    // unknown addresses get 404.html; /M11BB and /M11BB/ both open the league page
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash"
+  }
+}
