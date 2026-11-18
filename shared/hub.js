@@ -1219,6 +1219,11 @@ function makeModel(played, sheets, teams, opt) {
   });
 
   function pois(l) { var p = [Math.exp(-l)]; for (var i2 = 1; i2 <= 20; i2++) p[i2] = p[i2 - 1] * l / i2; return p; }
+  /* tie chance: the league's tie rate, raised for evenly matched teams and lowered for lopsided ones
+     (each matchup's Poisson draw chance relative to the average over all pairs) */
+  var MD = null;
+  function drawP(a, h) { var pa = pois(LG * att[a] * def[h]), ph = pois(LG * att[h] * def[a]), d = 0; for (var i = 0; i <= 20; i++) d += pa[i] * ph[i]; return d; }
+  function meanDraw() { if (MD != null) return MD; var s = 0, c = 0; teams.forEach(function (a) { teams.forEach(function (h) { if (a !== h) { s += drawP(a, h); c++; } }); }); return (MD = c ? s / c : 0); }
   function predict(a, h) {
     /* head to head history between the two clubs */
     var hm = 0, hn = 0;
@@ -1230,7 +1235,7 @@ function makeModel(played, sheets, teams, opt) {
     var lh = LG * att[h] * def[a] * Math.pow(info[h].lin, o.lin) * Math.pow(info[a].gk, o.gkw) * Math.exp(-x);
     var pa = pois(la), ph = pois(lh), w = 0, tt = 0, l = 0;
     for (var i3 = 0; i3 <= 20; i3++) for (var j = 0; j <= 20; j++) { var p = pa[i3] * ph[j]; if (i3 > j) w += p; else if (i3 === j) tt += p; else l += p; }
-    var s = w + l; var ptie = TIE; w = (1 - ptie) * w / s; l = (1 - ptie) * l / s; tt = ptie;
+    var s = w + l; var ptie = !TIE ? 0 : o.flatTie || !meanDraw() ? TIE : Math.min(0.5, TIE * tt / meanDraw()); w = (1 - ptie) * w / s; l = (1 - ptie) * l / s; tt = ptie;
     if (o.sh) { w = (1 - o.sh) * w + o.sh * (1 - tt) / 2; l = (1 - o.sh) * l + o.sh * (1 - tt) / 2; }
     var e = 1 / (1 + Math.pow(10, (elo[h] - elo[a]) / 400));
     var wa = (1 - o.beta) * w + o.beta * (1 - tt) * e, wh = (1 - o.beta) * l + o.beta * (1 - tt) * (1 - e);
