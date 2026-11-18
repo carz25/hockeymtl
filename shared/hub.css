@@ -496,6 +496,10 @@ th.adv,td.adv{background:color-mix(in srgb,var(--rule) 18%,transparent)}
 .sitebar-home{font-family:var(--display);font-weight:800;font-size:15px;letter-spacing:.06em;text-transform:uppercase}
 .sitebar-nav{display:flex;gap:16px;font-weight:600}
 .sitebar-note{margin-left:auto}
+.sitebar-contact{background:none;border:0;padding:0;color:#fff;font:inherit;font-weight:600;cursor:pointer}
+.sitebar-contact:hover{color:#7DD3FC;text-decoration:underline;text-underline-offset:3px}
+.sitebar-contact:focus-visible{outline:2px solid #7DD3FC;outline-offset:3px;border-radius:2px}
+.sitebar.slim .sitebar-contact{margin-left:16px}
 @media (max-width:720px){.sitebar-in{gap:4px 16px}.sitebar-note{margin-left:0;width:100%;font-size:11px}}
 /* division sites on desktop: the footer bar stays fixed along the bottom of the screen (phones: it scrolls with the page) */
 body.st-off:not(.m) .sitebar,body.st-sheet:not(.m) .sitebar{position:fixed;left:0;right:0;bottom:0;z-index:40}
