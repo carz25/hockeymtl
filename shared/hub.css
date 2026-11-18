@@ -160,14 +160,13 @@ th.on{color:var(--ink)}
 .mmid b{font-family:var(--display);font-size:20px;letter-spacing:.08em;color:var(--ink);font-weight:800;text-transform:uppercase}
 .mbody{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:24px 32px;padding:16px}
 .mbody h4{margin:0 0 10px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);font-weight:700}
-.cmp{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:2px 12px;padding:7px 0;align-items:baseline}
-.cmp .cv{font-weight:500;font-variant-numeric:tabular-nums;font-size:15px}
+.cmp{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:2px 12px;padding:8px 0;align-items:baseline;border-top:1px solid var(--rule)}
+.cmp:first-of-type{border-top:0}
+.cmp .cv{font-weight:400;font-variant-numeric:tabular-nums;font-size:15px}
 .cmp .cv.h{text-align:right}
-.cmp .cv.lead{font-weight:600;color:var(--ink)}
+.cmp .cv.lead{font-weight:700;color:var(--ink)}
 .cmp .cv:not(.lead){color:var(--mute)}
 .cmp .cl{font-size:12px;color:var(--mute);text-align:center;letter-spacing:.04em}
-.track{grid-column:1/-1;height:4px;border-radius:2px;background:var(--side-h);overflow:hidden;opacity:.85}
-.track i{display:block;height:100%;background:var(--side-a)}
 .mside{display:flex;flex-direction:column;gap:20px;min-width:0}
 .mside ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:14px}
 .mside li{display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline;justify-content:space-between}
@@ -880,8 +879,8 @@ button.rt2:focus-visible{outline:2px solid var(--side-a);outline-offset:2px}
 .gs-mph{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .gs-mph b{font-family:var(--display);font-weight:800;font-size:18px;text-transform:uppercase}
 .gs-mp small{font-size:12px;color:var(--mute)}
-.lead{font-size:12px;font-weight:700;color:#fff;border-radius:4px;padding:3px 8px;white-space:nowrap}
-.lead.a{background:var(--side-a)}.lead.h{background:var(--side-h)}.lead.tie{background:var(--ink);color:var(--card)}
+.gs-mph .lead{font-size:12px;font-weight:700;color:#fff;border-radius:4px;padding:3px 8px;white-space:nowrap}
+.gs-mph .lead.a{background:var(--side-a)}.gs-mph .lead.h{background:var(--side-h)}.gs-mph .lead.tie{background:var(--ink);color:var(--card)}
 .gs-ev{display:grid;grid-template-columns:40px 24px minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--rule);font-size:13px;color:var(--mute)}
 .gs-ev .tm{font-variant-numeric:tabular-nums}
 .gs-ev .lg{width:22px;height:22px;border-radius:4px}
@@ -997,3 +996,10 @@ a.plink:focus-visible{outline:2px solid var(--lgc,#2563EB);outline-offset:2px;bo
 .pshare:focus-visible{outline:2px solid var(--lgc,#2563EB);outline-offset:2px}
 .jt .jn{width:40px;min-width:40px;max-width:40px;text-align:center;color:var(--mute);font-variant-numeric:tabular-nums;padding-left:6px;padding-right:6px}
 .jt .stick.s2{left:40px}
+.tpl{cursor:pointer}.tpl:hover{text-decoration:underline;text-underline-offset:2px}
+/* team page upcoming rows: date on the opponent's line, time on the arena's line */
+.trow.up{align-items:start}
+.trow.up .tdt{line-height:20px;padding-top:4px}
+.trow.up .tdt small{line-height:18px;margin-top:4px}
+.trow.up .to small{line-height:18px}
+.trow.up .btn{align-self:center}

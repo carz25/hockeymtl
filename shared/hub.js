@@ -249,7 +249,7 @@
     var pc = "", wp = null;
     if (g.played) pc = "<i>" + (t === g.a ? g.sa : g.sh) + "</i>";
     else { wp = winProb(g.a, g.h); var v = t === g.a ? wp.a : wp.h; pc = '<em class="wpc' + (v === Math.max(wp.a, wp.h) && wp.a !== wp.h ? " fav" : "") + '">' + v + "%</em>"; }
-    return '<span class="wkl' + (g.played && !win ? " lose" : "") + '">' + badge(t) + '<b data-tp="' + t + '">' + esc(SHORT[t]) + "</b>" + pc + "</span>";
+    return '<span class="wkl' + (g.played && !win ? " lose" : "") + '">' + badge(t) + '<b><span class="tpl" data-tp="' + t + '">' + esc(SHORT[t]) + "</span></b>" + pc + "</span>";
   }
   function homeGame(g) {
     var inner = '<span class="hd">' + (g.played ? dshort(g.date) : dshort(g.date)) + "<small>" + (g.played ? fin(g) : g.time) + '</small></span><span class="hls">' + (g.played ? "" : '<span class="wph">Win probability</span>') + hLine(g, g.a, g.sa >= g.sh) + hLine(g, g.h, g.sh >= g.sa) + "</span>";
@@ -307,7 +307,7 @@
   }
   function resultTiles(list) {
     return '<div class="rgrid">' + list.map(function (g) {
-      var ln = function (t, sc, win) { var who = scorers(g, t); return '<div class="rl' + (win ? " w" : "") + '">' + badge(t) + "<b>" + esc(SHORT[t]) + "</b><i>" + sc + "</i></div>" + (who ? '<div class="rs">' + who + "</div>" : ""); };
+      var ln = function (t, sc, win) { var who = scorers(g, t); return '<div class="rl' + (win ? " w" : "") + '">' + badge(t) + '<b><span class="tpl" data-tp="' + t + '">' + esc(SHORT[t]) + "</span></b><i>" + sc + "</i></div>" + (who ? '<div class="rs">' + who + "</div>" : ""); };
       return '<button class="card rt2" data-open="' + g.id + '" aria-label="' + esc(SHORT[g.a]) + " " + g.sa + ", " + esc(SHORT[g.h]) + " " + g.sh + ', game summary"><div class="rh"><span>' + dshort(g.date) + "</span><span>" + fin(g) + "</span></div>" + ln(g.a, g.sa, g.sa > g.sh) + ln(g.h, g.sh, g.sh > g.sa) + "</button>";
     }).join("") + "</div>";
   }
@@ -1069,7 +1069,7 @@
     var hr = recOf(rs.filter(function (x) { return x.home; })), ar = recOf(rs.filter(function (x) { return !x.home; }));
     var head = '<div class="card thead"><div class="thl">' + badge(t, 1) + '<div><h2 class="tname">' + esc(TEAMS[t]) + '</h2><div class="sub">' + ord(s.rank) + " in the " + (MULTI ? esc(divOf(t).name) : GROUP) + " · " + rec(s) + " · " + (s.pend ? "–" : s.pts) + ' PTS</div><div class="sub">Last 5 ' + formChips(t, 5) + " · Streak " + streakOf(t) + "</div></div></div>" +
       '<div class="thr">' + (ng ? '<span class="sub">Next game</span><b>' + when(ng) + "</b><span>" + (ng.h === t ? "vs " + esc(TEAMS[ng.a]) : "at " + esc(TEAMS[ng.h])) + '</span><button class="btn pri" data-open="' + ng.id + '">Matchup preview</button>' : "") +
-      '<button class="btn" data-allteams="1">All teams</button></div></div>';
+      "</div></div>";
     var tiles = '<div class="tiles">' + tile("Points %", s.pct, ord(RK.pctn[t]) + " in the " + GROUP) + tile("Goals for / GP", f2(s.gfg), ord(RK.gfg[t]) + " · " + s.gf + " total") + tile("Goals against / GP", f2(s.gag), ord(RK.gag[t]) + " fewest · " + s.ga + " total") +
       tile("Home record", hr, recOfLbl(rs.filter(function (x) { return x.home; }))) + tile("Away record", ar, recOfLbl(rs.filter(function (x) { return !x.home; }))) + tile("PIM / GP", f1(s.pimg), ord(RK.pimg[t]) + " fewest · " + s.pim + " min") + "</div>";
     /* the same columns in every league; sheet leagues keep power-play goals as pwg/pwa and points per game as ppg */
@@ -1099,13 +1099,10 @@
   }
 
   /* ---------- matchups ---------- */
+  /* one comparison line: the stronger side's value in bold (mode: "high" = more is better, "low" = less is better, "diff" = more is better) */
   function cmpRow(label, va, vh, fa, fh, mode) {
-    var lead = va === vh ? 0 : ((mode !== "low") === (va > vh) ? 1 : 2), share;
-    if (mode === "diff") share = (va + 5) / (va + vh + 10);
-    else if (va + vh === 0) share = 0.5;
-    else share = mode === "high" ? va / (va + vh) : vh / (va + vh);
-    share = Math.min(0.92, Math.max(0.08, share));
-    return '<div class="cmp"><div class="cv a' + (lead === 1 ? " lead" : "") + '">' + fa + '</div><div class="cl">' + label + '</div><div class="cv h' + (lead === 2 ? " lead" : "") + '">' + fh + '</div><div class="track" aria-hidden="true"><i style="width:' + (share * 100).toFixed(1) + '%"></i></div></div>';
+    var lead = va === vh ? 0 : ((mode !== "low") === (va > vh) ? 1 : 2);
+    return '<div class="cmp"><div class="cv a' + (lead === 1 ? " lead" : "") + '">' + fa + '</div><div class="cl">' + label + '</div><div class="cv h' + (lead === 2 ? " lead" : "") + '">' + fh + "</div></div>";
   }
   function watch(t) {
     var sk3 = topSkaters(t, 3), gl = topGoalie(t);
@@ -1354,8 +1351,8 @@ function makeModel(played, sheets, teams, opt) {
       '<div class="wpl"><span><b>' + wp.a + "%</b>" + esc(SHORT[g.a]) + '</span><span class="mid">Win probability' + (OT ? "" : " · Tie " + wp.t + "%") + '</span><span>' + esc(SHORT[g.h]) + ' <b style="margin:0 0 0 4px">' + wp.h + "%</b></span></div></div>";
     var A = ST[g.a], H = ST[g.h];
     var atk = function (x, y) { return "<p><b>" + esc(SHORT[x.t]) + " offence</b> scores " + f2(x.gfg) + " per game (" + ord(RK.gfg[x.t]) + " in the " + GROUP + "). <b>" + esc(SHORT[y.t]) + " defence</b> allows " + f2(y.gag) + " (" + ord(RK.gag[y.t]) + " fewest).</p>"; };
-    var rows = cmpRow("Rank", -A.rank, -H.rank, ord(A.rank), ord(H.rank), "diff").replace(/<div class="track"[\s\S]*?<\/i><\/div>/, "") +
-      cmpRow("Record", A.w * 2 + A.tie, H.w * 2 + H.tie, rec(A), rec(H), "high").replace(/<div class="track"[\s\S]*?<\/i><\/div>/, "") +
+    var rows = cmpRow("Rank", -A.rank, -H.rank, ord(A.rank), ord(H.rank), "diff") +
+      cmpRow("Record", A.w * 2 + A.tie, H.w * 2 + H.tie, rec(A), rec(H), "high") +
       cmpRow("PTS%", parseFloat(A.pct), parseFloat(H.pct), A.pct, H.pct, "high") +
       cmpRow("Goals for / GP", A.gfg, H.gfg, f2(A.gfg), f2(H.gfg), "high") +
       cmpRow("Goals against / GP", A.gag, H.gag, f2(A.gag), f2(H.gag), "low") +
@@ -1548,7 +1545,7 @@ function makeModel(played, sheets, teams, opt) {
       if (renderPlayer(pp[1], decodeURIComponent(pp.slice(2).join("/")))) { showSub("player"); return "player"; }
       h = "players";
     }
-    $("p-player").hidden = true;
+    $("p-player").hidden = true; $("p-game").hidden = true;
     if (h === "matchups") h = "schedule";
     if (TABS.indexOf(h) < 0) h = "home";
     TABS.forEach(function (t) { $("p-" + t).hidden = t !== h; });
