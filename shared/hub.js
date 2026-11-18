@@ -35,7 +35,7 @@
     '<nav class="nav" aria-label="Sections">\n  <div class="in">\n    <div class="tabs">\n' +
     '      <a href="#home" data-tab="home">Home</a>\n      <a href="#standings" data-tab="standings">Standings</a>\n      <a href="#players" data-tab="players">Players</a>\n' +
     '      <a href="#schedule" data-tab="schedule">Schedule</a>\n      <a href="#teams" data-tab="teams">Teams</a>\n    </div>\n  </div>\n</nav>\n</div>\n\n' +
-    '<main class="in">\n  <section id="p-home"></section>\n  <section id="p-standings" hidden></section>\n  <section id="p-schedule" hidden></section>\n  <section id="p-teams" hidden></section>\n  <section id="p-players" hidden></section>\n  <section id="p-game" hidden></section>\n  <section id="p-player" hidden></section>\n</main>\n\n' +
+    '<main class="in">\n  <section id="p-home"></section>\n  <section id="p-standings" hidden></section>\n  <section id="p-schedule" hidden></section>\n  <section id="p-teams" hidden></section>\n  <section id="p-players" hidden></section>\n  <section id="p-game" hidden></section>\n  <section id="p-player" hidden></section>\n  <section id="p-preview" hidden></section>\n</main>\n\n' +
     '<footer>\n  <div class="in">\n    <p id="asof"></p>\n    <div class="viewsw"><span>View</span><div class="seg" role="group" aria-label="Page layout"><button data-view="auto">Auto</button><button data-view="mobile">Mobile</button><button data-view="desktop">Desktop</button></div></div>\n' +
     "    <p>" + L.footerNote + "</p>\n" +
     '    <p class="copy">The design, layout and code of this page may not be copied, reproduced or used to train AI models without written permission.</p>\n  </div>\n</footer>\n' +
@@ -524,8 +524,8 @@
   }
   function gbar(g) { var wp = winProb(g.a, g.h); return '<div class="gbar" aria-hidden="true"><i style="flex:' + wp.a + '"></i>' + (wp.t ? '<i class="t" style="flex:' + wp.t + '"></i>' : "") + '<i class="h" style="flex:' + wp.h + '"></i></div>'; }
   function gameInner(g, sheet) {
-    return '<div class="gtime"><b>' + g.time + "</b><span>#" + g.id + '</span></div><div class="gteams">' + (g.played ? "" : '<div class="wph">Win probability</div>') + teamLine(g, "a") + teamLine(g, "h") + (g.played ? "" : gbar(g)) + '</div><div class="gmeta"><span>' + esc(g.venue) + "</span>" +
-      (g.played ? '<span><span class="final">' + fin(g) + '</span>' + ' · <span class="more">Game summary ›</span>' + "</span>" : '<span><span class="more">Matchup preview</span></span>') + "</div>";
+    return '<div class="gtime"><b>' + g.time + "</b><span>#" + g.id + '</span></div><div class="gteams">' + (g.played ? "" : '<div class="wph">Win probability</div>') + teamLine(g, "a") + teamLine(g, "h") + (g.played ? "" : gbar(g)) + '</div><div class="gmeta"><span class="gven">' + (g.played ? '<span class="final">' + fin(g) + "</span> · " : "") + esc(g.venue) + "</span>" +
+      '<span class="more">' + (g.played ? "Game summary" : "Matchup preview") + " ›</span></div>";
   }
   function goalList(sh, t) {
     var items = sh.g.filter(function (x) { return x[0] === t; }).map(function (x) {
@@ -717,7 +717,7 @@
         cur = g.date; html += '<div class="day"' + (isNewMonth ? ' data-month="' + mk + '"' : "") + "><h3>" + dlong(g.date) + "</h3>" + (g.date === today ? '<span class="todaychip">Today</span>' : "") + '</div><div class="dgrid">';
       }
       var sheet = SHEET[g.id];
-      if (!g.played) html += '<details class="grow" id="m' + g.id + '"' + (g.id === state.open ? " open" : "") + "><summary>" + gameInner(g, false) + "</summary>" + matchBody(g) + "</details>";
+      if (!g.played) html += '<div class="grow" id="m' + g.id + '"><a class="grs" href="#preview/' + g.id + '">' + gameInner(g, false) + "</a></div>";
       else html += '<div class="grow" id="m' + g.id + '"><a class="grs" href="#game/' + g.id + '">' + gameInner(g, !!sheet) + "</a></div>";
     });
     if (cur) html += "</div>";
@@ -1095,7 +1095,20 @@
       (OFFICIAL ? "Official player stats through " + dlong(AS_OF) + (DATA_THROUGH && DATA_THROUGH > AS_OF ? ", plus game sheets through " + dlong(DATA_THROUGH) : "") + "." : "Counted from game sheets; PIM assumes 2 minutes per penalty.");
     el.innerHTML = head + '<div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">' + tiles +
       '<div class="tgrid"><div class="tcol"><h3>Skaters</h3>' + skT + "<h3>Goalies</h3>" + gkT + '<p class="mfoot">' + foot + "</p></div>" +
-      '<div class="tcol"><h3>Results</h3><div class="card tlist">' + resL + "</div><h3>Upcoming</h3><div class=\"card tlist\">" + upL + "</div></div></div></div>";
+      '<div class="tcol"><h3>Results</h3><div class="card tlist" id="tres">' + resL + "</div><h3>Upcoming</h3><div class=\"card tlist\" id=\"tup\">" + upL + "</div></div></div></div>";
+    fitTeamLists();
+  }
+  /* desktop team page: Results no taller than the roster column, Upcoming shows 5 games; both scroll beyond that */
+  function fitTeamLists() {
+    var r = $("tres"), u = $("tup"); if (!r || !u) return;
+    r.style.maxHeight = u.style.maxHeight = "";
+    if (document.body.classList.contains("m") || $("p-teams").hidden) return;
+    var rows = u.querySelectorAll(".trow");
+    if (rows.length > 5) u.style.maxHeight = Math.round(rows[5].getBoundingClientRect().top - u.getBoundingClientRect().top) + "px";
+    var left = r.closest(".tgrid").querySelector(".tcol"), room = left.getBoundingClientRect().bottom - r.getBoundingClientRect().top;
+    var upH = u.getBoundingClientRect().height + (u.getBoundingClientRect().top - r.getBoundingClientRect().bottom);
+    var max = Math.max(200, room - upH);
+    if (r.scrollHeight > max) r.style.maxHeight = max + "px";
   }
 
   /* ---------- matchups ---------- */
@@ -1370,6 +1383,36 @@ function makeModel(played, sheets, teams, opt) {
       "<div>" + seriesBlock(g) + '</div><div class="watch">' + watch(g.a) + watch(g.h) + "</div></div>" +
       '<p class="mfoot">Game #' + g.id + " · " + esc(g.venue) + ". Season stats come from the official table, with only " + small + " to " + Math.max(A.gp, H.gp) + " games played per team, so small samples can swing. Player lines come from available game sheets.</p></div>";
   }
+  /* ---------- matchup preview page: #preview/<id> ---------- */
+  function renderPreview(id) {
+    var g = GAMES.filter(function (x) { return x.id === id; })[0];
+    if (!g || g.played) return false;
+    var wp = winProb(g.a, g.h), A = ST[g.a], H = ST[g.h], fav = wp.a === wp.h ? null : wp.a > wp.h ? g.a : g.h;
+    var side = function (t, s, pct, cls) {
+      return '<div class="pvs ' + cls + '"><div class="pvb">' + badge(t, 1) + '</div><div class="pvn"><span class="pvt" data-tp="' + t + '">' + esc(TEAMS[t]) + '</span><span class="sub">' + ord(s.rank) + " · " + rec(s) + " · " + (s.pend ? "–" : s.pts) + ' PTS</span><span class="pvf">' + formChips(t, 5) + '</span></div><div class="pvp' + (t === fav ? " fav" : "") + '"><b>' + pct + '%</b><span>to win</span></div></div>';
+    };
+    var bar = '<div class="pvbar" role="img" aria-label="Win probability: ' + esc(SHORT[g.a]) + " " + wp.a + " percent" + (OT ? "" : ", tie " + wp.t + " percent") + ", " + esc(SHORT[g.h]) + " " + wp.h + ' percent"><i class="wa" style="flex:' + wp.a + '"></i>' + (OT || !wp.t ? "" : '<i class="wt" style="flex:' + wp.t + '"></i>') + '<i class="wh" style="flex:' + wp.h + '"></i></div>' +
+      '<div class="pvbl"><span>' + esc(SHORT[g.a]) + "</span><span>" + (OT ? "" : "Tie " + wp.t + "% · ") + "Projected score " + f1(wp.la) + "–" + f1(wp.lh) + "</span><span>" + esc(SHORT[g.h]) + "</span></div>";
+    var hero = '<div class="card pvhero"><div class="pvmeta">' + esc(when(g)) + " · " + esc(g.venue) + " · Game #" + g.id + "</div>" +
+      '<div class="pvteams">' + side(g.a, A, wp.a, "a") + '<div class="pvat">at</div>' + side(g.h, H, wp.h, "h") + "</div>" + bar + "</div>";
+    var rows = cmpRow("Rank", -A.rank, -H.rank, ord(A.rank), ord(H.rank), "diff") +
+      cmpRow("Record", A.w * 2 + A.tie, H.w * 2 + H.tie, rec(A), rec(H), "high") +
+      cmpRow("PTS%", parseFloat(A.pct), parseFloat(H.pct), A.pct, H.pct, "high") +
+      cmpRow("Goals for / GP", A.gfg, H.gfg, f2(A.gfg), f2(H.gfg), "high") +
+      cmpRow("Goals against / GP", A.gag, H.gag, f2(A.gag), f2(H.gag), "low") +
+      cmpRow("Goal diff / GP", A.dg, H.dg, (A.dg > 0 ? "+" : "") + f2(A.dg), (H.dg > 0 ? "+" : "") + f2(H.dg), "diff") +
+      cmpRow("Penalty min / GP", A.pimg, H.pimg, f1(A.pimg), f1(H.pimg), "low");
+    var cmp = '<div class="card pvc"><h3>Team comparison</h3><div class="cmph"><span>' + esc(SHORT[g.a]) + "</span><span></span><span>" + esc(SHORT[g.h]) + "</span></div>" + rows + "</div>";
+    var ser = '<div class="card pvc pvser"><h3>Season series</h3>' + seriesBlock(g) + "</div>";
+    var wat = '<div class="card pvc"><h3>Players to watch</h3><div class="watch">' + watch(g.a) + watch(g.h) + "</div></div>";
+    var model = '<div class="card pvc pvm"><h3>How the odds are set</h3>' + modelNotes(g, wp) + "</div>";
+    var small = Math.min(A.gp, H.gp);
+    $("p-preview").innerHTML = '<div class="ptop">' + backBtn("Back to Schedule") + '<button class="pshare" data-share="1">Share</button></div>' + hero +
+      '<div class="pvgrid"><div class="pvmain card pvc">' + scoutHTML(g) + '</div><div class="pvside">' + cmp + ser + wat + model + "</div></div>" +
+      '<p class="mfoot">Season stats come from the ' + (OFFICIAL ? "official table" : "standings") + ", with " + (small === Math.max(A.gp, H.gp) ? small : small + " to " + Math.max(A.gp, H.gp)) + " games played per team, so small samples can swing. Player lines come from available game sheets.</p>";
+    document.title = SHORT[g.a] + " at " + SHORT[g.h] + " · " + (LEAGUE.title || "") + " · Hockey MTL";
+    return true;
+  }
   /* ---------- wiring ---------- */
   if (MULTI) (function () {
     var sel = document.getElementById("divsel");
@@ -1389,6 +1432,7 @@ function makeModel(played, sheets, teams, opt) {
   function hereLabel() {
     var h = location.hash.slice(1) || "home";
     if (h.slice(0, 5) === "game/") return "Back to game summary";
+    if (h.slice(0, 8) === "preview/") return "Back to matchup preview";
     if (h.slice(0, 7) === "player/") { var pp = h.split("/"); return "Back to " + decodeURIComponent(pp.slice(2).join("/")); }
     if (h === "schedule") return state.sf === "results" ? "Back to Results" : "Back to Schedule";
     if (h === "teams") return "Back to " + (state.team !== "ALL" ? TEAMS[state.team] : "Teams");
@@ -1536,7 +1580,7 @@ function makeModel(played, sheets, teams, opt) {
     document.title = name + " · " + (L.title || "") + " · Hockey MTL";
     return true;
   }
-  function showSub(id) { TABS.concat(["game", "player"]).forEach(function (t) { $("p-" + t).hidden = t !== id; }); setNav(navTab()); }
+  function showSub(id) { TABS.concat(["game", "player", "preview"]).forEach(function (t) { $("p-" + t).hidden = t !== id; }); setNav(navTab()); }
   var TITLE0 = document.title;
   function route() {
     var h = location.hash.slice(1);
@@ -1545,15 +1589,20 @@ function makeModel(played, sheets, teams, opt) {
       if (renderGame(+h.slice(5))) { showSub("game"); return "game"; }
       h = "schedule";
     }
+    if (h.slice(0, 8) === "preview/") {
+      if (renderPreview(+h.slice(8))) { showSub("preview"); return "preview"; }
+      h = "schedule";
+    }
     if (h.slice(0, 7) === "player/") {
       var pp = h.split("/");
       if (renderPlayer(pp[1], decodeURIComponent(pp.slice(2).join("/")))) { showSub("player"); return "player"; }
       h = "players";
     }
-    $("p-player").hidden = true; $("p-game").hidden = true;
+    $("p-player").hidden = true; $("p-game").hidden = true; $("p-preview").hidden = true;
     if (h === "matchups") h = "schedule";
     if (TABS.indexOf(h) < 0) h = "home";
     TABS.forEach(function (t) { $("p-" + t).hidden = t !== h; });
+    if (h === "teams") setTimeout(fitTeamLists, 0);
     Array.prototype.forEach.call(document.querySelectorAll(".nav a"), function (a) { if (a.dataset.tab === h) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
     return h;
   }
@@ -1564,7 +1613,7 @@ function makeModel(played, sheets, teams, opt) {
   function leaveFor(id) { openSub("game/" + id); }
   document.addEventListener("click", function (e) {
     var gl = e.target.closest && e.target.closest("a.grs");
-    if (gl && !e.metaKey && !e.ctrlKey && !e.shiftKey) { e.preventDefault(); leaveFor(+gl.getAttribute("href").slice(6)); return; }
+    if (gl && !e.metaKey && !e.ctrlKey && !e.shiftKey) { e.preventDefault(); openSub(gl.getAttribute("href").slice(1)); return; }
     var plk = e.target.closest && e.target.closest("a.plink");
     if (plk && !e.metaKey && !e.ctrlKey && !e.shiftKey) { e.preventDefault(); openSub(plk.getAttribute("href").slice(1)); return; }
     var glog = e.target.closest && e.target.closest("tr[data-g]");
@@ -1574,12 +1623,13 @@ function makeModel(played, sheets, teams, opt) {
     if (tp && !tp.closest(".wkc") && !tp.closest("#p-teams .tcard")) { e.preventDefault(); openTeam(tp.dataset.tp); return; }
     var tab = e.target.closest("a[data-tab]");
     if (tab && state.team !== "ALL") { state.team = "ALL"; state.open = 0; state.pm = 10; renderAll(); }
+    if (tab && tab.dataset.tab === "schedule" && state.sf !== "upcoming") { state.sf = "upcoming"; renderSchedule(); }
     var b = e.target.closest("button"); if (!b) return;
     if (b.dataset.team) { openTeam(b.dataset.team); return; }
-    if (b.dataset.back) { goBack(location.hash.slice(1, 8) === "player/" ? "players" : "results"); return; }
+    if (b.dataset.back) { var bh = location.hash.slice(1); goBack(bh.slice(0, 7) === "player/" ? "players" : bh.slice(0, 8) === "preview/" ? "schedule" : "results"); return; }
     if (b.dataset.share) { var u = location.href; if (navigator.share) navigator.share({ title: document.title, url: u }).catch(function () { }); else if (navigator.clipboard) navigator.clipboard.writeText(u).then(function () { b.textContent = "Link copied"; setTimeout(function () { b.textContent = "Share"; }, 1800); }); return; }
     if (b.dataset.open) { var pg = GAMES.filter(function (x) { return x.id === +b.dataset.open; })[0];
-      if (pg && pg.played) { e.preventDefault(); leaveFor(pg.id); return; } }
+      if (pg) { e.preventDefault(); openSub((pg.played ? "game/" : "preview/") + pg.id); return; } }
     if (b.dataset.open) { e.preventDefault(); state.open = +b.dataset.open; var og = GAMES.filter(function (x) { return x.id === state.open; })[0] || { date: isoOf(new Date()) }; state.sf = "m:" + og.date.slice(0, 7);
       /* make sure the opened game is not hidden by the team or division filter */
       if (og.a && state.team !== "ALL" && og.a !== state.team && og.h !== state.team) state.team = "ALL";
@@ -1612,6 +1662,7 @@ function makeModel(played, sheets, teams, opt) {
     cfg.key = o[0]; cfg.dir = o[2]; state.pm = 10; renderPlayers();
   });
   if (mq.addEventListener) mq.addEventListener("change", applyView);
+  window.addEventListener("resize", function () { clearTimeout(fitTeamLists.t); fitTeamLists.t = setTimeout(fitTeamLists, 150); });
   window.addEventListener("hashchange", function () {
     /* back (our button or the browser's): return to the same spot */
     var h = location.hash.slice(1) || "home", top = NAV[NAV.length - 1], y = null;

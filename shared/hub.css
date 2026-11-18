@@ -1003,3 +1003,71 @@ a.plink:focus-visible{outline:2px solid var(--lgc,#2563EB);outline-offset:2px;bo
 .trow.up .tdt small{line-height:18px;margin-top:4px}
 .trow.up .to small{line-height:18px}
 .trow.up .btn{align-self:center}
+
+/* schedule cards: venue on the left of the footer, the link bigger at the bottom right */
+.gmeta .more{font-size:14px;font-weight:600}
+body:not(.m) .dgrid{grid-template-columns:repeat(auto-fill,minmax(400px,1fr))}
+body:not(.m) .dgrid .g,body:not(.m) .dgrid .grow>.grs{grid-template-columns:76px minmax(0,1fr);row-gap:10px}
+body:not(.m) .dgrid .gmeta{grid-column:1/-1;flex-direction:row;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid var(--rule);padding-top:8px}
+body:not(.m) .dgrid .gven{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body:not(.m) .dgrid .gmeta .more{flex:none;white-space:nowrap}
+body:not(.m) .dgrid .wph{display:none}
+.m .gmeta .more{font-size:14px}
+
+/* matchup preview page (#preview/<id>) */
+#p-preview .card{padding:20px 24px}
+.pvhero{margin-bottom:16px}
+.pvmeta{font-size:14px;color:var(--mute);margin-bottom:14px}
+.pvteams{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:16px}
+.pvs{display:flex;align-items:center;gap:14px;min-width:0}
+.pvs.h{flex-direction:row-reverse;text-align:right}
+.pvb .lg.big{width:72px;height:72px}
+.pvn{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+.pvs.h .pvn{align-items:flex-end}
+.pvt{font-family:var(--display);font-weight:800;font-size:34px;line-height:1;text-transform:uppercase;cursor:pointer}
+.pvt:hover{text-decoration:underline;text-underline-offset:3px}
+.pvn .sub{font-size:14px}
+.pvp{display:flex;flex-direction:column;align-items:center;padding:0 6px}
+.pvp b{font-family:var(--display);font-weight:800;font-size:52px;line-height:1;color:var(--mute);font-variant-numeric:tabular-nums}
+.pvp.fav b{color:var(--ink)}
+.pvp span{font-size:12px;color:var(--mute);text-transform:uppercase;letter-spacing:.1em}
+.pvat{font-family:var(--display);font-weight:800;font-size:20px;color:var(--mute);text-transform:uppercase}
+.pvbar{display:flex;gap:3px;height:10px;border-radius:5px;overflow:hidden;margin-top:18px}
+.pvbar i{display:block;min-width:3px}
+.pvbar .wa{background:var(--side-a)}.pvbar .wt{background:var(--mute);opacity:.4}.pvbar .wh{background:var(--side-h)}
+.pvbl{display:flex;justify-content:space-between;gap:12px;margin-top:6px;font-size:13px;color:var(--mute)}
+.pvgrid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;align-items:start}
+.pvside{display:flex;flex-direction:column;gap:16px;min-width:0}
+#p-preview h3{font-family:var(--display);font-weight:800;font-size:24px;text-transform:uppercase;letter-spacing:.02em;margin:0 0 12px}
+#p-preview h4{margin:0 0 10px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:700}
+#p-preview .scout{border-top:0;padding-top:0}
+#p-preview .scout>h4{font-family:var(--display);font-weight:800;font-size:24px;letter-spacing:.02em;margin:0 0 14px;text-transform:uppercase}
+#p-preview .scr{padding:16px 18px}
+#p-preview .scr h5{font-size:24px}
+#p-preview .scr ul,#p-preview .keys ol{font-size:15px;line-height:1.5}
+#p-preview .scr .scrwo{font-size:14.5px}
+#p-preview .keys{margin-top:20px}
+#p-preview .keys>h4{font-size:13px}
+.cmph{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:12px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);font-weight:600;padding-bottom:4px}
+.cmph span:last-child{text-align:right}
+#p-preview .cmp{font-size:15px}
+#p-preview .watch{grid-template-columns:repeat(2,minmax(0,1fr))}
+#p-preview .watch ul,#p-preview .pvc ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;font-size:14px}
+#p-preview .watch li{display:flex;flex-direction:column}
+#p-preview .watch small{color:var(--mute);font-size:12.5px}
+#p-preview .pvc p{margin:0 0 8px;font-size:14px}
+#p-preview .pvm .mf{font-size:14px}
+@media (max-width:1100px){.pvgrid{grid-template-columns:minmax(0,1fr)}}
+.m #p-preview .card{padding:14px}
+.m .pvteams{grid-template-columns:minmax(0,1fr);gap:10px}
+.m .pvat{display:none}
+.m .pvs,.m .pvs.h{flex-direction:row;text-align:left}
+.m .pvs.h .pvn{align-items:flex-start}
+.m .pvb .lg.big{width:44px;height:44px}
+.m .pvt{font-size:22px}
+.m .pvp b{font-size:34px}
+.m .pvgrid{grid-template-columns:minmax(0,1fr)}
+.m #p-preview .scr ul,.m #p-preview .keys ol{font-size:14px}
+.m #p-preview .watch{grid-template-columns:minmax(0,1fr)}
+.pvser>h4:first-of-type{display:none}
+#tres,#tup{overflow-y:auto;overscroll-behavior:contain}
