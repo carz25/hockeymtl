@@ -997,3 +997,9 @@ a.plink:focus-visible{outline:2px solid var(--lgc,#2563EB);outline-offset:2px;bo
 .jt .jn{width:40px;min-width:40px;max-width:40px;text-align:center;color:var(--mute);font-variant-numeric:tabular-nums;padding-left:6px;padding-right:6px}
 .jt .stick.s2{left:40px}
 .tpl{cursor:pointer}.tpl:hover{text-decoration:underline;text-underline-offset:2px}
+/* team page upcoming rows: date on the opponent's line, time on the arena's line */
+.trow.up{align-items:start}
+.trow.up .tdt{line-height:20px;padding-top:4px}
+.trow.up .tdt small{line-height:18px;margin-top:4px}
+.trow.up .to small{line-height:18px}
+.trow.up .btn{align-self:center}

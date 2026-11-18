@@ -1069,7 +1069,7 @@
     var hr = recOf(rs.filter(function (x) { return x.home; })), ar = recOf(rs.filter(function (x) { return !x.home; }));
     var head = '<div class="card thead"><div class="thl">' + badge(t, 1) + '<div><h2 class="tname">' + esc(TEAMS[t]) + '</h2><div class="sub">' + ord(s.rank) + " in the " + (MULTI ? esc(divOf(t).name) : GROUP) + " · " + rec(s) + " · " + (s.pend ? "–" : s.pts) + ' PTS</div><div class="sub">Last 5 ' + formChips(t, 5) + " · Streak " + streakOf(t) + "</div></div></div>" +
       '<div class="thr">' + (ng ? '<span class="sub">Next game</span><b>' + when(ng) + "</b><span>" + (ng.h === t ? "vs " + esc(TEAMS[ng.a]) : "at " + esc(TEAMS[ng.h])) + '</span><button class="btn pri" data-open="' + ng.id + '">Matchup preview</button>' : "") +
-      '<button class="btn" data-allteams="1">All teams</button></div></div>';
+      "</div></div>";
     var tiles = '<div class="tiles">' + tile("Points %", s.pct, ord(RK.pctn[t]) + " in the " + GROUP) + tile("Goals for / GP", f2(s.gfg), ord(RK.gfg[t]) + " · " + s.gf + " total") + tile("Goals against / GP", f2(s.gag), ord(RK.gag[t]) + " fewest · " + s.ga + " total") +
       tile("Home record", hr, recOfLbl(rs.filter(function (x) { return x.home; }))) + tile("Away record", ar, recOfLbl(rs.filter(function (x) { return !x.home; }))) + tile("PIM / GP", f1(s.pimg), ord(RK.pimg[t]) + " fewest · " + s.pim + " min") + "</div>";
     /* the same columns in every league; sheet leagues keep power-play goals as pwg/pwa and points per game as ppg */
