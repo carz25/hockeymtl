@@ -1099,13 +1099,10 @@
   }
 
   /* ---------- matchups ---------- */
+  /* one comparison line: the stronger side's value in bold (mode: "high" = more is better, "low" = less is better, "diff" = more is better) */
   function cmpRow(label, va, vh, fa, fh, mode) {
-    var lead = va === vh ? 0 : ((mode !== "low") === (va > vh) ? 1 : 2), share;
-    if (mode === "diff") share = (va + 5) / (va + vh + 10);
-    else if (va + vh === 0) share = 0.5;
-    else share = mode === "high" ? va / (va + vh) : vh / (va + vh);
-    share = Math.min(0.92, Math.max(0.08, share));
-    return '<div class="cmp"><div class="cv a' + (lead === 1 ? " lead" : "") + '">' + fa + '</div><div class="cl">' + label + '</div><div class="cv h' + (lead === 2 ? " lead" : "") + '">' + fh + '</div><div class="track" aria-hidden="true"><i style="width:' + (share * 100).toFixed(1) + '%"></i></div></div>';
+    var lead = va === vh ? 0 : ((mode !== "low") === (va > vh) ? 1 : 2);
+    return '<div class="cmp"><div class="cv a' + (lead === 1 ? " lead" : "") + '">' + fa + '</div><div class="cl">' + label + '</div><div class="cv h' + (lead === 2 ? " lead" : "") + '">' + fh + "</div></div>";
   }
   function watch(t) {
     var sk3 = topSkaters(t, 3), gl = topGoalie(t);
@@ -1354,8 +1351,8 @@ function makeModel(played, sheets, teams, opt) {
       '<div class="wpl"><span><b>' + wp.a + "%</b>" + esc(SHORT[g.a]) + '</span><span class="mid">Win probability' + (OT ? "" : " · Tie " + wp.t + "%") + '</span><span>' + esc(SHORT[g.h]) + ' <b style="margin:0 0 0 4px">' + wp.h + "%</b></span></div></div>";
     var A = ST[g.a], H = ST[g.h];
     var atk = function (x, y) { return "<p><b>" + esc(SHORT[x.t]) + " offence</b> scores " + f2(x.gfg) + " per game (" + ord(RK.gfg[x.t]) + " in the " + GROUP + "). <b>" + esc(SHORT[y.t]) + " defence</b> allows " + f2(y.gag) + " (" + ord(RK.gag[y.t]) + " fewest).</p>"; };
-    var rows = cmpRow("Rank", -A.rank, -H.rank, ord(A.rank), ord(H.rank), "diff").replace(/<div class="track"[\s\S]*?<\/i><\/div>/, "") +
-      cmpRow("Record", A.w * 2 + A.tie, H.w * 2 + H.tie, rec(A), rec(H), "high").replace(/<div class="track"[\s\S]*?<\/i><\/div>/, "") +
+    var rows = cmpRow("Rank", -A.rank, -H.rank, ord(A.rank), ord(H.rank), "diff") +
+      cmpRow("Record", A.w * 2 + A.tie, H.w * 2 + H.tie, rec(A), rec(H), "high") +
       cmpRow("PTS%", parseFloat(A.pct), parseFloat(H.pct), A.pct, H.pct, "high") +
       cmpRow("Goals for / GP", A.gfg, H.gfg, f2(A.gfg), f2(H.gfg), "high") +
       cmpRow("Goals against / GP", A.gag, H.gag, f2(A.gag), f2(H.gag), "low") +
