@@ -249,7 +249,7 @@
     var pc = "", wp = null;
     if (g.played) pc = "<i>" + (t === g.a ? g.sa : g.sh) + "</i>";
     else { wp = winProb(g.a, g.h); var v = t === g.a ? wp.a : wp.h; pc = '<em class="wpc' + (v === Math.max(wp.a, wp.h) && wp.a !== wp.h ? " fav" : "") + '">' + v + "%</em>"; }
-    return '<span class="wkl' + (g.played && !win ? " lose" : "") + '">' + badge(t) + '<b data-tp="' + t + '">' + esc(SHORT[t]) + "</b>" + pc + "</span>";
+    return '<span class="wkl' + (g.played && !win ? " lose" : "") + '">' + badge(t) + '<b><span class="tpl" data-tp="' + t + '">' + esc(SHORT[t]) + "</span></b>" + pc + "</span>";
   }
   function homeGame(g) {
     var inner = '<span class="hd">' + (g.played ? dshort(g.date) : dshort(g.date)) + "<small>" + (g.played ? fin(g) : g.time) + '</small></span><span class="hls">' + (g.played ? "" : '<span class="wph">Win probability</span>') + hLine(g, g.a, g.sa >= g.sh) + hLine(g, g.h, g.sh >= g.sa) + "</span>";
@@ -307,7 +307,7 @@
   }
   function resultTiles(list) {
     return '<div class="rgrid">' + list.map(function (g) {
-      var ln = function (t, sc, win) { var who = scorers(g, t); return '<div class="rl' + (win ? " w" : "") + '">' + badge(t) + "<b>" + esc(SHORT[t]) + "</b><i>" + sc + "</i></div>" + (who ? '<div class="rs">' + who + "</div>" : ""); };
+      var ln = function (t, sc, win) { var who = scorers(g, t); return '<div class="rl' + (win ? " w" : "") + '">' + badge(t) + '<b><span class="tpl" data-tp="' + t + '">' + esc(SHORT[t]) + "</span></b><i>" + sc + "</i></div>" + (who ? '<div class="rs">' + who + "</div>" : ""); };
       return '<button class="card rt2" data-open="' + g.id + '" aria-label="' + esc(SHORT[g.a]) + " " + g.sa + ", " + esc(SHORT[g.h]) + " " + g.sh + ', game summary"><div class="rh"><span>' + dshort(g.date) + "</span><span>" + fin(g) + "</span></div>" + ln(g.a, g.sa, g.sa > g.sh) + ln(g.h, g.sh, g.sh > g.sa) + "</button>";
     }).join("") + "</div>";
   }

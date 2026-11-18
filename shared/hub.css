@@ -996,3 +996,4 @@ a.plink:focus-visible{outline:2px solid var(--lgc,#2563EB);outline-offset:2px;bo
 .pshare:focus-visible{outline:2px solid var(--lgc,#2563EB);outline-offset:2px}
 .jt .jn{width:40px;min-width:40px;max-width:40px;text-align:center;color:var(--mute);font-variant-numeric:tabular-nums;padding-left:6px;padding-right:6px}
 .jt .stick.s2{left:40px}
+.tpl{cursor:pointer}.tpl:hover{text-decoration:underline;text-underline-offset:2px}
