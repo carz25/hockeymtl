@@ -73,7 +73,7 @@ No code changes are needed: the template was tested with every combination of `r
 
 ## Notes
 
-- After a change, GitHub Pages can take a few minutes to update, and browsers may keep the old `hub.css`/`hub.js` for a short while. A hard refresh shows the new version right away.
+- After a publish, Cloudflare rebuilds the site from `main` in about a minute. Pages are checked on every visit, so a reload shows the change; `hub.js`/`hub.css` change only when `C` is bumped (see Changing the shared code), and `data.js` can be up to 15 minutes old.
 - A few page sections still have two versions in `hub.js`, because the two leagues currently show different things. Those are standings and the home-page standings snapshot (one table vs divisions), and the players and team pages (sheet stats vs official stats). They're the functions ending in `C` (the M11 BB style) next to the ones without it (the M13 AAA style). If you want both leagues to look the same there, that's a change in one place.
 
 ## Changing the shared code
