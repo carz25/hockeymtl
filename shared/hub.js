@@ -1545,7 +1545,7 @@ function makeModel(played, sheets, teams, opt) {
       if (renderPlayer(pp[1], decodeURIComponent(pp.slice(2).join("/")))) { showSub("player"); return "player"; }
       h = "players";
     }
-    $("p-player").hidden = true;
+    $("p-player").hidden = true; $("p-game").hidden = true;
     if (h === "matchups") h = "schedule";
     if (TABS.indexOf(h) < 0) h = "home";
     TABS.forEach(function (t) { $("p-" + t).hidden = t !== h; });
