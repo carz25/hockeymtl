@@ -71,9 +71,17 @@ No code changes are needed: the template was tested with every combination of `r
 3. Create `data.js` from the league's schedule, standings and game sheets.
 4. Add one line for it to `shared/leagues.js` so it gets a panel on the home page and a link in the footer. The home page lays out any number of panels (side by side on computers, stacked bands on phones).
 
+## Next season: M11 AA (planned to replace M11 BB)
+
+`M11AA/index.html` is a "coming soon" placeholder, not linked from the home page. When the league starts:
+
+1. Replace the placeholder with a league page: copy `M11BB/index.html` (change the title and description) and add `league.js` and `data.js` as above.
+2. In `shared/leagues.js`, change the M11 BB line to M11 AA (or add it and drop M11 BB when that season is over).
+3. Keep the `M11BB/` folder so old links and last season's stats keep working, or turn `M11BB/index.html` into a page that points to `/M11AA/`.
+
 ## Notes
 
-- After a change, GitHub Pages can take a few minutes to update, and browsers may keep the old `hub.css`/`hub.js` for a short while. A hard refresh shows the new version right away.
+- After a publish, Cloudflare rebuilds the site from `main` in about a minute. Pages are checked on every visit, so a reload shows the change; `hub.js`/`hub.css` change only when `C` is bumped (see Changing the shared code), and `data.js` can be up to 15 minutes old.
 - A few page sections still have two versions in `hub.js`, because the two leagues currently show different things. Those are standings and the home-page standings snapshot (one table vs divisions), and the players and team pages (sheet stats vs official stats). They're the functions ending in `C` (the M11 BB style) next to the ones without it (the M13 AAA style). If you want both leagues to look the same there, that's a change in one place.
 
 ## Changing the shared code
