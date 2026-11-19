@@ -1091,8 +1091,7 @@
       var home = g.h === t, opp = home ? g.a : g.h;
       return '<div class="trow up"><span class="tdt">' + dshort(g.date) + (g.time === "TBD" ? "" : "<small>" + g.time + "</small>") + '</span><span class="to">' + (home ? "vs " : "at ") + tname(opp) + "<small>" + esc(g.venue) + '</small></span><button class="btn" data-open="' + g.id + '">Preview</button></div>';
     }).join("") || '<p class="empty">No games left on the schedule.</p>';
-    var foot = "PIM is penalty minutes. PP is power play, SH is short-handed, GWG is game-winning goals, GTG is game-tying goals. " +
-      (OFFICIAL ? "Official player stats through " + dlong(AS_OF) + (DATA_THROUGH && DATA_THROUGH > AS_OF ? ", plus game sheets through " + dlong(DATA_THROUGH) : "") + "." : "Counted from game sheets; PIM assumes 2 minutes per penalty.");
+    var foot = OFFICIAL ? "Official player stats through " + dlong(AS_OF) + (DATA_THROUGH && DATA_THROUGH > AS_OF ? ", plus game sheets through " + dlong(DATA_THROUGH) : "") + "." : "";
     el.innerHTML = head + '<div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">' + tiles +
       '<div class="tgrid"><div class="tcol"><h3>Skaters</h3>' + skT + "<h3>Goalies</h3>" + gkT + '<p class="mfoot" id="tfoot">' + foot + "</p>" + teamInsights(t) + "</div>" +
       '<div class="tcol"><h3>Results</h3><div class="card tlist" id="tres">' + resL + "</div><h3>Upcoming</h3><div class=\"card tlist\" id=\"tup\">" + upL + "</div></div></div></div>";
