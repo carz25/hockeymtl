@@ -1074,3 +1074,16 @@ body:not(.m) .dgrid .wph{display:none}
 .m #p-preview .watch{grid-template-columns:minmax(0,1fr)}
 .pvser>h4:first-of-type{display:none}
 #tres,#tup{overflow-y:auto;overscroll-behavior:contain}
+
+/* team insights (team page) */
+.insw h3{margin-top:4px}
+.inst{margin-bottom:12px;max-width:640px}
+.inst .rt td,.inst .rt th{text-align:center}
+.inst .rt th.l{text-align:left}
+.inst .pos{color:var(--win)}.inst .neg{color:var(--loss)}
+.insg{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.ins{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.ins>b{font-family:var(--display);font-weight:800;font-size:34px;line-height:1;font-variant-numeric:tabular-nums}
+.ins p{margin:0;font-size:14px;line-height:1.45;color:var(--ink2,var(--ink))}
+.m .insg{grid-template-columns:minmax(0,1fr)}
+.m .ins>b{font-size:30px}

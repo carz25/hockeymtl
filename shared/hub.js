@@ -1095,8 +1095,140 @@
       (OFFICIAL ? "Official player stats through " + dlong(AS_OF) + (DATA_THROUGH && DATA_THROUGH > AS_OF ? ", plus game sheets through " + dlong(DATA_THROUGH) : "") + "." : "Counted from game sheets; PIM assumes 2 minutes per penalty.");
     el.innerHTML = head + '<div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">' + tiles +
       '<div class="tgrid"><div class="tcol"><h3>Skaters</h3>' + skT + "<h3>Goalies</h3>" + gkT + '<p class="mfoot">' + foot + "</p></div>" +
-      '<div class="tcol"><h3>Results</h3><div class="card tlist" id="tres">' + resL + "</div><h3>Upcoming</h3><div class=\"card tlist\" id=\"tup\">" + upL + "</div></div></div></div>";
+      '<div class="tcol"><h3>Results</h3><div class="card tlist" id="tres">' + resL + "</div><h3>Upcoming</h3><div class=\"card tlist\" id=\"tup\">" + upL + "</div></div></div>" + teamInsights(t) + "</div>";
     fitTeamLists();
+  }
+  /* ---------- team insights: trends worked out from scores and game sheets ---------- */
+  function secOf(tm) { var p = String(tm).split(":"); return +p[0] * 60 + +(p[1] || 0); }
+  function perNo(p) { return p === "OT" || p === "SO" ? 4 : +p || 1; }
+  /* one game seen from team t: score, goals and penalties by period, in time order */
+  function sheetView(gm, t) {
+    var me = gm.a === t ? 0 : 1, ev = [];
+    gm.g.forEach(function (x, i) { var tt = gm.gt[i]; ev.push({ p: perNo(tt[0]), s: secOf(tt[1]), mine: x[0] === t, kind: tt[2] }); });
+    ev.sort(function (a, b) { return a.p - b.p || a.s - b.s; });
+    var pens = (gm.pt || []).map(function (x) { return { mine: x[0] === t, p: perNo(x[2]), s: secOf(x[3]), code: x[4] || "A" }; });
+    return { id: gm.id, date: (GBYID[gm.id] || {}).date || "", gf: gm.s[me], ga: gm.s[1 - me], ev: ev, pens: pens };
+  }
+  function teamSheets(t) {
+    return G.filter(function (gm) { return (gm.a === t || gm.h === t) && gm.gt && gm.gt.length === gm.g.length && GBYID[gm.id] && GBYID[gm.id].played; })
+      .map(function (gm) { return sheetView(gm, t); })
+      .sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : a.id - b.id; });
+  }
+  /* power play and penalty kill from game sheets. A chance starts each time a team goes up a man
+     (minors 2:00, ending early on a power-play goal; majors 5:00; matching penalties cancel). */
+  function stFrom(list, t) {
+    var o = { ppg: 0, ppo: 0, ppga: 0, pko: 0, games: list.length };
+    list.forEach(function (v) {
+      var T = function (p, s) { return p * 10000 + s; };
+      var pens = v.pens.filter(function (x) { return x.code[0] === "A" || x.code[0] === "B"; }).map(function (x) { var st = T(x.p, x.s); return { mine: x.mine, st: st, end: st + (x.code[0] === "B" ? 300 : 120), minor: x.code[0] === "A" }; });
+      var at = {}; pens.forEach(function (x) { (at[x.st] = at[x.st] || []).push(x); });
+      Object.keys(at).forEach(function (k) { var a = at[k].filter(function (x) { return x.mine; }), b = at[k].filter(function (x) { return !x.mine; }); for (var i = 0; i < Math.min(a.length, b.length); i++) a[i].co = b[i].co = true; });
+      var goals = v.ev.map(function (e) { return { mine: e.mine, t: T(e.p, e.s) }; });
+      var active = function (tm) { return pens.filter(function (x) { return !x.co && x.st <= tm && tm < x.end; }); };
+      var times = []; pens.forEach(function (x) { times.push(x.st, x.end); }); goals.forEach(function (g) { times.push(g.t); });
+      times = times.filter(function (x, i) { return times.indexOf(x) === i; }).sort(function (a, b) { return a - b; });
+      var prev = 0;
+      times.forEach(function (tm) {
+        goals.filter(function (g) { return g.t === tm; }).forEach(function (g) {
+          var act = active(tm), me = act.filter(function (x) { return x.mine; }).length, op = act.length - me;
+          var shortSide = g.mine && op > me ? false : !g.mine && me > op ? true : null;
+          if (shortSide === null) return;
+          if (shortSide) o.ppga++; else o.ppg++;
+          var m = act.filter(function (x) { return x.mine === shortSide && x.minor; }).sort(function (a, b) { return a.st - b.st; })[0]; if (m) m.end = tm;
+        });
+        var act = active(tm), me = act.filter(function (x) { return x.mine; }).length, op = act.length - me, st = op > me ? 1 : me > op ? -1 : 0;
+        if (st === 1 && prev !== 1) o.ppo++; if (st === -1 && prev !== -1) o.pko++; prev = st;
+      });
+    });
+    /* official leagues: the league's power-play goal count is more complete than the sheets' labels */
+    if (OFFICIAL && t && list.length >= GAMES.filter(function (g) { return g.played && (g.a === t || g.h === t); }).length && SPT[t]) o.ppg = Math.max(o.ppg, SPT[t].ppg);
+    o.pp = o.ppo ? o.ppg / o.ppo : null; o.pk = o.pko ? 1 - o.ppga / o.pko : null;
+    return o;
+  }
+  var ST_SHEETS = null;
+  function leagueST() {
+    if (ST_SHEETS) return ST_SHEETS;
+    ST_SHEETS = {};
+    ORDER.forEach(function (t) { var l = teamSheets(t); if (l.length >= 5) ST_SHEETS[t] = stFrom(l, t); });
+    return ST_SHEETS;
+  }
+  function sgn(n) { return n > 0 ? "+" + n : n < 0 ? "−" + -n : "0"; }
+  function pct0(x) { return Math.round(x * 100) + "%"; }
+  function teamInsights(t) {
+    var played = GAMES.filter(function (g) { return g.played && (g.a === t || g.h === t); }).sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : a.id - b.id; });
+    var res = played.map(function (g) { var me = g.a === t, f = me ? g.sa : g.sh, a = me ? g.sh : g.sa; return { gf: f, ga: a, r: f > a ? "W" : f < a ? "L" : "T", date: g.date }; });
+    var S = teamSheets(t), cards = [], n = res.length, PN = ["1st", "2nd", "3rd", "OT"];
+    var rtxt = function (xs) { var w = 0, l = 0, tt = 0; xs.forEach(function (x) { if (x.r === "W") w++; else if (x.r === "L") l++; else tt++; }); return w + "–" + l + (tt ? "–" + tt : ""); };
+    var card = function (big, text) { cards.push('<div class="ins"><b>' + big + "</b><p>" + text + "</p></div>"); };
+
+    /* period by period (game sheets) */
+    var per = [1, 2, 3, 4].map(function () { return { gf: 0, ga: 0, pen: 0 }; }), table = "";
+    S.forEach(function (v) { v.ev.forEach(function (e) { per[Math.min(4, e.p) - 1][e.mine ? "gf" : "ga"]++; }); v.pens.forEach(function (x) { if (x.mine) per[Math.min(4, x.p) - 1].pen++; }); });
+    var cols = per[3].gf + per[3].ga + per[3].pen ? 4 : 3;
+    if (S.length >= 3) {
+      var row = function (lbl, f, cls) { var h = '<tr><th class="l">' + lbl + "</th>"; for (var i = 0; i < cols; i++) h += "<td" + (cls ? ' class="' + cls(i) + '"' : "") + ">" + f(per[i]) + "</td>"; return h + "</tr>"; };
+      table = '<div class="card inst"><table class="rt"><thead><tr><th class="l">Period</th>' + PN.slice(0, cols).map(function (x) { return "<th>" + x + "</th>"; }).join("") + "</tr></thead><tbody>" +
+        row("Goals for", function (x) { return x.gf; }) + row("Goals against", function (x) { return x.ga; }) +
+        row("Difference", function (x) { return sgn(x.gf - x.ga); }, function (i) { var d = per[i].gf - per[i].ga; return "strong " + (d > 0 ? "pos" : d < 0 ? "neg" : ""); }) +
+        row("Penalties", function (x) { return x.pen; }) + "</tbody></table></div>";
+      /* 1. the period that decides games */
+      var diffs = per.slice(0, 3).map(function (x) { return x.gf - x.ga; }), bi = diffs.indexOf(Math.max.apply(null, diffs)), wi = diffs.indexOf(Math.min.apply(null, diffs));
+      var tot = diffs[0] + diffs[1] + diffs[2];
+      if (diffs[bi] - diffs[wi] >= 4) card(sgn(diffs[bi]), "Goal difference in the <b>" + PN[bi] + " period</b>, the team's best" + (tot > 0 && diffs[bi] > 0 && diffs[bi] < tot * 1.01 ? " (" + pct0(diffs[bi] / tot) + " of its " + sgn(tot) + " over the season)" : "") + ". The " + PN[wi] + " is its weakest at " + sgn(diffs[wi]) + ".");
+    }
+    /* 2. goals against, early games vs recent games */
+    if (n >= 6) {
+      var hf = Math.floor(n / 2), a1 = res.slice(0, hf).reduce(function (a, x) { return a + x.ga; }, 0) / hf, a2 = res.slice(n - hf).reduce(function (a, x) { return a + x.ga; }, 0) / hf;
+      if (a1 > 0 && Math.abs(a2 - a1) / a1 >= 0.15) card(f2(a1) + " → " + f2(a2), "Goals against per game, first " + hf + " games vs the last " + hf + ": <b>" + (a2 < a1 ? "down" : "up") + " " + pct0(Math.abs(a2 - a1) / a1) + "</b>.");
+    }
+    /* 3. the goals-against line that decides results */
+    if (n >= 6) {
+      var best = null;
+      for (var k = 1; k <= 8; k++) {
+        var lo = res.filter(function (x) { return x.ga <= k; }), hi = res.filter(function (x) { return x.ga > k; });
+        if (lo.length < 2 || hi.length < 2) continue;
+        var wp = function (xs) { return xs.reduce(function (a, x) { return a + (x.r === "W" ? 1 : x.r === "T" ? 0.5 : 0); }, 0) / xs.length; };
+        var gap = wp(lo) - wp(hi);
+        if (!best || gap > best.gap) best = { k: k, gap: gap, lo: lo, hi: hi };
+      }
+      if (best && best.gap >= 0.5) card(rtxt(best.lo), "Record when allowing <b>" + best.k + " goal" + (best.k === 1 ? "" : "s") + " or fewer</b>. When allowing " + (best.k + 1) + " or more: " + rtxt(best.hi) + ".");
+    }
+    /* 4. slow starts */
+    var gaS = per[0].ga + per[1].ga + per[2].ga + per[3].ga;
+    if (S.length >= 5 && gaS >= 10 && per[0].ga / gaS >= 0.4) card(pct0(per[0].ga / gaS), "of goals against come in the <b>1st period</b> (" + per[0].ga + " of " + gaS + "). Starts are the place to tighten up.");
+    /* 5. offence every game */
+    if (n >= 5) { var mn = Math.min.apply(null, res.map(function (x) { return x.gf; })); if (mn >= 2) card(mn + "+", "goals in <b>every game</b> this season (" + n + " games)."); }
+    /* 6. penalties: when, and the score at the time */
+    var pens = [], lead2 = 0;
+    S.forEach(function (v) { v.pens.forEach(function (x) { if (!x.mine) return; pens.push(x); var m = 0, o = 0; v.ev.forEach(function (e) { if (e.p < x.p || (e.p === x.p && e.s < x.s)) { if (e.mine) m++; else o++; } }); if (m - o >= 2) lead2++; }); });
+    if (S.length >= 5 && pens.length >= 10) {
+      var pp = [0, 0, 0, 0]; pens.forEach(function (x) { pp[Math.min(4, x.p) - 1]++; });
+      var mi = pp.indexOf(Math.max.apply(null, pp));
+      card(pct0(pp[mi] / pens.length), "of penalties are taken in the <b>" + PN[mi] + " period</b> (" + pp[mi] + " of " + pens.length + ")." + (lead2 ? " " + lead2 + " came while leading by 2 or more." : ""));
+    }
+    /* 7. the 1st period and the result */
+    if (S.length >= 5) {
+      var ahead = [], dW = 0, dL = 0, nW = 0, nL = 0;
+      S.forEach(function (v) { var d = 0; v.ev.forEach(function (e) { if (e.p === 1) d += e.mine ? 1 : -1; }); var r = v.gf > v.ga ? "W" : v.gf < v.ga ? "L" : "T"; if (d > 0) ahead.push({ r: r }); if (r === "W") { dW += d; nW++; } if (r === "L") { dL += d; nL++; } });
+      if (ahead.length >= 3) card(rtxt(ahead), "when <b>leading after the 1st period</b>." + (nW >= 2 && nL >= 2 ? " 1st-period goal difference: " + sgn(dW) + " in wins, " + sgn(dL) + " in losses." : ""));
+    }
+    /* 8. longest run of periods without a goal against */
+    if (S.length >= 3) {
+      var run = 0, bestRun = 0, from = "", to = "", cs = "";
+      S.forEach(function (v) { for (var p = 1; p <= 3; p++) { var ga = v.ev.filter(function (e) { return e.p === p && !e.mine; }).length; if (!ga) { if (!run) cs = v.date; run++; if (run > bestRun) { bestRun = run; from = cs; to = v.date; } } else run = 0; } });
+      if (bestRun >= 4) card(bestRun, "straight <b>periods without a goal against</b>, the longest run" + (from ? " (" + dshort(from) + (to !== from ? " to " + dshort(to) : "") + ")" : "") + ".");
+    }
+    /* 9. special teams, ranked among teams with game sheets */
+    var L = leagueST(), me = L[t];
+    if (me && me.pp != null && me.pk != null) {
+      var ts = Object.keys(L).filter(function (x) { return L[x].pp != null && L[x].pk != null; });
+      var rk = function (key) { return 1 + ts.filter(function (x) { return L[x][key] > me[key]; }).length; };
+      var comb = function (x) { return L[x].pp + L[x].pk; }, rc = 1 + ts.filter(function (x) { return comb(x) > comb(t); }).length;
+      card(pct0(me.pp) + " / " + pct0(me.pk), "<b>Power play / penalty kill</b>: " + ord(rk("pp")) + " and " + ord(rk("pk")) + ", " + ord(rc) + " combined, among the " + ts.length + " teams with game sheets. " + me.ppo + " power plays, " + me.pko + " times short-handed.");
+    }
+    if (!table && !cards.length) return "";
+    return '<div class="insw"><h3>Team insights</h3>' + table + (cards.length ? '<div class="insg">' + cards.join("") + "</div>" : "") +
+      '<p class="mfoot">Trends use every result' + (S.length ? "; periods, penalties and special teams use the " + S.length + " game sheet" + (S.length === 1 ? "" : "s") + " with goal times" + (S.length < n ? " (of " + n + " games played)" : "") : "") + ". A power-play chance starts each time the other team goes a man down.</p></div>";
   }
   /* desktop team page: Results no taller than the roster column, Upcoming shows 5 games; both scroll beyond that */
   function fitTeamLists() {
