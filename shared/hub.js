@@ -1094,8 +1094,8 @@
     var foot = "PIM is penalty minutes. PP is power play, SH is short-handed, GWG is game-winning goals, GTG is game-tying goals. " +
       (OFFICIAL ? "Official player stats through " + dlong(AS_OF) + (DATA_THROUGH && DATA_THROUGH > AS_OF ? ", plus game sheets through " + dlong(DATA_THROUGH) : "") + "." : "Counted from game sheets; PIM assumes 2 minutes per penalty.");
     el.innerHTML = head + '<div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">' + tiles +
-      '<div class="tgrid"><div class="tcol"><h3>Skaters</h3>' + skT + "<h3>Goalies</h3>" + gkT + '<p class="mfoot">' + foot + "</p></div>" +
-      '<div class="tcol"><h3>Results</h3><div class="card tlist" id="tres">' + resL + "</div><h3>Upcoming</h3><div class=\"card tlist\" id=\"tup\">" + upL + "</div></div></div>" + teamInsights(t) + "</div>";
+      '<div class="tgrid"><div class="tcol"><h3>Skaters</h3>' + skT + "<h3>Goalies</h3>" + gkT + '<p class="mfoot" id="tfoot">' + foot + "</p>" + teamInsights(t) + "</div>" +
+      '<div class="tcol"><h3>Results</h3><div class="card tlist" id="tres">' + resL + "</div><h3>Upcoming</h3><div class=\"card tlist\" id=\"tup\">" + upL + "</div></div></div></div>";
     fitTeamLists();
   }
   /* ---------- team insights: trends worked out from scores and game sheets ---------- */
@@ -1230,14 +1230,15 @@
     return '<div class="insw"><h3>Team insights</h3>' + table + (cards.length ? '<div class="insg">' + cards.join("") + "</div>" : "") +
       '<p class="mfoot">Trends use every result' + (S.length ? "; periods, penalties and special teams use the " + S.length + " game sheet" + (S.length === 1 ? "" : "s") + " with goal times" + (S.length < n ? " (of " + n + " games played)" : "") : "") + ". A power-play chance starts each time the other team goes a man down.</p></div>";
   }
-  /* desktop team page: Results no taller than the roster column, Upcoming shows 5 games; both scroll beyond that */
+  /* team page: Upcoming shows 5 games and scrolls beyond that; on desktop Results is no taller than the roster */
   function fitTeamLists() {
     var r = $("tres"), u = $("tup"); if (!r || !u) return;
     r.style.maxHeight = u.style.maxHeight = "";
-    if (document.body.classList.contains("m") || $("p-teams").hidden) return;
+    if ($("p-teams").hidden) return;
     var rows = u.querySelectorAll(".trow");
     if (rows.length > 5) u.style.maxHeight = Math.round(rows[5].getBoundingClientRect().top - u.getBoundingClientRect().top) + "px";
-    var left = r.closest(".tgrid").querySelector(".tcol"), room = left.getBoundingClientRect().bottom - r.getBoundingClientRect().top;
+    if (document.body.classList.contains("m")) return;
+    var f = $("tfoot"), room = f.getBoundingClientRect().bottom - r.getBoundingClientRect().top;
     var upH = u.getBoundingClientRect().height + (u.getBoundingClientRect().top - r.getBoundingClientRect().bottom);
     var max = Math.max(200, room - upH);
     if (r.scrollHeight > max) r.style.maxHeight = max + "px";

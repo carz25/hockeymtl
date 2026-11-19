@@ -1076,6 +1076,7 @@ body:not(.m) .dgrid .wph{display:none}
 #tres,#tup{overflow-y:auto;overscroll-behavior:contain}
 
 /* team insights (team page) */
+.insw{margin-top:22px}
 .insw h3{margin-top:4px}
 .inst{margin-bottom:12px;max-width:640px}
 .inst .rt td,.inst .rt th{text-align:center}
