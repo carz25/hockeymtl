@@ -29,6 +29,12 @@
     '.hc-send{border:0;border-radius:999px;padding:10px 22px;background:#C8102E;color:#fff;font:inherit;font-weight:700;font-size:15px;cursor:pointer;margin-left:auto}' +
     '.hc-send:hover{background:#A50D26}.hc-send:disabled{opacity:.6;cursor:default}' +
     '.hc-send:focus-visible,.hc-x:focus-visible{outline:2px solid #2563EB;outline-offset:2px}' +
+    '.hc-done{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1000;display:flex;flex-direction:column;align-items:center;gap:6px;padding:22px 30px;border-radius:14px;background:rgba(15,27,42,.92);color:#fff;font-family:"IBM Plex Sans",system-ui,sans-serif;box-shadow:0 16px 48px rgba(0,0,0,.3);pointer-events:none;animation:hcIn .25s ease-out;transition:opacity .6s ease}' +
+    '.hc-done.out{opacity:0}' +
+    '.hc-ck{display:grid;place-items:center;width:64px;height:64px;border-radius:50%;background:#1F9D55;margin-bottom:4px}' +
+    '.hc-done b{font-size:17px}.hc-done span{font-size:14px;opacity:.85}' +
+    '@keyframes hcIn{from{opacity:0;transform:translate(-50%,-46%)}to{opacity:1;transform:translate(-50%,-50%)}}' +
+    '@media (prefers-reduced-motion:reduce){.hc-done{animation:none;transition:none}}' +
     '@media (max-width:520px){.hc-row{grid-template-columns:1fr}.hc-in{padding:18px 16px 16px}.hc-top h2{font-size:26px}}';
 
   function el(html) { var d = document.createElement("div"); d.innerHTML = html; return d.firstChild; }
@@ -38,7 +44,7 @@
     dlg = el('<dialog class="hc-dlg" aria-labelledby="hc-title"><form class="hc-in" novalidate>' +
       '<div class="hc-top"><h2 id="hc-title">Contact</h2><button type="button" class="hc-x" aria-label="Close">&times;</button></div>' +
       '<p class="hc-lede">Questions, corrections or ideas for the site? Send a note.</p>' +
-      '<div class="hc-row"><div class="hc-f"><label for="hc-name">Name</label><input id="hc-name" name="name" maxlength="80" autocomplete="name" required></div>' +
+      '<div class="hc-row"><div class="hc-f"><label for="hc-name">First &amp; Last name</label><input id="hc-name" name="name" maxlength="80" autocomplete="name" required></div>' +
       '<div class="hc-f"><label for="hc-email">Email</label><input id="hc-email" name="email" type="email" maxlength="120" autocomplete="email" required></div></div>' +
       '<div class="hc-f"><label for="hc-subject">Subject</label><input id="hc-subject" name="subject" maxlength="120" required></div>' +
       '<div class="hc-f"><label for="hc-message">Message</label><textarea id="hc-message" name="message" maxlength="' + MAX + '" rows="5" required aria-describedby="hc-cnt"></textarea><span class="hc-cnt" id="hc-cnt" aria-live="polite">' + MAX + ' characters left</span></div>' +
@@ -51,7 +57,7 @@
     ta.addEventListener("input", function () { var left = MAX - ta.value.length; cnt.textContent = left + (left === 1 ? " character left" : " characters left"); cnt.classList.toggle("lo", left <= 20); });
     dlg.querySelector(".hc-x").addEventListener("click", close);
     dlg.addEventListener("click", function (e) { if (e.target === dlg) close(); });
-    dlg.addEventListener("close", function () { if (lastBtn) lastBtn.focus(); });
+    dlg.addEventListener("close", function () { if (lastBtn && document.body.contains(lastBtn)) lastBtn.focus(); });
     form.addEventListener("input", function () { var m = dlg.querySelector(".hc-msg"); if (m.classList.contains("err")) say(""); });
     form.addEventListener("submit", send);
   }
@@ -79,13 +85,20 @@
       .then(function (r) { return r.json().catch(function () { return { ok: false }; }); })
       .then(function (r) {
         btn.disabled = false;
-        if (r.ok) { f.reset(); f.message.dispatchEvent(new Event("input")); say("Thanks, your message was sent.", "ok"); if (widget && window.turnstile) window.turnstile.reset(widget); }
+        if (r.ok) { f.reset(); f.message.dispatchEvent(new Event("input")); say(""); if (widget && window.turnstile) window.turnstile.reset(widget); close(); sent(); }
         else { say(r.error || "Your message could not be sent. Please try again later.", "err"); if (widget && window.turnstile) window.turnstile.reset(widget); }
       })
       .catch(function () { btn.disabled = false; say("Your message could not be sent. Check your connection and try again.", "err"); });
   }
 
   function close() { if (dlg.open) dlg.close(); }
+  /* after a send: a green check in the middle of the screen that fades away by itself */
+  function sent() {
+    var d = el('<div class="hc-done" role="status" aria-live="polite"><span class="hc-ck" aria-hidden="true"><svg viewBox="0 0 52 52" width="52" height="52"><path d="M14 27l8 8 16-18" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b>Message sent</b><span>Thanks, we will get back to you.</span></div>');
+    document.body.appendChild(d);
+    setTimeout(function () { d.classList.add("out"); }, 1800);
+    setTimeout(function () { d.remove(); }, 2400);
+  }
 
   window.HMTL_CONTACT = function (btn) {
     if (!dlg) build();

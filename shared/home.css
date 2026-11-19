@@ -113,3 +113,8 @@ body{margin:0;background:var(--seam);color:#fff;font-family:var(--body);overflow
   .hp.many .hp-p:first-child .hp-num{top:50%}
 }
 @media (max-width:767px), (max-aspect-ratio:4/5){.hp.many{bottom:44px}}
+
+/* home page footer: copyright centred, Contact at the right end */
+.sitebar.slim.has-contact .sitebar-in{position:relative}
+.sitebar.slim.has-contact .sitebar-contact{position:absolute;right:max(16px,env(safe-area-inset-right,0px));top:50%;transform:translateY(-50%);margin:0}
+@media (max-width:520px){.sitebar.slim.has-contact .sitebar-in{justify-content:flex-start}}
