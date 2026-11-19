@@ -2,7 +2,7 @@
    Sends to /api/contact (worker.js), which emails the site owner. */
 (function () {
   /* Turnstile (Cloudflare's spam check) site key, public. Leave "" to skip the check. */
-  var SITEKEY = "";
+  var SITEKEY = "0x4AAAAAAGHy20x5Ar8V87RK";
   var MAX = 250, dlg, lastBtn, widget = null;
 
   var css = '' +
