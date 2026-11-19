@@ -37,7 +37,7 @@ window.HMTL_SITEBAR = function (base, slim) {
     if (loading) return;
     loading = true;
     var s = document.createElement("script");
-    s.src = "/shared/contact.js?v=2";
+    s.src = "/shared/contact.js?v=3";
     s.onload = function () { loading = false; if (window.HMTL_CONTACT) window.HMTL_CONTACT(b); };
     s.onerror = function () { loading = false; };
     document.head.appendChild(s);
