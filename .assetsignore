@@ -8,3 +8,4 @@ __pycache__/
 wrangler.jsonc
 CNAME
 .assetsignore
+worker.js

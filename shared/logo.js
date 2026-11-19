@@ -16,9 +16,28 @@ window.HMTL_WORDMARK = '<span class="wm" aria-hidden="true"><span class="wm-h">H
 window.HMTL_SITEBAR = function (base, slim) {
   base = base || "";
   /* slim: one line with the copyright only (home page, where the divisions are already on screen) */
-  if (slim) return '<div class="sitebar slim"><div class="sitebar-in"><span class="sitebar-note">&copy; 2026 Hockey MTL. All Rights Reserved.</span></div></div>';
+  var contact = '<button type="button" class="sitebar-contact" data-contact="1">Contact</button>';
+  if (slim) return '<div class="sitebar slim"><div class="sitebar-in"><span class="sitebar-note">&copy; 2026 Hockey MTL. All Rights Reserved.</span>' + contact + '</div></div>';
   var links = (window.LEAGUES || []).map(function (l) { return '<a href="' + base + l.folder + '/">' + l.label + "</a>"; }).join("");
   return '<div class="sitebar"><div class="sitebar-in"><a class="sitebar-home" href="' + (base || "./") + '">Hockey MTL</a>' +
-    '<nav class="sitebar-nav" aria-label="All divisions">' + links + "</nav>" +
+    '<nav class="sitebar-nav" aria-label="All divisions">' + links + "</nav>" + contact +
     '<span class="sitebar-note"><span class="sb-long">Unofficial fan site, not affiliated with any league or club. &copy; 2026 Hockey MTL</span><span class="sb-short">Unofficial fan site &middot; &copy; 2026 Hockey MTL</span></span></div></div>';
 };
+
+/* Contact button (any page with the footer): loads the form on first use from /shared/contact.js. */
+(function () {
+  var loading = false;
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest("[data-contact]");
+    if (!b) return;
+    e.preventDefault();
+    if (window.HMTL_CONTACT) { window.HMTL_CONTACT(b); return; }
+    if (loading) return;
+    loading = true;
+    var s = document.createElement("script");
+    s.src = "/shared/contact.js?v=1";
+    s.onload = function () { loading = false; if (window.HMTL_CONTACT) window.HMTL_CONTACT(b); };
+    s.onerror = function () { loading = false; };
+    document.head.appendChild(s);
+  });
+})();

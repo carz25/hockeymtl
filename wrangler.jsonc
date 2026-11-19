@@ -1,13 +1,21 @@
-// Cloudflare Workers settings: the site is plain files served straight from Cloudflare (no code runs).
-// Cloudflare rebuilds the site from this repo each time main changes (Workers Builds, deploy command: npx wrangler deploy).
+// Cloudflare Workers settings. The site is plain files served straight from Cloudflare;
+// worker.js runs only for /api/* (the contact form). Cloudflare rebuilds the site from this repo
+// each time main changes (Workers Builds, deploy command: npx wrangler deploy).
 {
   "name": "hockeymtl",
+  "main": "worker.js",
   "compatibility_date": "2026-11-18",
   "assets": {
-    // the whole repo is the site; .assetsignore lists what is not published (tools, notes)
+    // the whole repo is the site; .assetsignore lists what is not published (tools, notes, worker.js)
     "directory": ".",
+    "binding": "ASSETS",
+    // only the contact form's address runs code; everything else is a file
+    "run_worker_first": ["/api/*"],
     // unknown addresses get 404.html; /M11BB and /M11BB/ both open the league page
     "not_found_handling": "404-page",
     "html_handling": "auto-trailing-slash"
-  }
+  },
+  // the contact form emails the owner; Cloudflare only lets this reach addresses verified
+  // under Email Routing, and the address itself is the CONTACT_TO secret, not stored here
+  "send_email": [{ "name": "EMAIL" }]
 }

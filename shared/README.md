@@ -78,9 +78,11 @@ No code changes are needed: the template was tested with every combination of `r
 
 ## Changing the shared code
 
-Each league page loads `hub.js` and `hub.css` as `?v=C`, where `C` is set near the top of every league's `index.html` (`var C = "20261117b"`). Browsers keep their copy until `C` changes, so after any change to `shared/hub.js` or `shared/hub.css`, give `C` a new value in **every** league's `index.html` (the same value everywhere). `data.js` needs nothing: its `?v=` changes every 15 minutes on its own.
+Each league page loads `hub.js` and `hub.css` as `?v=C`, where `C` is set near the top of every league's `index.html` (`var C = "20261117b"`). Browsers keep their copy until `C` changes, so after any change to `shared/hub.js` or `shared/hub.css`, give `C` a new value in **every** league's `index.html`, and in the `hub.css?v=` link of `index.html` and `404.html` (the same value everywhere). `data.js` needs nothing: its `?v=` changes every 15 minutes on its own.
 
 ## Hosting
 
 The site is served by Cloudflare (Workers static assets), rebuilt from `main` on every push. `wrangler.jsonc` holds the settings, `.assetsignore` lists repo files that are not published (tools, notes), and `_headers` sets how long browsers keep each file. Nothing else is needed for a new league: its folder is published like the others.
+
+`worker.js` runs only for `/api/*`: today that is the footer's Contact form (`shared/contact.js`, loaded on first click by `shared/logo.js`), which emails the owner through Cloudflare Email Routing. Its private settings live in the Worker (Settings → Variables and Secrets), not in the repo: `CONTACT_TO` (the owner's verified address), `TURNSTILE_SECRET` (spam check), optional `CONTACT_FROM` (default `form@hockeymtl.ca`). The public Turnstile site key goes in `SITEKEY` at the top of `shared/contact.js`.
 
