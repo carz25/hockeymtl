@@ -39,3 +39,7 @@
   Cache-Control: public, max-age=86400
 /shared/icons/*
   Cache-Control: public, max-age=86400
+
+# Test page for a new home page: keep it out of search results
+/new-home/*
+  X-Robots-Tag: noindex, nofollow
