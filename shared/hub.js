@@ -683,8 +683,22 @@
         return "<div><b>" + plinkK(t, x[1]) + "</b> · " + mmss(x[2]) + " · " + x[3] + " GA" + dec + "</div>";
       }).join("") + "</div>";
     }).join("");
-    return '<div class="gsum">' + head + '<div class="desk">' + starsD + '<div class="gs-two">' + scoring + penalties + "</div></div>" +
-      '<div class="mob">' + starsM + '<div class="gs-sec gs-mlist">' + mob + "</div></div>" + '<div class="gs-gk">' + gk + "</div></div>";
+    var tab = state.gtab || "recap";
+    var tabs = '<div class="ttabs gtabs" role="tablist" aria-label="Game summary sections">' + [["recap", "Recap"], ["pbp", "Play by play"], ["box", "Box score"]].map(function (x) {
+      return '<button role="tab" data-gtab="' + x[0] + '" aria-selected="' + (tab === x[0]) + '">' + x[1] + "</button>";
+    }).join("") + "</div>";
+    var body;
+    if (tab === "recap") {
+      body = '<div class="desk">' + starsD + '</div><div class="mob">' + starsM + "</div>" +
+        (D.timed && D.goals.length ? '<div class="card gsec2"><div class="tc-hd"><h3>Game flow</h3><span class="tc-leg"><i class="k-a"></i>' + abbr(a) + ' ahead<i class="k-h"></i>' + abbr(h) + ' ahead · circles are goals (jersey #) · bars are penalties</span></div>' + gameFlow(g, D) + "</div>" : "") +
+        keyMoments(g, sh, D) +
+        '<div class="g2">' + (D.timed ? '<div class="card gsec2"><h3>By period</h3>' + periodSplit(g, D) + "</div>" : "") + whatItMeans(g) + "</div>";
+    } else if (tab === "pbp") {
+      body = '<div class="desk"><div class="gs-two">' + scoring + penalties + '</div></div><div class="mob"><div class="gs-sec gs-mlist">' + mob + "</div></div>";
+    } else {
+      body = boxScore(g, sh, D) + '<div class="gs-gk">' + gk + "</div>";
+    }
+    return '<div class="gsum gsum2" id="gsum" style="' + teamPair(a, h) + '">' + head + tabs + '<div class="gbody">' + body + "</div></div>";
   }
   function toSec(t) { var m = /^(\d+):(\d+)$/.exec(t || ""); return m ? +m[1] * 60 + +m[2] : 0; }
   function isoOf(d) { return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
@@ -1175,11 +1189,17 @@
   /* ---------- team colours: the strongest colour in the team's logo, worked out once in the browser ---------- */
   var TCOL = {};
   function teamColor(t) { return TCOL[t] || BADGE[t] || "#1F4E8C"; }
-  function paintTeamColor(t) {
-    if (TCOL[t] || !LOGOS) return;
-    var probe = document.querySelector("#tban .tb-logo .lg"); if (!probe) return;
-    var m = /url\(["']?(.*?)["']?\)/.exec(getComputedStyle(probe).backgroundImage || ""); if (!m) return;
+  function paintTeamColor(t) { logoColor(t, function (hex) { var pg = $("tpage"); if (pg && state.team === t) pg.style.setProperty("--tc", hex); }); }
+  function logoColor(t, cb) {
+    var fb = BADGE[t] || "#1F4E8C";
+    if (TCOL[t]) { cb(TCOL[t]); return; }
+    if (!LOGOS) { TCOL[t] = fb; cb(fb); return; }
+    var probe = document.createElement("div"); probe.style.cssText = "position:absolute;left:-9999px;top:0"; probe.innerHTML = badge(t, 1); document.body.appendChild(probe);
+    var el = probe.querySelector(".lg"), m = el && /url\(["']?(.*?)["']?\)/.exec(getComputedStyle(el).backgroundImage || "");
+    probe.parentNode.removeChild(probe);
+    if (!m) { TCOL[t] = fb; cb(fb); return; }
     var img = new Image();
+    img.onerror = function () { TCOL[t] = fb; cb(fb); };
     img.onload = function () {
       try {
         var c = document.createElement("canvas"), N = 40; c.width = c.height = N;
@@ -1189,17 +1209,253 @@
           if (d[i + 3] < 200) continue;
           var r = d[i], g = d[i + 1], b = d[i + 2], mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 510, sat = mx === mn ? 0 : (mx - mn) / (255 - Math.abs(mx + mn - 255));
           if (sat < 0.3 || l < 0.12 || l > 0.85) continue;
-          var k = (r >> 5) + "," + (g >> 5) + "," + (b >> 5);
+          var hue = mx === r ? ((g - b) / (mx - mn) + 6) % 6 : mx === g ? (b - r) / (mx - mn) + 2 : (r - g) / (mx - mn) + 4, k = Math.round(hue * 2) % 12;   // 12 hue families
           var o = bins[k] || (bins[k] = { n: 0, r: 0, g: 0, b: 0 }); o.n++; o.r += r; o.g += g; o.b += b;
         }
         var best = null; Object.keys(bins).forEach(function (k) { if (!best || bins[k].n > best.n) best = bins[k]; });
-        if (!best || best.n < 12) { TCOL[t] = BADGE[t] || "#1F4E8C"; return; }
-        var hex = "#" + [best.r, best.g, best.b].map(function (v) { return ("0" + Math.round(v / best.n).toString(16)).slice(-2); }).join("");
-        TCOL[t] = hex;
-        var pg = $("tpage"); if (pg && state.team === t) pg.style.setProperty("--tc", hex);
-      } catch (e) { TCOL[t] = BADGE[t] || "#1F4E8C"; }
+        TCOL[t] = !best || best.n < 40 ? fb : "#" + [best.r, best.g, best.b].map(function (v) { return ("0" + Math.round(v / best.n).toString(16)).slice(-2); }).join("");
+      } catch (e) { TCOL[t] = fb; }
+      cb(TCOL[t]);
     };
     img.src = m[1];
+  }
+
+  /* ---------- team colours for two-team pages (game summary, matchup preview) ---------- */
+  function teamPair(a, h) {
+    var ca = teamColor(a), ch = teamColor(h);
+    var rgb = function (x) { var m = /^#?([0-9a-f]{6})$/i.exec(x || ""); if (!m) return [0, 0, 0]; var n = parseInt(m[1], 16); return [n >> 16, (n >> 8) & 255, n & 255]; };
+    var p = rgb(ca), q = rgb(ch), d = Math.sqrt(Math.pow(p[0] - q[0], 2) + Math.pow(p[1] - q[1], 2) + Math.pow(p[2] - q[2], 2));
+    if (d < 90) ch = "#5B6B80";                           // two teams in near-identical colours: keep them apart on the charts
+    return "--ca:" + ca + ";--ch:" + ch;
+  }
+  function paintPair(id, a, h) {
+    var n = 0, done = function () { if (++n < 2) return; var el = $(id); if (el) el.setAttribute("style", teamPair(a, h)); };
+    logoColor(a, done); logoColor(h, done);
+  }
+  function abbr(t) { return esc(SHORT[t]); }
+
+  /* ---------- game summary extras ---------- */
+  /* when each goal and penalty happened, in seconds from the opening face-off */
+  function flowTimes(D) {
+    var plen = Math.round(D.glen / 3 * 60), ab = function (p, t) { return (p - 1) * plen + Math.min(toSec(t), plen); };
+    var ot = D.periods.filter(function (p) { return p >= 4; }).length;
+    var otMax = 0; D.goals.concat(D.pens).forEach(function (e) { if (e.per >= 4) otMax = Math.max(otMax, toSec(e.time)); });
+    var end = 3 * plen + (ot ? Math.max(300, otMax + 30) : 0);
+    return { plen: plen, end: end, ab: ab, ot: ot };
+  }
+  function gameFlow(g, D) {
+    var T = flowTimes(D), W = document.body.classList.contains("m") ? 480 : 1200, H = 230, top = 26, mid = 104, lane = 182;
+    var marg = 0, maxM = 2; D.goals.forEach(function (x) { maxM = Math.max(maxM, Math.abs(x.sa - x.sh)); });
+    var u = (mid - top) / maxM, X = function (s) { return (s / T.end * W).toFixed(1); };
+    var segs = "", prev = 0, out = "";
+    D.goals.forEach(function (x) {
+      var s = T.ab(x.per, x.time);
+      if (marg) segs += '<rect class="' + (marg > 0 ? "fa" : "fh") + '" x="' + X(prev) + '" y="' + (marg > 0 ? mid - marg * u : mid).toFixed(1) + '" width="' + (X(s) - X(prev)).toFixed(1) + '" height="' + Math.abs(marg * u).toFixed(1) + '"/>';
+      prev = s; marg = x.sa - x.sh;
+    });
+    if (marg) segs += '<rect class="' + (marg > 0 ? "fa" : "fh") + '" x="' + X(prev) + '" y="' + (marg > 0 ? mid - marg * u : mid).toFixed(1) + '" width="' + (W - X(prev)).toFixed(1) + '" height="' + Math.abs(marg * u).toFixed(1) + '"/>';
+    // step line
+    var path = "M0 " + mid, m2 = 0;
+    D.goals.forEach(function (x) { var s = X(T.ab(x.per, x.time)); path += " H" + s + " V" + (mid - (x.sa - x.sh) * u).toFixed(1); m2 = x.sa - x.sh; });
+    path += " H" + W;
+    // period lines
+    var per = "";
+    for (var p = 1; p <= 3 + T.ot; p++) {
+      var x0 = p === 1 ? 0 : X((p - 1) * T.plen), x1 = p <= 3 ? X(p * T.plen) : W;
+      if (p > 1) per += '<line class="pl" x1="' + x0 + '" x2="' + x0 + '" y1="' + (top - 14) + '" y2="' + (lane + 30) + '"/>';
+      per += '<text class="plb" x="' + ((+x0 + +x1) / 2).toFixed(1) + '" y="12">' + (p >= 4 ? "OT" : ["1st", "2nd", "3rd"][p - 1]) + "</text>";
+    }
+    // penalties: one lane per team under the chart, each box as long as the penalty
+    var pens = D.pens.filter(function (x) { return x.mins > 0 && x.per; }).map(function (x) {
+      var s = T.ab(x.per, x.time), e = Math.min(s + x.mins * 60, x.per <= 3 ? x.per * T.plen : T.end), y = x.t === D.a ? lane : lane + 16;
+      return '<rect class="' + (x.t === D.a ? "pa" : "ph") + '" x="' + X(s) + '" y="' + y + '" width="' + Math.max(3, X(e) - X(s)).toFixed(1) + '" height="11" rx="2"><title>' + esc(x.time) + " " + perShort(x.per) + " · " + esc(x.k ? nm(x.t, x.k) : "Bench") + " (" + abbr(x.t) + ") · " + esc(x.what || "Penalty") + ", " + x.mins + " min</title></rect>";
+    }).join("");
+    // goal markers: jersey number where we have it
+    var dots = D.goals.map(function (x) {
+      var s = X(T.ab(x.per, x.time)), y = (mid - (x.sa - x.sh) * u).toFixed(1), name = x.k ? nm(x.t, x.k) : "Unknown";
+      var num = NUM[x.t] && NUM[x.t][name] != null ? String(NUM[x.t][name]) : "";
+      return '<g class="gm ' + (x.t === D.a ? "a" : "h") + '"><title>' + esc(x.time) + " " + perShort(x.per) + " · " + esc(name) + " (" + abbr(x.t) + ")" + (x.kind === "pp" ? ", power play" : x.kind === "sh" ? ", short-handed" : "") + (x.gw ? ", game-winner" : "") + " · " + x.sa + "–" + x.sh + "</title>" +
+        '<circle cx="' + s + '" cy="' + y + '" r="12"/><text x="' + s + '" y="' + (+y + 4) + '">' + esc(num || "•") + "</text></g>";
+    }).join("");
+    var lbl = '<text class="yl a" x="6" y="' + (top + 4) + '">' + abbr(D.a) + " ahead</text>" + '<text class="yl h" x="6" y="' + (mid + maxM * u - 4).toFixed(1) + '">' + abbr(D.h) + " ahead</text>";
+    return '<svg class="gflow" viewBox="0 0 ' + W + " " + (lane + 32) + '" role="img" aria-label="Game flow: who led, by how much, and when each goal and penalty happened">' + per +
+      '<line class="mid" x1="0" x2="' + W + '" y1="' + mid + '" y2="' + mid + '"/>' + segs + '<path class="step" d="' + path + '"/>' + pens + dots + lbl + "</svg>";
+  }
+  function keyMoments(g, sh, D) {
+    var c = [], card = function (k, big, txt, tm) { c.push('<div class="km' + (tm ? " " + tm : "") + '"><span class="k">' + k + "</span><b>" + big + "</b><p>" + txt + "</p></div>"); };
+    var who = function (x) { return plinkK(x.t, x.k) + " <small>" + abbr(x.t) + "</small>"; };
+    var side = function (t) { return t === D.a ? "a" : "h"; };
+    var f = D.goals[0];
+    if (f && D.timed) card("First goal", esc(f.time) + " " + perShort(f.per), who(f), side(f.t));
+    var gw = D.goals.filter(function (x) { return x.gw; })[0];
+    if (gw) card("Game-winner", gw.time ? esc(gw.time) + " " + perShort(gw.per) : "GWG", who(gw) + (gw.kind === "pp" ? " · power play" : gw.kind === "sh" ? " · short-handed" : ""), side(gw.t));
+    if (D.timed && D.goals.length) {
+      var T = flowTimes(D), led = {}, prev = 0, m = 0; led.a = 0; led.h = 0; led.t = 0;
+      D.goals.forEach(function (x) { var s = T.ab(x.per, x.time); led[m > 0 ? "a" : m < 0 ? "h" : "t"] += s - prev; prev = s; m = x.sa - x.sh; });
+      var endS = D.periods.filter(function (p) { return p >= 4; }).length ? T.ab(D.goals[D.goals.length - 1].per, D.goals[D.goals.length - 1].time) : 3 * T.plen;
+      led[m > 0 ? "a" : m < 0 ? "h" : "t"] += Math.max(0, endS - prev);
+      var tot = led.a + led.h + led.t || 1, mm = function (s) { return Math.floor(s / 60) + ":" + ("0" + Math.round(s % 60)).slice(-2); };
+      var top = led.a >= led.h ? "a" : "h";
+      c.push('<div class="km wide"><span class="k">Time leading</span><b>' + abbr(top === "a" ? D.a : D.h) + " " + mm(led[top]) + '</b><div class="kbar"><i class="a" style="flex:' + led.a + '"></i><i class="t" style="flex:' + led.t + '"></i><i class="h" style="flex:' + led.h + '"></i></div>' +
+        "<p>" + abbr(D.a) + " " + mm(led.a) + " · tied " + mm(led.t) + " · " + abbr(D.h) + " " + mm(led.h) + "</p></div>");
+      var big = 0, bx = null; D.goals.forEach(function (x) { if (Math.abs(x.sa - x.sh) > big) { big = Math.abs(x.sa - x.sh); bx = x; } });
+      if (bx && big >= 2) card("Biggest lead", "+" + big + " " + abbr(bx.sa > bx.sh ? D.a : D.h), "Reached at " + esc(bx.time) + " of the " + perShort(bx.per) + ", at " + bx.sa + "–" + bx.sh + ".", side(bx.sa > bx.sh ? D.a : D.h));
+      var best = null;
+      [D.a, D.h].forEach(function (t) {
+        var l = D.goals.filter(function (x) { return x.t === t; });
+        for (var i = 1; i < l.length; i++) { var gap = T.ab(l[i].per, l[i].time) - T.ab(l[i - 1].per, l[i - 1].time); if (gap <= 150 && (!best || gap < best.gap)) best = { gap: gap, t: t, x: l[i] }; }
+      });
+      if (best) card("Quick strike", "2 goals in " + mm(best.gap), abbr(best.t) + " struck twice, finishing at " + esc(best.x.time) + " of the " + perShort(best.x.per) + ".", side(best.t));
+      if (D.win) {
+        var deficit = 0; D.goals.forEach(function (x) { var d = D.win === D.a ? x.sh - x.sa : x.sa - x.sh; if (d > deficit) deficit = d; });
+        if (deficit) card("Comeback", "Down " + deficit + ", won", abbr(D.win) + " trailed by " + deficit + " goal" + (deficit === 1 ? "" : "s") + " and came back.", side(D.win));
+      }
+    }
+    var ppg = function (t) { return D.goals.filter(function (x) { return x.t === t && x.kind === "pp"; }).length; };
+    var ppo = function (t) { var o = t === D.a ? D.h : D.a; return D.pens.filter(function (x) { return x.t === o && (x.code || "A")[0] !== "C" && (x.code || "A")[0] !== "D"; }).length; };
+    if (D.timed) card("Power plays", ppg(D.a) + "/" + ppo(D.a) + " · " + ppg(D.h) + "/" + ppo(D.h), abbr(D.a) + " " + ppg(D.a) + " of " + ppo(D.a) + ", " + abbr(D.h) + " " + ppg(D.h) + " of " + ppo(D.h) + " (goals / chances).");
+    return c.length ? '<div class="kms">' + c.join("") + "</div>" : "";
+  }
+  /* goals in each period, one side each */
+  function periodSplit(g, D) {
+    if (!D.timed) return "";
+    var per = function (t, p) { return D.goals.filter(function (x) { return x.t === t && x.per === p; }).length; };
+    var pim = function (t, p) { return D.pens.filter(function (x) { return x.t === t && x.per === p; }).reduce(function (s, x) { return s + x.mins; }, 0); };
+    var mx = 1; D.periods.forEach(function (p) { mx = Math.max(mx, per(D.a, p), per(D.h, p)); });
+    return '<div class="psplit"><div class="ps-hd"><span>' + abbr(D.a) + "</span><span></span><span>" + abbr(D.h) + "</span></div>" + D.periods.map(function (p) {
+      var a = per(D.a, p), h = per(D.h, p);
+      return '<div class="ps-r"><span class="ps-v">' + a + '</span><span class="ps-b a"><i style="width:' + (a / mx * 100) + '%"></i></span><span class="ps-l">' + perShort(p) + "<small>PIM " + pim(D.a, p) + "–" + pim(D.h, p) + '</small></span><span class="ps-b h"><i style="width:' + (h / mx * 100) + '%"></i></span><span class="ps-v">' + h + "</span></div>";
+    }).join("") + "</div>";
+  }
+  /* each player's line for this game */
+  function boxScore(g, sh, D) {
+    return '<div class="box2">' + [D.a, D.h].map(function (t) {
+      var P = {}, get = function (k) { return P[k] || (P[k] = { k: k, g: 0, a: 0, pim: 0, pp: 0, gw: 0 }); };
+      String((sh.d && sh.d[t]) || "").split(" ").forEach(function (k) { if (k) get(k); });
+      D.goals.forEach(function (x) { if (x.t !== t) return; if (x.k) { var r = get(x.k); r.g++; if (x.kind === "pp") r.pp++; if (x.gw) r.gw++; } x.as.forEach(function (k) { get(k).a++; }); });
+      D.pens.forEach(function (x) { if (x.t === t && x.k) get(x.k).pim += x.mins; });
+      var gks = sh.k.filter(function (x) { return x[0] === t; }).map(function (x) { return x[1]; });
+      var rows = Object.keys(P).map(function (k) { return P[k]; }).filter(function (r) { return gks.indexOf(r.k) < 0; })
+        .sort(function (p, q) { return (q.g + q.a) - (p.g + p.a) || q.g - p.g || q.pim - p.pim || nm(t, p.k).localeCompare(nm(t, q.k)); });
+      var jn = function (k) { var n = nm(t, k); return NUM[t] && NUM[t][n] != null ? NUM[t][n] : ""; };
+      return '<div class="card"><h3>' + badge(t) + " " + esc(TEAMS[t]) + '</h3><div class="wrap"><table class="rt jt"><thead><tr><th class="jn">#</th><th class="l">Player</th><th>G</th><th>A</th><th>PTS</th><th>PIM</th></tr></thead><tbody>' +
+        rows.map(function (r) { var pts = r.g + r.a; return '<tr class="' + (pts ? "" : "z") + '"><td class="jn">' + jn(r.k) + '</td><td class="l strong">' + plinkK(t, r.k) + (r.gw ? ' <span class="gtag gw">GWG</span>' : "") + "</td><td>" + r.g + "</td><td>" + r.a + '</td><td class="strong">' + pts + "</td><td>" + (r.pim || "–") + "</td></tr>"; }).join("") +
+        "</tbody></table></div></div>";
+    }).join("") + "</div>";
+  }
+  function whatItMeans(g) {
+    var side = function (t) {
+      var s = ST[t], ng = nextGame(t);
+      return '<div class="wim"><div class="wim-t">' + badge(t) + "<b>" + esc(TEAMS[t]) + '</b></div><div class="wim-n"><span><b>' + ord(s.rank) + "</b><small>" + (MULTI ? esc(divOf(t).name) : GROUP) + "</small></span><span><b>" + rec(s) + "</b><small>" + RECL + "</small></span><span>" + streakOf(t) + "<small>Streak</small></span></div>" +
+        (ng ? '<p class="wim-x">Next: ' + dshort(ng.date) + " " + (ng.h === t ? "vs " : "at ") + abbr(ng.h === t ? ng.a : ng.h) + "</p>" : "") + "</div>";
+    };
+    return '<div class="card gsec2"><h3>Where they stand now</h3><div class="wims">' + side(g.a) + side(g.h) + '</div><div class="gser">' + seriesBlock(g) + "</div></div>";
+  }
+
+  /* ---------- matchup preview extras ---------- */
+  /* bars measured against the whole league: a full bar is the league's best, an empty one its worst */
+  function taleOfTape(g) {
+    var A = ST[g.a], H = ST[g.h], rows = [];
+    var span = function (key, low, fn) {
+      var vals = ORDER.map(function (t) { return fn ? fn(t) : ST[t][key]; }).filter(function (v) { return v != null && !isNaN(v); });
+      var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+      return function (v) { if (hi === lo) return 0.5; var r = (v - lo) / (hi - lo); return low ? 1 - r : r; };
+    };
+    var row = function (lbl, va, vh, fa, fh, sc) {
+      var ra = sc(va), rh = sc(vh), lead = ra === rh ? 0 : ra > rh ? 1 : 2;
+      rows.push('<div class="tt-r"><span class="tt-v a' + (lead === 1 ? " on" : "") + '">' + fa + '</span><span class="tt-b a"><i style="width:' + Math.round(8 + 92 * ra) + '%"' + (lead === 1 ? ' class="on"' : "") + '></i></span><span class="tt-l">' + lbl + '</span><span class="tt-b h"><i style="width:' + Math.round(8 + 92 * rh) + '%"' + (lead === 2 ? ' class="on"' : "") + '></i></span><span class="tt-v h' + (lead === 2 ? " on" : "") + '">' + fh + "</span></div>");
+    };
+    row("Points %", parseFloat(A.pct), parseFloat(H.pct), A.pct, H.pct, span(null, 0, function (t) { return parseFloat(ST[t].pct); }));
+    row("Goals for / game", A.gfg, H.gfg, f2(A.gfg), f2(H.gfg), span("gfg"));
+    row("Goals against / game", A.gag, H.gag, f2(A.gag), f2(H.gag), span("gag", 1));
+    row("Goal diff / game", A.dg, H.dg, sgn2(A.dg), sgn2(H.dg), span("dg"));
+    row("Penalty min / game", A.pimg, H.pimg, f1(A.pimg), f1(H.pimg), span("pimg", 1));
+    var L5 = function (t) { return results(t).slice(-5).reduce(function (s, x) { return s + (x.r === "W" ? 2 : x.r === "T" ? 1 : 0); }, 0); };
+    row("Points, last 5", L5(g.a), L5(g.h), L5(g.a), L5(g.h), span(null, 0, L5));
+    var S = leagueST();
+    if (S[g.a] && S[g.h] && S[g.a].pp != null && S[g.h].pp != null) {
+      var ks = Object.keys(S);
+      var sp = function (k) { var v = ks.map(function (t) { return S[t][k]; }).filter(function (x) { return x != null; }), lo = Math.min.apply(null, v), hi = Math.max.apply(null, v); return function (x) { return hi === lo ? 0.5 : (x - lo) / (hi - lo); }; };
+      row("Power play %", S[g.a].pp, S[g.h].pp, pct0(S[g.a].pp), pct0(S[g.h].pp), sp("pp"));
+      row("Penalty kill %", S[g.a].pk, S[g.h].pk, pct0(S[g.a].pk), pct0(S[g.h].pk), sp("pk"));
+    }
+    return '<div class="tt"><div class="tt-hd"><span>' + abbr(g.a) + "</span><span>Bars compare each team with the whole " + (MULTI ? "league" : GROUP) + "</span><span>" + abbr(g.h) + "</span></div>" + rows.join("") + "</div>";
+  }
+  function sgn2(v) { return (v > 0 ? "+" : "") + f2(v); }
+  /* last 10 games for each team, goal difference per game */
+  function formChart(g) {
+    return '<div class="fch">' + [g.a, g.h].map(function (t) {
+      var l = results(t).slice(-10), mx = Math.max.apply(null, l.map(function (x) { return Math.abs(x.us - x.them); }).concat([3]));
+      var w = l.filter(function (x) { return x.r === "W"; }).length, lo = l.filter(function (x) { return x.r === "L"; }).length;
+      return '<div class="fch-r"><span class="fch-t">' + badge(t) + "<b>" + abbr(t) + "</b><small>" + w + "-" + lo + (l.length - w - lo ? "-" + (l.length - w - lo) : "") + " last " + l.length + '</small></span><span class="fch-b">' + l.map(function (x) {
+        var d = x.us - x.them, h = Math.max(3, Math.round(Math.abs(d) / mx * 26));
+        return '<a class="grs fcb" href="#game/' + x.g.id + '" title="' + dshort(x.g.date) + (x.home ? " vs " : " at ") + esc(SHORT[x.opp]) + ": " + x.r + " " + x.us + "–" + x.them + '"><i class="' + (d > 0 ? "up" : d < 0 ? "dn" : "ev") + '" style="height:' + h + 'px"></i></a>';
+      }).join("") + "</span></div>";
+    }).join("") + "</div>";
+  }
+  /* most likely final scores from the projected goals of each team */
+  function likelyScores(g, wp) {
+    var po = function (l, k) { var p = Math.exp(-l); for (var i = 1; i <= k; i++) p *= l / i; return p; };
+    var all = [], tie = 0, a3 = 0, h3 = 0;
+    for (var i = 0; i <= 12; i++) for (var j = 0; j <= 12; j++) {
+      var p = po(wp.la, i) * po(wp.lh, j); all.push([i, j, p]);
+      if (i === j) tie += p; if (i - j >= 3) a3 += p; if (j - i >= 3) h3 += p;
+    }
+    all.sort(function (x, y) { return y[2] - x[2]; });
+    var pc = function (v) { return Math.max(1, Math.round(v * 100)) + "%"; };
+    return '<div class="lsc"><div class="lsc-top">' + all.slice(0, 3).map(function (x, i) {
+      var who = x[0] > x[1] ? abbr(g.a) + " win" : x[1] > x[0] ? abbr(g.h) + " win" : OT ? "Tied, to overtime" : "Tie";
+      return '<div class="lsc-s' + (i ? "" : " on") + '"><b>' + x[0] + "–" + x[1] + "</b><small>" + who + "</small><span>" + pc(x[2]) + "</span></div>";
+    }).join("") + '</div><div class="lsc-x"><span><b>' + pc(tie) + "</b>" + (OT ? "Tied after regulation, goes to overtime" : "Ends in a tie") + "</span><span><b>" + pc(a3) + "</b>" + abbr(g.a) + " win by 3+</span><span><b>" + pc(h3) + "</b>" + abbr(g.h) + " win by 3+</span></div>" +
+      '<p class="mfoot">From the projected score, ' + abbr(g.a) + " " + f1(wp.la) + " – " + abbr(g.h) + " " + f1(wp.lh) + ".</p></div>";
+  }
+  /* each team's goal difference per game in each period, from game sheets with goal times */
+  function periodMatch(g) {
+    var A = teamInsightData(g.a), H = teamInsightData(g.h);
+    if (A.S.length < 3 || H.S.length < 3) return "";
+    var P = ["1st", "2nd", "3rd"], v = function (I, i) { return (I.per[i].gf - I.per[i].ga) / I.S.length; };
+    var mx = 0.5; [0, 1, 2].forEach(function (i) { mx = Math.max(mx, Math.abs(v(A, i)), Math.abs(v(H, i))); });
+    var bar = function (x, cls) { return '<span class="pm-b"><i class="' + cls + (x < 0 ? " neg" : "") + '" style="width:' + Math.round(Math.abs(x) / mx * 50) + "%;" + (x < 0 ? "right:50%" : "left:50%") + '"></i></span><span class="pm-v ' + (x > 0 ? "pos" : x < 0 ? "neg" : "") + '">' + sgn2(x) + "</span>"; };
+    return '<div class="pm"><div class="pm-hd"><span></span><span>' + abbr(g.a) + "</span><span>" + abbr(g.h) + "</span></div>" + P.map(function (p, i) {
+      return '<div class="pm-r"><span class="pm-l">' + p + '</span><span class="pm-c">' + bar(v(A, i), "a") + '</span><span class="pm-c">' + bar(v(H, i), "h") + "</span></div>";
+    }).join("") + '<p class="mfoot">Goal difference per game in each period, from ' + A.S.length + " and " + H.S.length + " game sheets with goal times.</p></div>";
+  }
+  function stMatch(g) {
+    var S = leagueST(), A = S[g.a], H = S[g.h];
+    if (!A || !H || A.pp == null || H.pp == null) return "";
+    var pair = function (x, y, tx, ty, cx, cy) {
+      return '<div class="stm-r"><div class="stm-s"><span class="k">' + abbr(tx) + ' power play</span><b>' + pct0(x.pp) + '</b><span class="stm-g ' + cx + '"><i style="width:' + Math.round(x.pp * 100) + '%"></i></span></div>' +
+        '<span class="stm-vs">vs</span><div class="stm-s"><span class="k">' + abbr(ty) + ' penalty kill</span><b>' + pct0(y.pk) + '</b><span class="stm-g ' + cy + '"><i style="width:' + Math.round(y.pk * 100) + '%"></i></span></div></div>';
+    };
+    return '<div class="stm">' + pair(A, H, g.a, g.h, "a", "h") + pair(H, A, g.h, g.a, "h", "a") + '<p class="mfoot">Counted from game sheets; a power-play chance starts each time the other team goes a man down.</p></div>';
+  }
+  /* players to watch, as cards; a flame when he has a point in each of his last 3 game sheets */
+  function watchCards(t) {
+    var sk3 = topSkaters(t, 3), gl = topGoalie(t);
+    var card = function (r, line, big, unit, gk) {
+      var n = NUM[t] && NUM[t][r.name] != null ? NUM[t][r.name] : "";
+      var hot = !gk && (function () { var l = playerLog(t, r.name).slice(-3); return l.length === 3 && l.every(function (x) { return x.pts > 0; }); })();
+      return '<div class="wc"><span class="wc-n">' + (n !== "" ? n : "") + '</span><div class="wc-w"><b>' + plink(t, r.name) + (hot ? ' <span class="hot" title="A point in each of his last 3 games">🔥</span>' : "") + "</b><small>" + line + '</small></div><span class="wc-v"><b>' + big + "</b><small>" + unit + "</small></span></div>";
+    };
+    return '<div class="wcs"><h4>' + badge(t) + " " + esc(TEAMS[t]) + "</h4>" + sk3.map(function (r) { return card(r, r.g + " G · " + r.a + " A · " + r.gp + " GP", r.pts, "PTS"); }).join("") +
+      (gl ? card(gl, "Goalie · " + gl.w + "-" + gl.l + "-" + gl.t + " · " + gl.so + " SO", f2(gl.gaa), "GAA", 1) : "") + "</div>";
+  }
+  /* results against teams both have played */
+  function commonOpp(g) {
+    var ra = results(g.a), rh = results(g.h);
+    var opps = ORDER.filter(function (o) { return o !== g.a && o !== g.h && ra.some(function (x) { return x.opp === o; }) && rh.some(function (x) { return x.opp === o; }); });
+    if (!opps.length) return '<p class="empty">They have no opponents in common yet.</p>';
+    var tot = { a: [0, 0, 0, 0], h: [0, 0, 0, 0] };
+    var cell = function (list, o, key) {
+      var l = list.filter(function (x) { return x.opp === o; }), w = 0, lo = 0, ti = 0, d = 0;
+      l.forEach(function (x) { if (x.r === "W") w++; else if (x.r === "L") lo++; else ti++; d += x.us - x.them; });
+      tot[key][0] += w; tot[key][1] += lo; tot[key][2] += ti; tot[key][3] += d;
+      return '<td class="co-c"><b>' + w + "-" + lo + (ti ? "-" + ti : "") + '</b> <span class="' + (d > 0 ? "pos" : d < 0 ? "neg" : "") + '">' + (d > 0 ? "+" : "") + d + "</span></td>";
+    };
+    var body = opps.map(function (o) { return '<tr><td class="l">' + tname(o) + "</td>" + cell(ra, o, "a") + cell(rh, o, "h") + "</tr>"; }).join("");
+    var tt = function (k) { var x = tot[k]; return '<td class="co-c"><b>' + x[0] + "-" + x[1] + (x[2] ? "-" + x[2] : "") + '</b> <span class="' + (x[3] > 0 ? "pos" : x[3] < 0 ? "neg" : "") + '">' + (x[3] > 0 ? "+" : "") + x[3] + "</span></td>"; };
+    return '<div class="wrap"><table class="rt co"><thead><tr><th class="l">Opponent</th><th>' + abbr(g.a) + "</th><th>" + abbr(g.h) + "</th></tr></thead><tbody>" + body + '</tbody><tfoot><tr><th class="l">All common opponents</th>' + tt("a") + tt("h") + "</tr></tfoot></table></div>" +
+      '<p class="mfoot">Record and goal difference against the ' + opps.length + " team" + (opps.length === 1 ? "" : "s") + " both have played.</p>";
   }
 
   /* ---------- charts ---------- */
@@ -1653,21 +1909,31 @@ function makeModel(played, sheets, teams, opt) {
       '<div class="pvbl"><span>' + esc(SHORT[g.a]) + "</span><span>" + (OT ? "" : "Tie " + wp.t + "% · ") + "Projected score " + f1(wp.la) + "–" + f1(wp.lh) + "</span><span>" + esc(SHORT[g.h]) + "</span></div>";
     var hero = '<div class="card pvhero"><div class="pvmeta">' + esc(when(g)) + " · " + esc(g.venue) + " · Game #" + g.id + "</div>" +
       '<div class="pvteams">' + side(g.a, A, wp.a, "a") + '<div class="pvat">at</div>' + side(g.h, H, wp.h, "h") + "</div>" + bar + "</div>";
-    var rows = cmpRow("Rank", -A.rank, -H.rank, ord(A.rank), ord(H.rank), "diff") +
-      cmpRow("Record", A.w * 2 + A.tie, H.w * 2 + H.tie, rec(A), rec(H), "high") +
-      cmpRow("PTS%", parseFloat(A.pct), parseFloat(H.pct), A.pct, H.pct, "high") +
-      cmpRow("Goals for / GP", A.gfg, H.gfg, f2(A.gfg), f2(H.gfg), "high") +
-      cmpRow("Goals against / GP", A.gag, H.gag, f2(A.gag), f2(H.gag), "low") +
-      cmpRow("Goal diff / GP", A.dg, H.dg, (A.dg > 0 ? "+" : "") + f2(A.dg), (H.dg > 0 ? "+" : "") + f2(H.dg), "diff") +
-      cmpRow("Penalty min / GP", A.pimg, H.pimg, f1(A.pimg), f1(H.pimg), "low");
-    var cmp = '<div class="card pvc"><h3>Team comparison</h3><div class="cmph"><span>' + esc(SHORT[g.a]) + "</span><span></span><span>" + esc(SHORT[g.h]) + "</span></div>" + rows + "</div>";
-    var ser = '<div class="card pvc pvser"><h3>Season series</h3>' + seriesBlock(g) + "</div>";
-    var wat = '<div class="card pvc"><h3>Players to watch</h3><div class="watch">' + watch(g.a) + watch(g.h) + "</div></div>";
-    var model = '<div class="card pvc pvm"><h3>How the odds are set</h3>' + modelNotes(g, wp) + "</div>";
-    var small = Math.min(A.gp, H.gp);
-    $("p-preview").innerHTML = '<div class="ptop">' + backBtn("Back to Schedule") + '<button class="pshare" data-share="1">Share</button></div>' + hero +
-      '<div class="pvgrid"><div class="pvmain card pvc">' + scoutHTML(g) + '</div><div class="pvside">' + cmp + ser + wat + model + "</div></div>" +
+    if (state.pid !== id) { state.pid = id; state.ptab = "preview"; }
+    var tab = state.ptab || "preview", small = Math.min(A.gp, H.gp);
+    var tabs = '<div class="ttabs gtabs" role="tablist" aria-label="Matchup preview sections">' + [["preview", "Preview"], ["teams", "Teams"], ["history", "History"], ["model", "Model"]].map(function (x) {
+      return '<button role="tab" data-ptab="' + x[0] + '" aria-selected="' + (tab === x[0]) + '">' + x[1] + "</button>";
+    }).join("") + "</div>";
+    var keys = keysFor(g.a, g.h), body;
+    if (tab === "preview") {
+      body = '<div class="pv2"><div class="pv2c">' +
+        '<div class="card gsec2"><h3>Keys to the game</h3>' + (keys.length ? '<ol class="keys2">' + keys.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ol>" : '<p class="empty">No clear mismatch. Both teams profile similarly, so execution and discipline decide it.</p>') + "</div>" +
+        '<div class="card gsec2"><h3>Tale of the tape</h3>' + taleOfTape(g) + "</div></div>" +
+        '<div class="pv2c"><div class="card gsec2"><div class="tc-hd"><h3>Recent form</h3><span class="tc-leg">Goal difference, last 10 games</span></div>' + formChart(g) + "</div>" +
+        '<div class="card gsec2"><h3>Likely scores</h3>' + likelyScores(g, wp) + "</div></div></div>";
+    } else if (tab === "teams") {
+      var pm = periodMatch(g), stm = stMatch(g);
+      body = '<div class="card gsec2"><h3>Scouting report</h3><div class="scout"><div class="scrg">' + scoutCard(g.a, g.h) + scoutCard(g.h, g.a) + "</div></div></div>" +
+        (pm || stm ? '<div class="pv2">' + (pm ? '<div class="card gsec2"><h3>Period by period</h3>' + pm + "</div>" : "") + (stm ? '<div class="card gsec2"><h3>Special teams</h3>' + stm + "</div>" : "") + "</div>" : "") +
+        '<div class="card gsec2"><h3>Players to watch</h3><div class="pv2">' + watchCards(g.a) + watchCards(g.h) + "</div></div>";
+    } else if (tab === "history") {
+      body = '<div class="pv2"><div class="card gsec2 pvser">' + seriesBlock(g).replace("<h4>Season series</h4>", "<h3>Season series</h3>") + '</div><div class="card gsec2"><h3>Common opponents</h3>' + commonOpp(g) + "</div></div>";
+    } else {
+      body = '<div class="card gsec2 pvm"><h3>How the odds are set</h3>' + modelNotes(g, wp) + "</div>";
+    }
+    $("p-preview").innerHTML = '<div class="ptop">' + backBtn("Back to Schedule") + '<button class="pshare" data-share="1">Share</button></div><div id="pvwrap" class="pvwrap" style="' + teamPair(g.a, g.h) + '">' + hero + tabs + '<div class="gbody">' + body + "</div></div>" +
       '<p class="mfoot">Season stats come from the ' + (OFFICIAL ? "official table" : "standings") + ", with " + (small === Math.max(A.gp, H.gp) ? small : small + " to " + Math.max(A.gp, H.gp)) + " games played per team, so small samples can swing. Player lines come from available game sheets.</p>";
+    paintPair("pvwrap", g.a, g.h);
     document.title = SHORT[g.a] + " at " + SHORT[g.h] + " · " + (LEAGUE.title || "") + " · Hockey MTL";
     return true;
   }
@@ -1720,7 +1986,9 @@ function makeModel(played, sheets, teams, opt) {
     var g = GAMES.filter(function (x) { return x.id === id; })[0];
     if (!g || !g.played) return false;
     var sheet = SHEET[g.id];
+    if (state.gid !== id) { state.gid = id; state.gtab = "recap"; }
     $("p-game").innerHTML = '<div class="gpage">' + backBtn("Back to Results") + '<div class="gpbody">' + (sheet ? sheetDetail(g, sheet) : resultDetail(g)) + "</div></div>";
+    if (sheet) paintPair("gsum", g.a, g.h);
     return true;
   }
   /* ---------- player profile: #player/<team>/<name> ---------- */
@@ -1886,6 +2154,8 @@ function makeModel(played, sheets, teams, opt) {
     if (b.dataset.team) { openTeam(b.dataset.team); return; }
     if (b.dataset.ttab) { state.ttab = b.dataset.ttab; renderTeams(); var tt = document.querySelector(".ttabs"); if (tt && tt.getBoundingClientRect().top < 0) tt.scrollIntoView(); var sel = document.querySelector('.ttabs [data-ttab="' + state.ttab + '"]'); if (sel) sel.focus(); return; }
     if (b.dataset.tmore) { state.tmore = !state.tmore; renderTeams(); return; }
+    if (b.dataset.gtab) { state.gtab = b.dataset.gtab; renderGame(state.gid); var gb = document.querySelector('[data-gtab="' + state.gtab + '"]'); if (gb) gb.focus(); return; }
+    if (b.dataset.ptab) { state.ptab = b.dataset.ptab; renderPreview(state.pid); var pb = document.querySelector('[data-ptab="' + state.ptab + '"]'); if (pb) pb.focus(); return; }
     if (b.dataset.back) { var bh = location.hash.slice(1); goBack(bh.slice(0, 7) === "player/" ? "players" : bh.slice(0, 8) === "preview/" ? "schedule" : "results"); return; }
     if (b.dataset.share) { var u = location.href; if (navigator.share) navigator.share({ title: document.title, url: u }).catch(function () { }); else if (navigator.clipboard) navigator.clipboard.writeText(u).then(function () { b.textContent = "Link copied"; setTimeout(function () { b.textContent = "Share"; }, 1800); }); return; }
     if (b.dataset.open) { var pg = GAMES.filter(function (x) { return x.id === +b.dataset.open; })[0];
