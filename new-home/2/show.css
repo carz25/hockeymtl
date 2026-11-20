@@ -1,0 +1,153 @@
+/* hockeymtl.ca landing page, test version 2 (/new-home/2/). Colours per division are in show.js (THEME). */
+html:has(body.sp-body){background:#050B14}
+body.sp-body{margin:0;background:#050B14;color:#fff;font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:15px;line-height:1.45}
+body.sp-body::before{display:none}
+.sp{position:relative;min-height:100vh;min-height:100dvh;overflow:hidden;display:flex;flex-direction:column;background:#050B14}
+.sp a{color:#fff}
+.sp a:focus-visible,.sp button:focus-visible{outline:3px solid #7DD3FC;outline-offset:3px}
+.sp-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.sp-disp,.sp h1,.sp-wm,.sp-nav,.sp-bhd,.sp-slide,.sp-clock b,.sp-dname b,.sp-st b,.sp-enter,.sp-out{font-family:"Big Shoulders Display","Arial Narrow",sans-serif}
+
+/* the rink, the arena lights and the vignette */
+.sp-rink{position:absolute;inset:-3%;transition:transform .2s ease-out}
+.sp-rink svg{width:100%;height:100%;display:block}
+.sp-carve{stroke-dasharray:1000;animation:spCarve 2.8s ease-out both}
+.sp-lights{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.sp-beam{position:absolute;top:-6%;width:70%;height:130%;transform-origin:50% 0;mix-blend-mode:screen;-webkit-mask-image:linear-gradient(180deg,#000 8%,transparent 90%);mask-image:linear-gradient(180deg,#000 8%,transparent 90%)}
+.sp-beam.a{left:-14%;background:conic-gradient(from 166deg at 50% 0,rgba(125,211,252,0) 0deg,rgba(125,211,252,.34) 12deg,rgba(125,211,252,0) 26deg);animation:spSweepA 9s ease-in-out infinite alternate}
+.sp-beam.b{right:-14%;background:conic-gradient(from 168deg at 50% 0,rgba(255,255,255,0) 0deg,rgba(255,255,255,.24) 11deg,rgba(255,255,255,0) 24deg);animation:spSweepB 11s ease-in-out infinite alternate}
+.sp-vig{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 8%,rgba(5,11,20,0) 35%,rgba(5,11,20,.88) 100%)}
+.sp-strip{position:relative;z-index:1;display:flex;height:4px;flex:none}.sp-strip span{flex:1}
+
+/* header: logo and division links, no bar */
+.sp-top{position:relative;z-index:2;display:flex;align-items:center;gap:10px 28px;padding:16px 48px}
+.sp-brand{display:flex;align-items:center;gap:14px;text-decoration:none}
+.sp-brand .puck{width:64px;height:64px;flex:none}
+.sp-wm{display:flex;flex-direction:column;font-weight:800;text-transform:uppercase;line-height:1}
+.sp-wm span:first-child{font-size:14px;letter-spacing:.42em;color:#7DD3FC}
+.sp-wm span:last-child{font-size:40px;font-style:italic}
+.sp-nav{margin-left:auto;display:flex;gap:6px 28px;font-size:22px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.sp-nav a{padding:10px 0;text-decoration:none;border-bottom:2px solid transparent}
+.sp-nav a:hover{border-bottom-color:#fff}
+
+/* hero */
+.sp-main{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;justify-content:center;gap:28px;padding:0 48px 22px}
+.sp-hero{display:flex;flex-wrap:wrap;align-items:center;gap:32px 56px}
+.sp-copy{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;gap:20px}
+.sp-eye{font-size:14px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:#7DD3FC}
+.sp h1{margin:0;color:#fff;font-size:clamp(54px,min(8.2vw,11.5vh),118px);font-weight:800;font-style:italic;line-height:.9;letter-spacing:.005em;text-transform:uppercase;white-space:normal}
+.sp h1 span{color:inherit;font-size:inherit}
+.slam{display:inline-block;animation:spSlam .75s cubic-bezier(.2,.9,.2,1) both}
+.sheen{background:linear-gradient(100deg,#7DD3FC 0%,#fff 42%,#7DD3FC 58%,#2E6FE0 100%);background-size:240% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:#7DD3FC;animation:spSlam .75s cubic-bezier(.2,.9,.2,1) both,spSheen 5s linear infinite;padding-right:.08em}
+.rise{animation:spRise .7s ease-out both}
+.sp-copy p{margin:0;max-width:520px;font-size:18px;color:#C9D6E4}
+
+/* scoreboard */
+.sp-boardw{flex:0 1 440px;min-width:300px}
+.sp-board{transition:transform .2s ease-out;background-color:#04070C;background-image:radial-gradient(rgba(255,255,255,.06) 1px,rgba(255,255,255,0) 1.3px);background-size:5px 5px;border:1px solid #24364F;box-shadow:0 30px 80px rgba(0,0,0,.6),inset 0 0 0 6px #0A111C;padding:24px 26px 22px;display:flex;flex-direction:column;gap:14px}
+.sp-board[hidden]{display:none}
+.sp-bhd{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:17px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#AABCD0}
+.sp-lamp{flex:none;width:16px;height:16px;border-radius:50%;background:#FF3B3B;animation:spLamp 4s linear infinite}
+.sp-slides{position:relative;height:150px}
+.sp-slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;gap:4px;opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease;text-transform:uppercase;text-decoration:none;pointer-events:none}
+.sp-slide.on{opacity:1;transform:none;pointer-events:auto}
+.sp-tag{align-self:flex-start;padding:2px 8px;font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:11px;font-weight:700;letter-spacing:.06em;color:#fff;text-transform:uppercase}
+.sp-row{display:flex;align-items:baseline;justify-content:space-between;gap:16px;color:#C99A3A}
+.sp-row span{font-size:36px;font-weight:600;line-height:1.1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sp-row b{font-size:62px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
+.sp-row.w{color:#FFC247;text-shadow:0 0 18px rgba(255,180,60,.55)}
+.sp-row.w span,.sp-row.w b{font-weight:800}
+.sp-slide:hover .sp-row.w{color:#FFD67A}
+.sp-dots{display:flex;gap:8px}.sp-dots span{width:22px;height:4px;background:#24364F;transition:background .3s}.sp-dots span.on{background:#FFC247}
+.sp-next{display:flex;flex-direction:column;gap:8px;padding-top:14px;border-top:1px solid #24364F}
+.sp-next[hidden]{display:none}
+.sp-nlbl{font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#AABCD0!important;text-decoration:none}
+.sp-nlbl:hover{color:#fff!important}
+.sp-clock{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;font-variant-numeric:tabular-nums}
+.sp-clock span{display:flex;flex-direction:column;align-items:center;padding:8px 0 6px;background:#0A111C;border:1px solid #24364F}
+.sp-clock b{font-size:42px;font-weight:800;line-height:1}
+.sp-clock small{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#AABCD0}
+
+/* division doors */
+.sp-doors{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(460px,100%),1fr));gap:20px 28px;padding:0 22px}
+.sp-door{position:relative;overflow:hidden;display:block;text-decoration:none;background:var(--bg);background-image:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,0) 45%);border-top:3px solid var(--edge);transform:skewX(-9deg);animation:spDoor .8s cubic-bezier(.2,.9,.2,1) backwards;transition:transform .25s ease,box-shadow .25s ease}
+.sp-door:hover{transform:skewX(-9deg) translateY(-10px);box-shadow:0 26px 60px rgba(0,0,0,.55)}
+.sp-door::after{content:"";position:absolute;top:0;bottom:0;left:0;width:30%;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.24),rgba(255,255,255,0));transform:translateX(-140%) skewX(-20deg)}
+.sp-door:hover::after{animation:spGlint .9s ease-out}
+.sp-un{position:relative;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 28px;padding:20px 52px 22px;transform:skewX(9deg)}
+.sp-out{position:absolute;right:150px;top:-36px;font-size:210px;font-weight:800;font-style:italic;line-height:1;color:rgba(255,255,255,.06);-webkit-text-stroke:2px rgba(255,255,255,.34);pointer-events:none}
+.sp-dname{position:relative;display:flex;flex-direction:column}
+.sp-deye{font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--soft)}
+.sp-dname b{font-size:78px;font-weight:800;line-height:.95;text-transform:uppercase}
+.sp-dstats{position:relative;display:flex;gap:26px;min-height:56px}
+.sp-st{display:flex;flex-direction:column}
+.sp-st b{font-size:40px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.sp-st small{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--soft)}
+.sp-enter{position:relative;display:inline-flex;align-items:center;gap:10px;font-size:22px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+
+/* results ticker */
+.sp-tick{position:relative;z-index:1;flex:none;overflow:hidden;white-space:nowrap;background:rgba(4,7,12,.85);border-top:1px solid #1A2C45;border-bottom:1px solid #1A2C45}
+.sp-tick[hidden]{display:none}
+.sp-track{display:flex;width:max-content;animation:spRoll var(--dur,46s) linear infinite}
+.sp-tick:hover .sp-track,.sp-tick:focus-within .sp-track{animation-play-state:paused}
+.sp-set{display:flex}
+.sp-chip{display:inline-flex;align-items:center;gap:10px;padding:11px 26px;border-right:1px solid #1A2C45;font-size:14px;text-decoration:none}
+.sp-chip:hover{background:#0B1626}
+.sp-chip>span:last-child{color:#AABCD0}
+.sp-chip .sp-tag{align-self:auto;padding:2px 6px;letter-spacing:.04em}
+
+/* footer */
+.sp-foot{position:relative;z-index:1;flex:none;background:#050B14;margin:0;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 24px;padding:10px 48px;font-size:13px;color:#AABCD0}
+.sp-foot button{border:0;background:none;padding:6px 0;color:#F2F6FA;font:inherit;text-decoration:underline;cursor:pointer}
+.sp-foot button:hover{color:#7DD3FC}
+.sp-short{display:none}
+
+@keyframes spSlam{from{opacity:0;transform:translateY(46px) skewX(-14deg) scale(1.12)}to{opacity:1;transform:none}}
+@keyframes spRise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+@keyframes spSheen{from{background-position:120% 0}to{background-position:-120% 0}}
+@keyframes spSweepA{from{transform:rotate(-15deg)}to{transform:rotate(13deg)}}
+@keyframes spSweepB{from{transform:rotate(14deg)}to{transform:rotate(-12deg)}}
+@keyframes spCarve{from{stroke-dashoffset:1000}to{stroke-dashoffset:0}}
+@keyframes spLamp{0%,10%{opacity:1;box-shadow:0 0 34px 12px rgba(255,60,60,.75)}32%,100%{opacity:.3;box-shadow:0 0 0 0 rgba(255,60,60,0)}}
+@keyframes spRoll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes spDoor{from{opacity:0;transform:translateY(60px) skewX(-9deg)}to{opacity:1;transform:skewX(-9deg)}}
+@keyframes spGlint{from{transform:translateX(-140%) skewX(-20deg)}to{transform:translateX(360%) skewX(-20deg)}}
+
+/* narrower screens */
+@media (max-width:1100px){
+  .sp-boardw{flex:1 1 100%}
+  .sp-board{max-width:560px}
+}
+@media (max-width:700px){
+  .sp-top{padding:10px 16px}
+  .sp-brand .puck{width:44px;height:44px}
+  .sp-wm span:first-child{font-size:11px}.sp-wm span:last-child{font-size:30px}
+  .sp-nav{display:none}
+  .sp-main{padding:4px 16px 20px;gap:24px}
+  .sp-hero{gap:22px}
+  .sp-copy{flex-basis:auto;gap:12px}
+  .sp-eye{font-size:11px;letter-spacing:.16em}
+  .sp h1{font-size:clamp(46px,14.5vw,64px)}
+  .sp-copy p{font-size:15px}
+  .sp-boardw{min-width:0}
+  .sp-board{padding:16px 16px 14px;gap:10px}
+  .sp-bhd{font-size:14px}
+  .sp-slides{height:112px}
+  .sp-row span{font-size:28px}.sp-row b{font-size:46px}
+  .sp-clock b{font-size:30px}.sp-clock small{font-size:10px}
+  .sp-doors{padding:0 10px;gap:14px}
+  .sp-un{padding:14px 26px 16px;gap:8px 18px}
+  .sp-out{right:20px;top:-20px;font-size:140px}
+  .sp-dname b{font-size:54px}
+  .sp-dstats{gap:16px;min-height:44px}
+  .sp-st b{font-size:28px}.sp-st small{font-size:10px}
+  .sp-enter{font-size:18px}
+  .sp-chip{padding:9px 16px;font-size:13px}
+  .sp-foot{padding:8px 16px 12px;font-size:12px}
+  .sp-long{display:none}.sp-short{display:inline}
+  .sp-foot button{min-height:44px}
+}
+@media (prefers-reduced-motion:reduce){
+  .sp *,.sp *::after{animation:none!important;transition:none!important}
+  .sp-tick{overflow-x:auto}.sp-set+.sp-set{display:none}
+}
