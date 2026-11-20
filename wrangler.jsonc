@@ -17,5 +17,10 @@
   },
   // the contact form emails the owner; Cloudflare only lets this reach addresses verified
   // under Email Routing, and the address itself is the CONTACT_TO secret, not stored here
-  "send_email": [{ "name": "EMAIL" }]
+  "send_email": [{ "name": "EMAIL" }],
+  // branch previews (Workers Builds runs "wrangler preview" for branches other than main)
+  // need their own copy of the bindings
+  "previews": {
+    "send_email": [{ "name": "EMAIL" }]
+  }
 }
