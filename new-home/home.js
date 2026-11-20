@@ -64,8 +64,8 @@
     '<div class="nh-strip" aria-hidden="true">' + strip + "</div>" +
     '<header class="nh-top"><a class="nh-brand" href="' + BASE + '" aria-label="Hockey MTL home">' + LOGO +
     '<span class="nh-wm"><span>Hockey</span><span>MTL</span></span></a>' +
-    '<span class="nh-rule" aria-hidden="true"></span>' +
-    "<h1>Scores, standings and stats for Montréal youth hockey. Pick your division.</h1></header>" +
+    '<h1 class="nh-sr">Hockey MTL: scores, standings and stats for Montréal youth hockey</h1>' +
+    '<nav class="nh-nav" aria-label="Divisions">' + LEAGUES.map(function (l) { return '<a href="' + BASE + l.folder + '/">' + esc(l.label) + "</a>"; }).join("") + "</nav></header>" +
     '<main class="nh-main' + (many ? " many" : "") + '" style="--last:' + theme(LEAGUES[LEAGUES.length - 1]).bg + '">' + panels + "</main>" +
     '<section class="nh-fin" aria-label="Latest results"><div class="nh-fin-hd"><span id="nh-fin-d"></span><b>Latest results</b></div>' +
     '<div class="nh-car"><div class="nh-track" id="nh-fin"></div></div></section>' +

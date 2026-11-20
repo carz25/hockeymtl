@@ -6,15 +6,19 @@ body.nh-body::before{display:none}
 .nh a:focus-visible,.nh button:focus-visible{outline:3px solid #7DD3FC;outline-offset:3px}
 .nh-strip{display:flex;height:4px;flex:none}.nh-strip span{flex:1}
 
-/* header */
-.nh-top{flex:none;display:flex;flex-wrap:wrap;align-items:center;gap:12px 28px;padding:18px 48px}
-.nh-brand{display:flex;align-items:center;gap:14px;text-decoration:none}
+/* header: no bar of its own; the logo and division links float over the top of the panels */
+.nh{position:relative}
+.nh-top{position:absolute;top:4px;left:0;right:0;z-index:3;display:flex;align-items:center;gap:12px 28px;padding:18px 48px;pointer-events:none}
+.nh-top a{pointer-events:auto}
+.nh-brand{display:flex;align-items:center;gap:14px;text-decoration:none;filter:drop-shadow(0 2px 10px rgba(0,0,0,.35))}
 .nh-brand .puck{width:68px;height:68px;flex:none}
 .nh-wm{display:flex;flex-direction:column;font-family:"Big Shoulders Display","Arial Narrow",sans-serif;font-weight:800;text-transform:uppercase;line-height:1}
 .nh-wm span:first-child{font-size:15px;letter-spacing:.42em;color:#7DD3FC}
 .nh-wm span:last-child{font-size:44px;font-style:italic}
-.nh-rule{width:1px;height:44px;background:#1E3250}
-.nh-top h1{margin:0;flex:1 1 320px;min-width:0;max-width:420px;font-family:inherit;font-size:17px;font-weight:500;line-height:1.4;letter-spacing:normal;text-transform:none;white-space:normal;color:#AABCD0}
+.nh-nav{margin-left:auto;display:flex;gap:6px 28px;font-family:"Big Shoulders Display","Arial Narrow",sans-serif;font-size:22px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.nh-nav a{padding:10px 0;text-decoration:none;border-bottom:2px solid transparent;text-shadow:0 1px 8px rgba(0,0,0,.4)}
+.nh-nav a:hover{border-bottom-color:#fff;color:#fff}
+.nh-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
 /* division panels: the first is cut on a slant over the second, with a thin dark seam */
 .nh-main{flex:1;padding:0;gap:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(520px,100%),1fr));min-height:560px;overflow:hidden;background:var(--last,#811823)}
@@ -22,8 +26,8 @@ body.nh-body::before{display:none}
 .nh-main:not(.many) .nh-p.first{z-index:1;margin-right:-80px;background:#080C12;clip-path:polygon(0 0,100% 0,calc(100% - 160px) 100%,0 100%)}
 .nh-main:not(.many) .nh-p.first .nh-in{background:var(--bg);background-image:radial-gradient(50% 42% at 50% -6%,rgba(var(--glow),.2),rgba(0,0,0,0) 72%);clip-path:polygon(0 0,calc(100% - 10px) 0,calc(100% - 170px) 100%,0 100%);padding-right:190px}
 .nh-main:not(.many) .nh-p:not(.first) .nh-in{padding-left:140px}
-.nh-in{position:relative;flex:1;box-sizing:border-box;padding:40px 56px;display:flex;flex-direction:column;justify-content:flex-end;gap:20px;overflow:hidden}
-.nh-num{position:absolute;top:6px;right:60px;font-family:"Big Shoulders Display","Arial Narrow",sans-serif;font-size:340px;font-weight:800;font-style:italic;line-height:1;color:rgba(255,255,255,.07);-webkit-text-stroke:2px rgba(255,255,255,.3);pointer-events:none;user-select:none}
+.nh-in{position:relative;flex:1;box-sizing:border-box;padding:120px 56px 40px;display:flex;flex-direction:column;justify-content:flex-end;gap:20px;overflow:hidden}
+.nh-num{position:absolute;top:96px;right:60px;font-family:"Big Shoulders Display","Arial Narrow",sans-serif;font-size:340px;font-weight:800;font-style:italic;line-height:1;color:rgba(255,255,255,.07);-webkit-text-stroke:2px rgba(255,255,255,.3);pointer-events:none;user-select:none}
 .nh-p.first .nh-num{right:190px}
 .nh-scr{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .nh-scr path{fill:none;stroke:rgba(255,255,255,.16);stroke-width:1.2;stroke-linecap:round;vector-effect:non-scaling-stroke}
@@ -72,23 +76,23 @@ body.nh-body::before{display:none}
   .nh-main:not(.many) .nh-p:not(.first){clip-path:polygon(0 30px,100% 0,100% 100%,0 100%)}
   .nh-main:not(.many) .nh-p:not(.first) .nh-in{padding-left:56px;padding-top:52px}
   .nh-p.first .nh-num{right:60px}
+  .nh-main:not(.many) .nh-p:not(.first) .nh-num{top:30px}
 }
 
 /* phones */
 @media (max-width:700px){
   .nh{height:100vh;height:100dvh;min-height:0}
-  .nh-top{flex-wrap:nowrap;gap:10px;padding:10px 16px 6px}
+  .nh-top{padding:10px 16px}
   .nh-brand{gap:10px;min-height:48px}
+  .nh-nav{display:none}
   .nh-brand .puck{width:40px;height:40px}
   .nh-wm span:first-child{font-size:11px}.nh-wm span:last-child{font-size:30px}
-  .nh-rule{display:none}
-  .nh-top h1{flex:1 1 auto;font-size:13px;line-height:1.35}
   .nh-main{display:flex;flex-direction:column;min-height:0}
   .nh-p{flex:1;min-height:0}
-  .nh-in{padding:14px 16px 30px;gap:8px}
-  .nh-main:not(.many) .nh-p.first .nh-in{padding:14px 16px 34px}
+  .nh-in{padding:72px 16px 30px;gap:8px}
+  .nh-main:not(.many) .nh-p.first .nh-in{padding:72px 16px 34px}
   .nh-main:not(.many) .nh-p:not(.first) .nh-in{padding:38px 16px 14px}
-  .nh-num,.nh-p.first .nh-num{top:4px;right:14px;font-size:132px;-webkit-text-stroke-width:1.5px}
+  .nh-num,.nh-p.first .nh-num{top:56px;right:14px;font-size:132px;-webkit-text-stroke-width:1.5px}
   .nh-main:not(.many) .nh-p:not(.first) .nh-num{top:26px}
   .nh-eye{font-size:11px;letter-spacing:.12em}
   .nh-p h2{font-size:64px}
