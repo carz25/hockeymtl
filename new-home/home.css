@@ -23,8 +23,10 @@ body.nh-body::before{display:none}
 .nh-main:not(.many) .nh-p.first .nh-in{background:var(--bg);background-image:radial-gradient(50% 42% at 50% -6%,rgba(var(--glow),.2),rgba(0,0,0,0) 72%);clip-path:polygon(0 0,calc(100% - 10px) 0,calc(100% - 170px) 100%,0 100%);padding-right:190px}
 .nh-main:not(.many) .nh-p:not(.first) .nh-in{padding-left:140px}
 .nh-in{position:relative;flex:1;box-sizing:border-box;padding:40px 56px;display:flex;flex-direction:column;justify-content:flex-end;gap:20px;overflow:hidden}
-.nh-num{position:absolute;top:-30px;right:60px;font-family:"Big Shoulders Display","Arial Narrow",sans-serif;font-size:340px;font-weight:800;font-style:italic;line-height:1;color:rgba(255,255,255,.07);-webkit-text-stroke:2px rgba(255,255,255,.3);pointer-events:none;user-select:none}
+.nh-num{position:absolute;top:6px;right:60px;font-family:"Big Shoulders Display","Arial Narrow",sans-serif;font-size:340px;font-weight:800;font-style:italic;line-height:1;color:rgba(255,255,255,.07);-webkit-text-stroke:2px rgba(255,255,255,.3);pointer-events:none;user-select:none}
 .nh-p.first .nh-num{right:190px}
+.nh-scr{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.nh-scr path{fill:none;stroke:rgba(255,255,255,.16);stroke-width:1.2;stroke-linecap:round;vector-effect:non-scaling-stroke}
 .nh-hd{position:relative;display:flex;flex-direction:column;gap:2px}
 .nh-eye{font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--soft)}
 .nh-p h2{margin:0;font-family:"Big Shoulders Display","Arial Narrow",sans-serif;font-size:clamp(84px,8.9vw,128px);font-weight:800;line-height:.95;letter-spacing:.01em;text-transform:uppercase}
@@ -37,15 +39,20 @@ body.nh-body::before{display:none}
 .nh-go{position:relative;align-self:flex-start;display:inline-flex;align-items:center;gap:12px;min-height:54px;padding:0 26px;background:#fff;color:#0C1A2C!important;font-family:"Big Shoulders Display","Arial Narrow",sans-serif;font-size:24px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;text-decoration:none;transition:background .15s ease,gap .15s ease}
 .nh-go:hover{background:#DCEBFA;gap:16px}
 
-/* latest final scores */
-.nh-fin{flex:none;background:#060D17;border-top:1px solid #1A2C45}
+/* latest results: a carousel that scrolls on its own; hover or keyboard focus pauses it */
+.nh-fin{flex:none;display:flex;align-items:stretch;background:#060D17;border-top:1px solid #1A2C45}
 .nh-fin[hidden]{display:none}
-.nh-fin-in{display:flex;align-items:stretch;padding:0 48px;overflow-x:auto;scrollbar-width:thin}
-.nh-fin-hd{display:flex;flex-direction:column;justify-content:center;padding:10px 26px 10px 0;white-space:nowrap}
+.nh-fin-hd{flex:none;display:flex;flex-direction:column;justify-content:center;padding:10px 26px 10px 48px;white-space:nowrap;background:#060D17;position:relative;z-index:1;box-shadow:12px 0 16px -4px #060D17}
 .nh-fin-hd span{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#AABCD0}
 .nh-fin-hd b{font-family:"Big Shoulders Display","Arial Narrow",sans-serif;font-size:20px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.nh-car{flex:1;min-width:0;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,#000 92%,transparent);mask-image:linear-gradient(90deg,#000 92%,transparent)}
+.nh-track{display:flex;width:max-content;animation:nhRoll var(--dur,40s) linear infinite}
+.nh-car:hover .nh-track,.nh-car:focus-within .nh-track{animation-play-state:paused}
+.nh-set{display:flex}
+@keyframes nhRoll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .nh-g{display:flex;align-items:center;gap:12px;padding:10px 22px;border-left:1px solid #1A2C45;text-decoration:none;white-space:nowrap}
 .nh-g:hover{background:#0B1626}
+.nh-g:focus-visible{outline-offset:-3px}
 .nh-tag{padding:2px 6px;font-size:11px;font-weight:700;letter-spacing:.04em;color:#fff}
 .nh-sc{display:grid;grid-template-columns:auto auto;gap:0 14px;font-size:13px;color:#AABCD0}
 .nh-sc .n{text-align:right;font-variant-numeric:tabular-nums}
@@ -81,8 +88,8 @@ body.nh-body::before{display:none}
   .nh-in{padding:14px 16px 30px;gap:8px}
   .nh-main:not(.many) .nh-p.first .nh-in{padding:14px 16px 34px}
   .nh-main:not(.many) .nh-p:not(.first) .nh-in{padding:38px 16px 14px}
-  .nh-num,.nh-p.first .nh-num{top:-8px;right:14px;font-size:132px;-webkit-text-stroke-width:1.5px}
-  .nh-main:not(.many) .nh-p:not(.first) .nh-num{top:14px}
+  .nh-num,.nh-p.first .nh-num{top:4px;right:14px;font-size:132px;-webkit-text-stroke-width:1.5px}
+  .nh-main:not(.many) .nh-p:not(.first) .nh-num{top:26px}
   .nh-eye{font-size:11px;letter-spacing:.12em}
   .nh-p h2{font-size:64px}
   .nh-dl{gap:4px 18px;min-height:0}
@@ -93,8 +100,8 @@ body.nh-body::before{display:none}
   .nh-next{font-size:13px;min-height:0}
   .nh-arena{display:none}
   .nh-go{align-self:stretch;justify-content:space-between;min-height:48px;margin-right:60px;padding:0 18px;font-size:22px}
-  .nh-fin-in{padding:0 16px}
-  .nh-fin-hd{padding:8px 14px 8px 0}
+  .nh-fin-hd{padding:8px 14px 8px 16px}
+  .nh-fin-hd span{display:none}
   .nh-fin-hd b{font-size:16px}
   .nh-g{padding:8px 14px;gap:8px}
   .nh-foot{flex-wrap:nowrap;padding:2px 16px 8px;font-size:12px;border-top:0}
@@ -102,4 +109,4 @@ body.nh-body::before{display:none}
   .nh-foot button{min-height:44px}
 }
 @media (max-width:700px) and (max-height:700px){.nh-dl{display:none}}
-@media (prefers-reduced-motion:reduce){.nh-go{transition:none}}
+@media (prefers-reduced-motion:reduce){.nh-go{transition:none}.nh-track{animation:none}.nh-car{overflow-x:auto;-webkit-mask-image:none;mask-image:none}.nh-set+.nh-set{display:none}}

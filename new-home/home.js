@@ -30,12 +30,24 @@
   }
   function arena(a) { return String(a || "").split(" (")[0].split(" - ")[0]; }
 
+  // skate scratches on the ice, as on the current home page; fixed seed so they look the same on every visit
+  function scratches(seed) {
+    var out = "";
+    function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+    for (var i = 0; i < 30; i++) {
+      var x = rnd() * 800, y = rnd() * 800, a = (rnd() - 0.5) * 1.4, L = 80 + rnd() * 280, b = (rnd() - 0.5) * 60;
+      var x2 = x + Math.cos(a) * L, y2 = y + Math.sin(a) * L;
+      out += '<path d="M' + x.toFixed(0) + " " + y.toFixed(0) + "Q" + ((x + x2) / 2).toFixed(0) + " " + ((y + y2) / 2 + b).toFixed(0) + " " + x2.toFixed(0) + " " + y2.toFixed(0) + '"/>';
+    }
+    return '<svg class="nh-scr" viewBox="0 0 800 800" preserveAspectRatio="none" aria-hidden="true">' + out + "</svg>";
+  }
+
   /* ---------- page shell, drawn at once; numbers fill in when each division's data arrives ---------- */
   var many = LEAGUES.length !== 2;
   var panels = LEAGUES.map(function (l, i) {
     var th = theme(l), num = (String(l.label).match(/\d+/) || [""])[0];
     return '<section class="nh-p' + (i === 0 ? " first" : "") + '" aria-label="' + esc(l.label) + '" style="--bg:' + th.bg + ";--glow:" + th.glow + ";--soft:" + th.soft + '">' +
-      '<div class="nh-in">' +
+      '<div class="nh-in">' + scratches(11 + i * 97) +
       '<span class="nh-num" aria-hidden="true">' + esc(num) + "</span>" +
       '<div class="nh-hd"><span class="nh-eye" id="nh-eye-' + i + '">Under ' + esc(num) + "</span>" +
       '<h2><a href="' + BASE + l.folder + '/">' + esc(l.label) + "</a></h2></div>" +
@@ -55,8 +67,8 @@
     '<span class="nh-rule" aria-hidden="true"></span>' +
     "<h1>Scores, standings and stats for Montréal youth hockey. Pick your division.</h1></header>" +
     '<main class="nh-main' + (many ? " many" : "") + '" style="--last:' + theme(LEAGUES[LEAGUES.length - 1]).bg + '">' + panels + "</main>" +
-    '<section class="nh-fin" aria-label="Latest final scores"><div class="nh-fin-in" id="nh-fin">' +
-    '<div class="nh-fin-hd"><span id="nh-fin-d"></span><b>Latest finals</b></div></div></section>' +
+    '<section class="nh-fin" aria-label="Latest results"><div class="nh-fin-hd"><span id="nh-fin-d"></span><b>Latest results</b></div>' +
+    '<div class="nh-car"><div class="nh-track" id="nh-fin"></div></div></section>' +
     '<footer class="nh-foot"><span><span class="nh-long">Unofficial fan site, not affiliated with any league or club. </span><span class="nh-short">Unofficial fan site · </span>&copy; 2026 Hockey MTL</span>' +
     '<button type="button" data-contact="1">Contact</button></footer>' +
     "</div>");
@@ -95,12 +107,16 @@
     if (!finals.length) { document.querySelector(".nh-fin").hidden = true; return; }
     finals.sort(function (a, b) { return a.g[1] < b.g[1] ? 1 : a.g[1] > b.g[1] ? -1 : 0; });
     document.getElementById("nh-fin-d").textContent = when(finals[0].g[1]);
-    document.getElementById("nh-fin").insertAdjacentHTML("beforeend", finals.map(function (f) {
+    var chips = finals.map(function (f) {
       var g = f.g, aw = g[6] > g[7], hw = g[7] > g[6];
       var rows = [[g[4], g[6], aw], [g[5], g[7], hw]];
       if (hw) rows.reverse();                                  // winner on top
-      return '<a class="nh-g" href="' + f.root + "#game/" + g[0] + '"><span class="nh-tag" style="background:' + theme(f.l).tag + '">' + esc(f.l.label) + "</span>" +
-        '<span class="nh-sc">' + rows.map(function (r) { return '<span class="' + (r[2] || g[6] === g[7] ? "w" : "") + '">' + esc(f.name(r[0])) + "</span><span class=\"n" + (r[2] || g[6] === g[7] ? " w" : "") + '">' + r[1] + "</span>"; }).join("") + "</span></a>";
-    }).join(""));
+      return '<a class="nh-g" href="' + f.root + "#game/" + g[0] + '" aria-label="' + esc(f.l.label + ": " + f.name(rows[0][0]) + " " + rows[0][1] + ", " + f.name(rows[1][0]) + " " + rows[1][1] + ", game summary") + '"><span class="nh-tag" style="background:' + theme(f.l).tag + '">' + esc(f.l.label) + "</span>" +
+        '<span class="nh-sc" aria-hidden="true">' + rows.map(function (r) { return '<span class="' + (r[2] || g[6] === g[7] ? "w" : "") + '">' + esc(f.name(r[0])) + "</span><span class=\"n" + (r[2] || g[6] === g[7] ? " w" : "") + '">' + r[1] + "</span>"; }).join("") + "</span></a>";
+    }).join("");
+    // the carousel runs a second copy right behind the first so it loops without a gap; the copy is hidden from screen readers and the Tab key
+    var track = document.getElementById("nh-fin");
+    track.innerHTML = '<div class="nh-set">' + chips + '</div><div class="nh-set" aria-hidden="true">' + chips.replace(/<a /g, '<a tabindex="-1" ') + "</div>";
+    track.style.setProperty("--dur", Math.max(20, finals.length * 4) + "s");
   }
 })();
