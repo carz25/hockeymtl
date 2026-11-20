@@ -1365,6 +1365,9 @@
       var ra = sc(va), rh = sc(vh), lead = ra === rh ? 0 : ra > rh ? 1 : 2;
       rows.push('<div class="tt-r"><span class="tt-v a' + (lead === 1 ? " on" : "") + '">' + fa + '</span><span class="tt-b a"><i style="width:' + Math.round(8 + 92 * ra) + '%"' + (lead === 1 ? ' class="on"' : "") + '></i></span><span class="tt-l">' + lbl + '</span><span class="tt-b h"><i style="width:' + Math.round(8 + 92 * rh) + '%"' + (lead === 2 ? ' class="on"' : "") + '></i></span><span class="tt-v h' + (lead === 2 ? " on" : "") + '">' + fh + "</span></div>");
     };
+    var NR = function (t) { return MULTI ? divOf(t).teams.length : ORDER.length; };
+    var rk = function (t) { var n = NR(t); return n > 1 ? 1 - (ST[t].rank - 1) / (n - 1) : 0.5; };
+    row("Rank", rk(g.a), rk(g.h), ord(A.rank), ord(H.rank), function (v) { return v; });
     row("Points %", parseFloat(A.pct), parseFloat(H.pct), A.pct, H.pct, span(null, 0, function (t) { return parseFloat(ST[t].pct); }));
     row("Goals for / game", A.gfg, H.gfg, f2(A.gfg), f2(H.gfg), span("gfg"));
     row("Goals against / game", A.gag, H.gag, f2(A.gag), f2(H.gag), span("gag", 1));
@@ -1379,13 +1382,13 @@
       row("Power play %", S[g.a].pp, S[g.h].pp, pct0(S[g.a].pp), pct0(S[g.h].pp), sp("pp"));
       row("Penalty kill %", S[g.a].pk, S[g.h].pk, pct0(S[g.a].pk), pct0(S[g.h].pk), sp("pk"));
     }
-    return '<div class="tt"><div class="tt-hd"><span>' + abbr(g.a) + "</span><span>Bars compare each team with the whole " + (MULTI ? "league" : GROUP) + "</span><span>" + abbr(g.h) + "</span></div>" + rows.join("") + "</div>";
+    return '<div class="tt"><div class="tt-hd"><span>' + abbr(g.a) + "</span><span></span><span>" + abbr(g.h) + "</span></div>" + rows.join("") + "</div>";
   }
   function sgn2(v) { return (v > 0 ? "+" : "") + f2(v); }
   /* last 10 games for each team, goal difference per game */
   function formChart(g) {
     return '<div class="fch">' + [g.a, g.h].map(function (t) {
-      var l = results(t).slice(-10), mx = Math.max.apply(null, l.map(function (x) { return Math.abs(x.us - x.them); }).concat([3]));
+      var l = results(t).slice(document.body.classList.contains("m") ? -5 : -10), mx = Math.max.apply(null, l.map(function (x) { return Math.abs(x.us - x.them); }).concat([3]));
       var w = l.filter(function (x) { return x.r === "W"; }).length, lo = l.filter(function (x) { return x.r === "L"; }).length;
       return '<div class="fch-r"><span class="fch-t">' + badge(t) + "<b>" + abbr(t) + "</b><small>" + w + "-" + lo + (l.length - w - lo ? "-" + (l.length - w - lo) : "") + " last " + l.length + '</small></span><span class="fch-b">' + l.map(function (x) {
         var d = x.us - x.them, h = Math.max(3, Math.round(Math.abs(d) / mx * 26));
@@ -1440,23 +1443,45 @@
     return '<div class="wcs"><h4>' + badge(t) + " " + esc(TEAMS[t]) + "</h4>" + sk3.map(function (r) { return card(r, r.g + " G · " + r.a + " A · " + r.gp + " GP", r.pts, "PTS"); }).join("") +
       (gl ? card(gl, "Goalie · " + gl.w + "-" + gl.l + "-" + gl.t + " · " + gl.so + " SO", f2(gl.gaa), "GAA", 1) : "") + "</div>";
   }
+  /* every meeting this season, played and still to come, with the series score on top */
+  function seriesCards(g) {
+    var between = GAMES.filter(function (x) { return (x.a === g.a && x.h === g.h) || (x.a === g.h && x.h === g.a); });
+    var wa = 0, wh = 0, ti = 0, gfa = 0, gfh = 0;
+    between.forEach(function (x) { if (!x.played) return; var sa = x.a === g.a ? x.sa : x.sh, shh = x.a === g.a ? x.sh : x.sa; gfa += sa; gfh += shh; if (sa > shh) wa++; else if (shh > sa) wh++; else ti++; });
+    var n = wa + wh + ti;
+    var lead = !n ? "First meeting of the season" : wa === wh ? "Series tied " + wa + "–" + wh + (ti ? "–" + ti : "") : (wa > wh ? abbr(g.a) : abbr(g.h)) + " lead the series " + Math.max(wa, wh) + "–" + Math.min(wa, wh) + (ti ? "–" + ti : "");
+    var head = '<div class="ss-hd"><div class="ss-t a">' + badge(g.a, 1) + "<b>" + wa + '</b></div><div class="ss-m"><b>' + lead + "</b>" + (n ? "<small>Goals " + abbr(g.a) + " " + gfa + " · " + abbr(g.h) + " " + gfh + "</small>" : "") + '</div><div class="ss-t h"><b>' + wh + "</b>" + badge(g.h, 1) + "</div></div>";
+    var cards = between.map(function (x) {
+      var cur = x.id === g.id, side = function (t, sc, win) { return '<span class="ss-r' + (win ? " w" : "") + '">' + badge(t) + "<em>" + abbr(t) + "</em>" + (x.played ? "<b>" + sc + "</b>" : "") + "</span>"; };
+      var inner = '<span class="ss-d">' + dshort(x.date) + (x.played ? " · Final" : cur ? " · This game" : " · " + esc(x.time)) + "</span>" +
+        side(x.a, x.sa, x.played && x.sa > x.sh) + side(x.h, x.sh, x.played && x.sh > x.sa);
+      if (cur) return '<div class="ss-c cur">' + inner + "</div>";
+      return '<a class="grs ss-c' + (x.played ? "" : " up") + '" href="#' + (x.played ? "game/" : "preview/") + x.id + '">' + inner + "</a>";
+    }).join("");
+    return head + '<div class="ss-cs">' + cards + "</div>";
+  }
   /* results against teams both have played */
   function commonOpp(g) {
     var ra = results(g.a), rh = results(g.h);
     var opps = ORDER.filter(function (o) { return o !== g.a && o !== g.h && ra.some(function (x) { return x.opp === o; }) && rh.some(function (x) { return x.opp === o; }); });
     if (!opps.length) return '<p class="empty">They have no opponents in common yet.</p>';
-    var tot = { a: [0, 0, 0, 0], h: [0, 0, 0, 0] };
-    var cell = function (list, o, key) {
-      var l = list.filter(function (x) { return x.opp === o; }), w = 0, lo = 0, ti = 0, d = 0;
-      l.forEach(function (x) { if (x.r === "W") w++; else if (x.r === "L") lo++; else ti++; d += x.us - x.them; });
-      tot[key][0] += w; tot[key][1] += lo; tot[key][2] += ti; tot[key][3] += d;
-      return '<td class="co-c"><b>' + w + "-" + lo + (ti ? "-" + ti : "") + '</b> <span class="' + (d > 0 ? "pos" : d < 0 ? "neg" : "") + '">' + (d > 0 ? "+" : "") + d + "</span></td>";
+    var tot = { a: { w: 0, l: 0, t: 0, d: 0 }, h: { w: 0, l: 0, t: 0, d: 0 } };
+    var chips = function (list, o, key) {
+      return list.filter(function (x) { return x.opp === o; }).map(function (x) {
+        var T = tot[key]; if (x.r === "W") T.w++; else if (x.r === "L") T.l++; else T.t++; T.d += x.us - x.them;
+        return '<a class="grs co-g ' + x.r + '" href="#game/' + x.g.id + '" title="' + dshort(x.g.date) + (x.home ? " vs " : " at ") + esc(SHORT[o]) + '"><b>' + x.r + "</b> " + x.us + "–" + x.them + "</a>";
+      }).join("");
     };
-    var body = opps.map(function (o) { return '<tr><td class="l">' + tname(o) + "</td>" + cell(ra, o, "a") + cell(rh, o, "h") + "</tr>"; }).join("");
-    var tt = function (k) { var x = tot[k]; return '<td class="co-c"><b>' + x[0] + "-" + x[1] + (x[2] ? "-" + x[2] : "") + '</b> <span class="' + (x[3] > 0 ? "pos" : x[3] < 0 ? "neg" : "") + '">' + (x[3] > 0 ? "+" : "") + x[3] + "</span></td>"; };
-    return '<div class="wrap"><table class="rt co"><thead><tr><th class="l">Opponent</th><th>' + abbr(g.a) + "</th><th>" + abbr(g.h) + "</th></tr></thead><tbody>" + body + '</tbody><tfoot><tr><th class="l">All common opponents</th>' + tt("a") + tt("h") + "</tr></tfoot></table></div>" +
-      '<p class="mfoot">Record and goal difference against the ' + opps.length + " team" + (opps.length === 1 ? "" : "s") + " both have played.</p>";
+    var rows = opps.map(function (o) { return '<div class="co-r"><span class="co-o">' + badge(o) + "<b>" + esc(SHORT[o]) + '</b></span><span class="co-cell">' + chips(ra, o, "a") + '</span><span class="co-cell">' + chips(rh, o, "h") + "</span></div>"; }).join("");
+    var sum = function (k, t) {
+      var T = tot[k];
+      return '<div class="co-s ' + k + '">' + badge(t) + '<div><b>' + T.w + " win" + (T.w === 1 ? "" : "s") + ", " + T.l + " loss" + (T.l === 1 ? "" : "es") + (T.t ? ", " + T.t + " tie" + (T.t === 1 ? "" : "s") : "") + '</b><small>Goal difference <span class="' + (T.d > 0 ? "pos" : T.d < 0 ? "neg" : "") + '">' + (T.d > 0 ? "+" : T.d < 0 ? "−" : "") + Math.abs(T.d) + "</span></small></div></div>";
+    };
+    var body = '<div class="co-r co-h"><span>Opponent</span><span>' + esc(TEAMS[g.a]) + "</span><span>" + esc(TEAMS[g.h]) + "</span></div>" + rows;
+    return '<p class="co-lead">How each team did against the ' + opps.length + " opponent" + (opps.length === 1 ? "" : "s") + " they have both played.</p>" +
+      '<div class="co-sum">' + sum("a", g.a) + sum("h", g.h) + "</div>" + '<div class="co-t">' + body + "</div>";
   }
+
 
   /* ---------- charts ---------- */
   /* every game: goals for above the line, goals against below; each pair opens the game summary */
@@ -1911,7 +1936,7 @@ function makeModel(played, sheets, teams, opt) {
       '<div class="pvteams">' + side(g.a, A, wp.a, "a") + '<div class="pvat">at</div>' + side(g.h, H, wp.h, "h") + "</div>" + bar + "</div>";
     if (state.pid !== id) { state.pid = id; state.ptab = "preview"; }
     var tab = state.ptab || "preview", small = Math.min(A.gp, H.gp);
-    var tabs = '<div class="ttabs gtabs" role="tablist" aria-label="Matchup preview sections">' + [["preview", "Preview"], ["teams", "Teams"], ["history", "History"], ["model", "Model"]].map(function (x) {
+    var tabs = '<div class="ttabs gtabs" role="tablist" aria-label="Matchup preview sections">' + [["preview", "Preview"], ["teams", "Scouting"], ["history", "History"], ["model", "Model"]].map(function (x) {
       return '<button role="tab" data-ptab="' + x[0] + '" aria-selected="' + (tab === x[0]) + '">' + x[1] + "</button>";
     }).join("") + "</div>";
     var keys = keysFor(g.a, g.h), body;
@@ -1919,7 +1944,7 @@ function makeModel(played, sheets, teams, opt) {
       body = '<div class="pv2"><div class="pv2c">' +
         '<div class="card gsec2"><h3>Keys to the game</h3>' + (keys.length ? '<ol class="keys2">' + keys.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ol>" : '<p class="empty">No clear mismatch. Both teams profile similarly, so execution and discipline decide it.</p>') + "</div>" +
         '<div class="card gsec2"><h3>Tale of the tape</h3>' + taleOfTape(g) + "</div></div>" +
-        '<div class="pv2c"><div class="card gsec2"><div class="tc-hd"><h3>Recent form</h3><span class="tc-leg">Goal difference, last 10 games</span></div>' + formChart(g) + "</div>" +
+        '<div class="pv2c"><div class="card gsec2"><div class="tc-hd"><h3>Recent form</h3><span class="tc-leg">Goal difference, last ' + (document.body.classList.contains("m") ? 5 : 10) + ' games</span></div>' + formChart(g) + "</div>" +
         '<div class="card gsec2"><h3>Likely scores</h3>' + likelyScores(g, wp) + "</div></div></div>";
     } else if (tab === "teams") {
       var pm = periodMatch(g), stm = stMatch(g);
@@ -1927,9 +1952,9 @@ function makeModel(played, sheets, teams, opt) {
         (pm || stm ? '<div class="pv2">' + (pm ? '<div class="card gsec2"><h3>Period by period</h3>' + pm + "</div>" : "") + (stm ? '<div class="card gsec2"><h3>Special teams</h3>' + stm + "</div>" : "") + "</div>" : "") +
         '<div class="card gsec2"><h3>Players to watch</h3><div class="pv2">' + watchCards(g.a) + watchCards(g.h) + "</div></div>";
     } else if (tab === "history") {
-      body = '<div class="pv2"><div class="card gsec2 pvser">' + seriesBlock(g).replace("<h4>Season series</h4>", "<h3>Season series</h3>") + '</div><div class="card gsec2"><h3>Common opponents</h3>' + commonOpp(g) + "</div></div>";
+      body = '<div class="card gsec2"><h3>Season series</h3>' + seriesCards(g) + '</div><div class="card gsec2"><h3>Common opponents</h3>' + commonOpp(g) + "</div>";
     } else {
-      body = '<div class="card gsec2 pvm"><h3>How the odds are set</h3>' + modelNotes(g, wp) + "</div>";
+      body = '<div class="card gsec2 pvm pvm-open"><h3>How the odds are set</h3>' + modelNotes(g, wp).replace('<details class="mdet">', '<details class="mdet" open>') + "</div>";
     }
     $("p-preview").innerHTML = '<div class="ptop">' + backBtn("Back to Schedule") + '<button class="pshare" data-share="1">Share</button></div><div id="pvwrap" class="pvwrap" style="' + teamPair(g.a, g.h) + '">' + hero + tabs + '<div class="gbody">' + body + "</div></div>" +
       '<p class="mfoot">Season stats come from the ' + (OFFICIAL ? "official table" : "standings") + ", with " + (small === Math.max(A.gp, H.gp) ? small : small + " to " + Math.max(A.gp, H.gp)) + " games played per team, so small samples can swing. Player lines come from available game sheets.</p>";
